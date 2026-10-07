@@ -625,6 +625,7 @@ public static partial class InspectPanePatch
         public BarSpan span;  // 多列布局下的占位（整行/单列/两列/适应）
         public BarType type;  // 条标识：缓动按条标识独立跟踪
         public Action<Rect>? onBarDrawn; // 条上额外标记（如自爆阈值）
+        public Need? tooltipNeed; // 需求条悬浮提示的数据源（非 null 时悬停条区显示原版需求提示）
     }
 
     /// <summary>
@@ -939,6 +940,13 @@ public static partial class InspectPanePatch
         Text.WordWrap = prevWordWrap;
         Text.Anchor = TextAnchor.UpperLeft;
 
+        // 需求条悬浮提示：悬停条区时显示原版需求面板的需求提示（Need.GetTipString，原版方法，
+        // 提示标识码与原版一致取条区矩形派生），统一由 pawnBarTooltips 开关控制。
+        if (pawnBarTooltips && info.tooltipNeed != null && Mouse.IsOver(rect))
+        {
+            TooltipHandler.TipRegion(rect, new TipSignal(info.tooltipNeed.GetTipString, rect.GetHashCode()));
+        }
+
         return y + info.height + rowSpacing;
     }
 
@@ -1133,7 +1141,7 @@ public static partial class InspectPanePatch
     /// 标签与数值均嵌入条内：开启 pawnSkillWhiteFont（默认开启）时文本无视进度条比例、始终为白色，
     /// 关闭后按 DrawBarTextMasked 的遮罩进度反色（未覆盖区白色、已覆盖区黑色）；
     /// 纯文本样式无进度可反色，文本始终为白色。
-    /// 开启 pawnSkillTooltip 时悬停条区显示原版角色面板的技能提示（见 DrawSkillTooltip）。
+    /// 开启 pawnBarTooltips（统一悬浮提示开关）时悬停条区显示原版角色面板的技能提示（见 DrawSkillTooltip）。
     /// </summary>
     private static void DrawSkillBar(Rect barRect, SkillRecord skill)
     {
@@ -1205,22 +1213,25 @@ public static partial class InspectPanePatch
             }
         }
 
-        // 悬浮提示：悬停条区时显示原版角色面板的技能提示（原版方法，开关控制）。
-        if (pawnSkillTooltip)
+        // 悬浮提示：悬停条区时显示原版角色面板的技能提示（原版方法，统一悬浮提示开关控制）。
+        if (pawnBarTooltips)
         {
             DrawSkillTooltip(barRect, skill);
         }
     }
 
     /// <summary>技能等级文本：开启 pawnSkillShowProgressText 时以固定两位小数显示等级与当前等级内的升级进度
-    ///（如 5 级 + 55% 升级进度 = 5.55、5 级 + 5% = 5.05；整级 / 满级同样带小数 = 5.00 / 20.00）；关闭则显示整数等级。</summary>
+    ///（如 5 级 + 55% 升级进度 = 5.55、5 级 + 5% = 5.05；整级 / 满级同样带小数 = 5.00 / 20.00），
+    /// 整数部分以富文本 &lt;b&gt; 标签加粗（GUI 样式富文本关闭或字体不支持时安全降级为普通字重）；关闭则显示整数等级。</summary>
     private static string SkillLevelText(SkillRecord skill)
     {
         if (!pawnSkillShowProgressText)
         {
             return skill.Level.ToStringCached();
         }
-        return (skill.Level + skill.XpProgressPercent).ToString("0.00");
+        string text = (skill.Level + skill.XpProgressPercent).ToString("0.00");
+        int dot = text.IndexOf('.');
+        return $"<b>{text.Substring(0, dot)}</b>{text.Substring(dot)}";
     }
 
     // 原版角色面板技能提示的内容方法（SkillUI 私有静态方法，反射获取；目标缺失时安全降级为无提示）。

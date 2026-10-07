@@ -289,13 +289,15 @@ public partial class MyModTemplateSettings : ModSettings
     public static SkillPassionStyle pawnSkillPassionStyle = SkillPassionStyle.Text;
     // 激情图标位置（仅图标样式生效）：关闭 = 图标绘制在技能名左侧（默认）；开启 = 图标绘制在技能名文本右侧。
     public static bool pawnSkillPassionIconAfterName = false;
-    // 技能条悬浮提示（默认开启）：鼠标悬停技能条时显示原版角色面板的技能提示
-    //（复用原版 SkillUI.DrawSkill 的提示内容与方法：私有 GetSkillDescription，反射调用）。
-    public static bool pawnSkillTooltip = true;
     // 技能条纯文本样式（默认关闭）：仅绘制技能名与等级文本，不绘制条背景与进度填充。
     public static bool pawnSkillPlainText = false;
     // 技能等级带升级进度小数（默认关闭）：等级以固定两位小数显示，如 5 级 + 55% 升级进度 = 5.55，整级 / 满级 = 5.00 / 20.00。
     public static bool pawnSkillShowProgressText = false;
+
+    // Pawn 条悬浮提示（默认开启，统一开关）：悬停 Pawn 面板的技能条与需求条（心情/食物/休息/娱乐/机械能量/模组需求）时
+    // 显示原版对应提示——技能条复用原版 SkillUI.DrawSkill 的技能提示（私有 GetSkillDescription，反射调用），
+    // 需求条复用原版 Need.GetTipString 需求提示。
+    public static bool pawnBarTooltips = true;
 
     // 检查面板窗口尺寸：宽度 = max(原版按 Tab 数量计算值, 最小宽度)、
     // 高度 = max(原版固定 165f, 最小高度)。
@@ -1034,6 +1036,9 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref pawnShowExtraButtons, "pawnShowExtraButtons", false);
         Scribe_Values.Look(ref pawnTitleFontSize, "pawnTitleFontSize", 23);
 
+        // Pawn 条悬浮提示（技能条与需求条统一开关）。
+        Scribe_Values.Look(ref pawnBarTooltips, "pawnBarTooltips", true);
+
         // Pawn 技能区。
         Scribe_Values.Look(ref pawnShowSkills, "pawnShowSkills", true);
         Scribe_Values.Look(ref pawnSkillColumns, "pawnSkillColumns", PawnSkillColumns.Six);
@@ -1046,7 +1051,6 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref pawnSkillTotalProgress, "pawnSkillTotalProgress", false);
         Scribe_Values.Look(ref pawnSkillPassionStyle, "pawnSkillPassionStyle", SkillPassionStyle.Text);
         Scribe_Values.Look(ref pawnSkillPassionIconAfterName, "pawnSkillPassionIconAfterName", false);
-        Scribe_Values.Look(ref pawnSkillTooltip, "pawnSkillTooltip", true);
         Scribe_Values.Look(ref pawnSkillPlainText, "pawnSkillPlainText", false);
         Scribe_Values.Look(ref pawnSkillShowProgressText, "pawnSkillShowProgressText", false);
 

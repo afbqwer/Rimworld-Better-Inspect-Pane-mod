@@ -418,6 +418,12 @@ public partial class MyModTemplateSettings : ModSettings
             Widgets.Label(new Rect(x, y, width, RowHeight), "BetterInspectPane.PawnSection".Translate());
             y += RowGap;
 
+            // Pawn 条悬浮提示（统一开关，默认开启）：悬停技能条与需求条时显示原版对应提示。
+            Rect pawnTooltipRect = new Rect(x, y, width, RowHeight);
+            Widgets.CheckboxLabeled(pawnTooltipRect, "BetterInspectPane.PawnBarTooltips".Translate(), ref pawnBarTooltips);
+            TooltipHandler.TipRegion(pawnTooltipRect, "BetterInspectPane.PawnBarTooltipsTip".Translate());
+            y += RowGap;
+
             // Pawn 条阈值标记总开关：心情（轻度/中度/重度崩溃）/ 血液（各流血阶段）/ 疼痛（疼痛休克）
             // 三者的黑色 1px 竖直阈值线（默认开启）。
             Rect thresholdMarkersToggleRect = new Rect(x, y, width, RowHeight);
@@ -605,12 +611,6 @@ public partial class MyModTemplateSettings : ModSettings
 
             if (pawnShowSkills)
             {
-                // 技能条悬浮提示（默认开启）：悬停技能条时显示原版角色面板的技能提示。
-                Rect skillTooltipRect = new Rect(x, y, width, RowHeight);
-                Widgets.CheckboxLabeled(skillTooltipRect, "BetterInspectPane.PawnSkillTooltip".Translate(), ref pawnSkillTooltip);
-                TooltipHandler.TipRegion(skillTooltipRect, "BetterInspectPane.PawnSkillTooltipTip".Translate());
-                y += RowGap;
-
                 // 技能条纯文本样式（默认关闭）：仅绘制技能名与等级文本，不绘制条背景与进度填充。
                 Rect skillPlainTextRect = new Rect(x, y, width, RowHeight);
                 Widgets.CheckboxLabeled(skillPlainTextRect, "BetterInspectPane.PawnSkillPlainText".Translate(), ref pawnSkillPlainText);

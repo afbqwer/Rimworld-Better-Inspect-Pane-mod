@@ -441,7 +441,7 @@ public static partial class InspectPanePatch
     /// eased 初始等于 fill（直接贴到目标值），随后由 EaseCollectedBars 统一缓动更新。
     /// </summary>
     private static BarRowInfo BuildBar(string label, string value, float fill, Color color, float height,
-        float fontScale, BarSpan span, BarType type, Action<Rect>? onBarDrawn = null)
+        float fontScale, BarSpan span, BarType type, Action<Rect>? onBarDrawn = null, Need? tooltipNeed = null)
     {
         return new BarRowInfo
         {
@@ -455,7 +455,8 @@ public static partial class InspectPanePatch
             color = color,
             span = span,
             type = type,
-            onBarDrawn = onBarDrawn
+            onBarDrawn = onBarDrawn,
+            tooltipNeed = tooltipNeed
         };
     }
 
@@ -2170,6 +2171,7 @@ public static partial class InspectPanePatch
     /// Pawn 需求条（心情 / 食物 / 休息 / 娱乐 / 机械能量共用）：
     /// 无对应需求（动物无心情/休息/娱乐、机械体无食物但有能量等）时隐藏；
     /// 填充 = 需求当前比例（CurLevelPercentage），数值样式显示百分比。
+    /// tooltipNeed 记录对应需求，悬停条区时显示原版需求提示（统一悬浮提示开关控制）。
     /// </summary>
     private static BarRowInfo? PawnNeedSpec(bool barEnabled, string labelKey, Need? need,
         float heightOffset, float fontScale, Color color, BarSpan span, ValueDisplayStyle style, BarType type,
@@ -2190,7 +2192,8 @@ public static partial class InspectPanePatch
             BarHeightFor(heightOffset), fontScale,
             span,
             type,
-            onBarDrawn);
+            onBarDrawn,
+            tooltipNeed: need);
     }
 
     private static BarRowInfo? MoodSpec(Pawn pawn)
@@ -2365,6 +2368,7 @@ public static partial class InspectPanePatch
     /// 如 Dubs Bad Hygiene 的 Bladder / Hygiene / DBHThirst）才显示，不依赖具体模组判断。
     /// 填充 = 需求当前比例（CurLevelPercentage）。
     /// invert 为 true（膀胱/口渴的「反转需求比例」选项）时填充 = 1 - 当前比例（如 80%→20%）。
+    /// tooltipNeed 记录对应需求，悬停条区时显示原版需求提示（统一悬浮提示开关控制）。
     /// </summary>
     private static BarRowInfo? DbhNeedSpec(bool barEnabled, string labelKey, Need? need, bool invert,
         float heightOffset, float fontScale, Color color, BarSpan span, ValueDisplayStyle style, BarType type)
@@ -2387,7 +2391,8 @@ public static partial class InspectPanePatch
             color,
             BarHeightFor(heightOffset), fontScale,
             span,
-            type);
+            type,
+            tooltipNeed: need);
     }
 
     /// <summary>膀胱条（Dubs Bad Hygiene 的 Bladder 需求等）：默认显示当前水平，可反转需求比例。</summary>
