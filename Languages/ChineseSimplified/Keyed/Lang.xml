@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+
+  <BetterInspectPane.SettingsCategory>更好的检查面板</BetterInspectPane.SettingsCategory>
+
+  <BetterInspectPane.OverrideInspectPane>覆盖原版检查面板绘制（应用四周边距与标题字号）</BetterInspectPane.OverrideInspectPane>
+
+  <BetterInspectPane.OverrideInspectString>覆盖 InspectString 绘制（InspectString 以 15 帧缓存）</BetterInspectPane.OverrideInspectString>
+
+  <BetterInspectPane.AdaptivePaneHeight>自适应面板高度（信息文字放不下时自动增高面板）</BetterInspectPane.AdaptivePaneHeight>
+
+  <BetterInspectPane.PaneMargin>检查面板四周边距：{0}</BetterInspectPane.PaneMargin>
+
+  <BetterInspectPane.TitleFontSize>标题文本字号：{0}</BetterInspectPane.TitleFontSize>
+
+  <BetterInspectPane.PawnShowFullName>显示 Pawn 全名（覆盖默认标题，改用全名）</BetterInspectPane.PawnShowFullName>
+
+  <BetterInspectPane.PawnShowExtraButtons>显示 Pawn 额外按钮（异种类型、阵营、文化）</BetterInspectPane.PawnShowExtraButtons>
+
+  <BetterInspectPane.PawnTitleFontSize>Pawn 面板标题字号：{0}</BetterInspectPane.PawnTitleFontSize>
+
+  <BetterInspectPane.PawnShowSkills>显示 Pawn 技能（在普通条区域下方显示技能等级条）</BetterInspectPane.PawnShowSkills>
+
+  <BetterInspectPane.PawnSkillWhiteFont>技能条文本使用白色字体</BetterInspectPane.PawnSkillWhiteFont>
+
+  <BetterInspectPane.PawnSkillWhiteFontTip>开启后，技能条上的技能名与等级无视进度条比例，总是以白色显示（条内嵌入文字不再随进度反黑）；关闭后恢复进度反色遮罩（未覆盖区白色、已覆盖区黑色）。</BetterInspectPane.PawnSkillWhiteFontTip>
+
+  <BetterInspectPane.PawnSkillTotalProgress>技能条按总进度填充</BetterInspectPane.PawnSkillTotalProgress>
+
+  <BetterInspectPane.PawnSkillTotalProgressTip>开启后，技能条填充比例 =（当前等级 + 当前技能升级进度%）÷ 技能等级上限 20，例如 10 级半为 52.5%；关闭则仅显示当前等级内的升级进度（0 级刚升级时为空条）。</BetterInspectPane.PawnSkillTotalProgressTip>
+
+  <BetterInspectPane.PawnSkillColumns>每行列数</BetterInspectPane.PawnSkillColumns>
+
+  <BetterInspectPane.PawnSkillColumns_Three>3 列</BetterInspectPane.PawnSkillColumns_Three>
+
+  <BetterInspectPane.PawnSkillColumns_Four>4 列</BetterInspectPane.PawnSkillColumns_Four>
+
+  <BetterInspectPane.PawnSkillColumns_Six>6 列</BetterInspectPane.PawnSkillColumns_Six>
+
+  <BetterInspectPane.PawnSkillPassionStyle>技能激情显示</BetterInspectPane.PawnSkillPassionStyle>
+
+  <BetterInspectPane.PawnSkillPassionStyle_Text>文本（+ / ++）</BetterInspectPane.PawnSkillPassionStyle_Text>
+
+  <BetterInspectPane.PawnSkillPassionStyle_Icon>图标</BetterInspectPane.PawnSkillPassionStyle_Icon>
+
+  <BetterInspectPane.PawnSkillPassionStyle_Tip>技能激情的表示方式：文本 = 在技能名后附加 +（轻微）/ ++（重度）；图标 = 绘制原版激情图标。安装 Vanilla Skills Expanded 后，两种方式均自动改用其激情定义，支持冷漠 / 天赋 / 狂热等额外激情种类。</BetterInspectPane.PawnSkillPassionStyle_Tip>
+
+  <BetterInspectPane.PawnSkillPassionIconAfterName>激情图标置于技能名称后</BetterInspectPane.PawnSkillPassionIconAfterName>
+
+  <BetterInspectPane.PawnSkillPassionIconAfterNameTip>仅图标样式生效：开启后激情图标绘制在技能名称右侧（默认绘制在技能名左侧）；技能条剩余宽度放不下图标时不绘制。</BetterInspectPane.PawnSkillPassionIconAfterNameTip>
+
+  <BetterInspectPane.PawnSkillFontSize>技能条字号：{0}</BetterInspectPane.PawnSkillFontSize>
+
+  <BetterInspectPane.PawnSkillBarHeight>技能条高度：{0}</BetterInspectPane.PawnSkillBarHeight>
+
+  <BetterInspectPane.PawnSkillColumnGap>技能条列间距：{0}</BetterInspectPane.PawnSkillColumnGap>
+
+  <BetterInspectPane.PawnSkillSpacing>技能区间隔：{0}</BetterInspectPane.PawnSkillSpacing>
+
+  <BetterInspectPane.ColorSkill>技能条颜色：</BetterInspectPane.ColorSkill>
+
+  <BetterInspectPane.Skill_Shooting>射击</BetterInspectPane.Skill_Shooting>
+
+  <BetterInspectPane.Skill_Melee>格斗</BetterInspectPane.Skill_Melee>
+
+  <BetterInspectPane.Skill_Construction>建造</BetterInspectPane.Skill_Construction>
+
+  <BetterInspectPane.Skill_Mining>采矿</BetterInspectPane.Skill_Mining>
+
+  <BetterInspectPane.Skill_Cooking>烹饪</BetterInspectPane.Skill_Cooking>
+
+  <BetterInspectPane.Skill_Plants>种植</BetterInspectPane.Skill_Plants>
+
+  <BetterInspectPane.Skill_Animals>驯兽</BetterInspectPane.Skill_Animals>
+
+  <BetterInspectPane.Skill_Crafting>手工</BetterInspectPane.Skill_Crafting>
+
+  <BetterInspectPane.Skill_Artistic>艺术</BetterInspectPane.Skill_Artistic>
+
+  <BetterInspectPane.Skill_Medicine>医疗</BetterInspectPane.Skill_Medicine>
+
+  <BetterInspectPane.Skill_Social>社交</BetterInspectPane.Skill_Social>
+
+  <BetterInspectPane.Skill_Intellectual>智识</BetterInspectPane.Skill_Intellectual>
+
+  <BetterInspectPane.HealthLabel>耐久</BetterInspectPane.HealthLabel>
+
+  <BetterInspectPane.ShowInfiniteDurabilityBar>为无限耐久对象显示耐久条</BetterInspectPane.ShowInfiniteDurabilityBar>
+
+  <BetterInspectPane.ShowInfiniteDurabilityBar_Tip>不使用命中点的对象（如无法损坏的物品/建筑）会被视为无限耐久。开启后，单选此类对象时也会显示一条永远满格的耐久条，数值显示 ∞。</BetterInspectPane.ShowInfiniteDurabilityBar_Tip>
+
+  <BetterInspectPane.InfiniteDurabilityValue>无限</BetterInspectPane.InfiniteDurabilityValue>
+
+  <BetterInspectPane.ShieldLabel>护盾</BetterInspectPane.ShieldLabel>
+
+  <BetterInspectPane.AmmoLabel>弹药</BetterInspectPane.AmmoLabel>
+  <BetterInspectPane.FuelLabel>燃料</BetterInspectPane.FuelLabel>
+
+  <BetterInspectPane.FreshnessLabel>新鲜</BetterInspectPane.FreshnessLabel>
+
+  <BetterInspectPane.WorkLabel>工作</BetterInspectPane.WorkLabel>
+
+  <BetterInspectPane.GrowthLabel>生长</BetterInspectPane.GrowthLabel>
+
+  <BetterInspectPane.ResearchLabel>研究</BetterInspectPane.ResearchLabel>
+
+  <BetterInspectPane.MaintenanceLabel>维护</BetterInspectPane.MaintenanceLabel>
+
+  <BetterInspectPane.EnableMaintenanceBar>显示维护条（Vanilla Gravship Expanded 建筑）</BetterInspectPane.EnableMaintenanceBar>
+
+  <BetterInspectPane.ColorMaintenance>维护条颜色：</BetterInspectPane.ColorMaintenance>
+
+  <BetterInspectPane.PipeNetLabel>管道网络</BetterInspectPane.PipeNetLabel>
+
+  <BetterInspectPane.EnablePipeNetBar>显示管道网络条（Vanilla Expanded Framework）</BetterInspectPane.EnablePipeNetBar>
+
+  <BetterInspectPane.ColorPipeNet>管道网络条颜色：</BetterInspectPane.ColorPipeNet>
+
+  <BetterInspectPane.UseResourceColor>管道条使用资源颜色（容量条原样、管道网络条 70% 透明度）</BetterInspectPane.UseResourceColor>
+
+  <BetterInspectPane.CooldownLabel>冷却</BetterInspectPane.CooldownLabel>
+
+  <BetterInspectPane.EnableCooldownBar>显示冷却条（炮塔）</BetterInspectPane.EnableCooldownBar>
+
+  <BetterInspectPane.ColorCooldown>冷却条颜色：</BetterInspectPane.ColorCooldown>
+
+  <BetterInspectPane.InvertCooldownFill>反转冷却条填充（冷却期间由满到空）</BetterInspectPane.InvertCooldownFill>
+
+  <BetterInspectPane.MinCooldownSeconds>最短显示冷却时长：{0} 秒</BetterInspectPane.MinCooldownSeconds>
+
+  <BetterInspectPane.AutoHideBar>自动隐藏</BetterInspectPane.AutoHideBar>
+
+  <BetterInspectPane.AutoHideBarTip>开启后，该条达到 {0} 时自动隐藏；关闭后始终保持显示。</BetterInspectPane.AutoHideBarTip>
+
+  <BetterInspectPane.WhiteFont>白色字体</BetterInspectPane.WhiteFont>
+
+  <BetterInspectPane.WhiteFontTip>开启后，该条的标签与数值无视进度条比例，总是以白色显示（条内嵌入文字不再随进度反黑）。</BetterInspectPane.WhiteFontTip>
+
+  <BetterInspectPane.ChargeLabel>充能</BetterInspectPane.ChargeLabel>
+
+  <BetterInspectPane.EnableChargeBar>显示充能条</BetterInspectPane.EnableChargeBar>
+
+  <BetterInspectPane.ColorCharge>充能条颜色：</BetterInspectPane.ColorCharge>
+
+  <BetterInspectPane.EnableResearchBar>显示研究条</BetterInspectPane.EnableResearchBar>
+
+  <BetterInspectPane.ColorResearch>研究条颜色：</BetterInspectPane.ColorResearch>
+
+  <BetterInspectPane.Mature>成熟</BetterInspectPane.Mature>
+
+  <BetterInspectPane.EnableWorldObjects>检查面板也适用于世界地图对象</BetterInspectPane.EnableWorldObjects>
+
+  <BetterInspectPane.WorldObjectSection>世界地图对象</BetterInspectPane.WorldObjectSection>
+
+  <BetterInspectPane.TimeRemainingLabel>剩余时间</BetterInspectPane.TimeRemainingLabel>
+
+  <BetterInspectPane.EnableTimeRemainingBar>显示剩余时间条（世界地图对象）</BetterInspectPane.EnableTimeRemainingBar>
+
+  <BetterInspectPane.ColorTimeRemaining>剩余时间条颜色：</BetterInspectPane.ColorTimeRemaining>
+
+  <BetterInspectPane.FactionRelationLabel>阵营关系</BetterInspectPane.FactionRelationLabel>
+
+  <BetterInspectPane.EnableFactionRelationBar>显示阵营关系条（世界地图对象）</BetterInspectPane.EnableFactionRelationBar>
+
+  <BetterInspectPane.ShowRelationThresholdMarker>使用关系阈值标记</BetterInspectPane.ShowRelationThresholdMarker>
+
+  <BetterInspectPane.ShowRelationThresholdMarker_Tip>开启后阵营关系条上限改用「关系上限」，并在原版盟友阈值（75）位置绘制阈值标记：World Domination 2 激活时上限取其设置中的关系上限（默认 200），未激活时用原版好感上限（100）。关闭时维持原口径（上限 = 阈值 75，无标记）。阈值标记同时受效果页「阈值标记」开关控制。</BetterInspectPane.ShowRelationThresholdMarker_Tip>
+
+  <BetterInspectPane.StrengthLabel>强度</BetterInspectPane.StrengthLabel>
+
+  <BetterInspectPane.EnableStrengthBar>显示强度条（World Domination 2，世界地图对象）；无强度上限（如玩家殖民地）时自动隐藏</BetterInspectPane.EnableStrengthBar>
+
+  <BetterInspectPane.EnableZones>检查面板也适用于区域</BetterInspectPane.EnableZones>
+
+  <BetterInspectPane.ZoneSection>区域</BetterInspectPane.ZoneSection>
+
+  <BetterInspectPane.GrowingLabel>已种植</BetterInspectPane.GrowingLabel>
+
+  <BetterInspectPane.EnableGrowingBar>显示已种植条（种植区）</BetterInspectPane.EnableGrowingBar>
+
+  <BetterInspectPane.ZoneGrowthLabel>总体生长</BetterInspectPane.ZoneGrowthLabel>
+
+  <BetterInspectPane.EnableZoneGrowthBar>显示总体生长条（种植区）</BetterInspectPane.EnableZoneGrowthBar>
+
+  <BetterInspectPane.StorageLabel>剩余容量</BetterInspectPane.StorageLabel>
+
+  <BetterInspectPane.EnableStorageBar>显示剩余容量条（储存区、储存容器建筑与管道储存容器）</BetterInspectPane.EnableStorageBar>
+
+  <BetterInspectPane.FishingLabel>剩余鱼</BetterInspectPane.FishingLabel>
+
+  <BetterInspectPane.EnableFishingBar>显示剩余鱼条（钓鱼区）</BetterInspectPane.EnableFishingBar>
+
+  <BetterInspectPane.ShowFishingTargetPctMarker>显示保留目标比例阈值标记（钓鱼区）</BetterInspectPane.ShowFishingTargetPctMarker>
+
+  <BetterInspectPane.ShowFishingTargetPctMarker_Tip>在剩余鱼条上按钓鱼区的保留目标比例阈值（targetPopulationPct，默认 50%）位置绘制黑色阈值标记：水域鱼群比例低于该值时钓鱼区停止捕鱼。</BetterInspectPane.ShowFishingTargetPctMarker_Tip>
+
+  <BetterInspectPane.ColorGrowing>已种植条颜色：</BetterInspectPane.ColorGrowing>
+
+  <BetterInspectPane.ColorZoneGrowth>总体生长条颜色：</BetterInspectPane.ColorZoneGrowth>
+
+  <BetterInspectPane.ColorStorage>剩余容量条颜色：</BetterInspectPane.ColorStorage>
+
+  <BetterInspectPane.ColorFishing>剩余鱼条颜色：</BetterInspectPane.ColorFishing>
+
+  <BetterInspectPane.EnablePawns>Pawn 检查面板（选中 Pawn 时替代原版面板内容）</BetterInspectPane.EnablePawns>
+
+  <BetterInspectPane.EnablePawns_Tip>开启后，选中 Pawn 时用本模组的进度条面板替代原版内容（原版底部标签页仍可用；时间表与允许区域由本模组自行绘制的策略行组件提供）。默认关闭。</BetterInspectPane.EnablePawns_Tip>
+
+  <BetterInspectPane.EnablePawnPolicyRow>显示 Pawn 策略行（食物/管制/着装/区域）</BetterInspectPane.EnablePawnPolicyRow>
+
+  <BetterInspectPane.PolicyRowFontSize>Pawn 策略行字号：{0}</BetterInspectPane.PolicyRowFontSize>
+
+  <BetterInspectPane.PolicyRowHeight>Pawn 策略行高度：{0}</BetterInspectPane.PolicyRowHeight>
+
+  <BetterInspectPane.PolicyRow.Food>食物：</BetterInspectPane.PolicyRow.Food>
+
+  <BetterInspectPane.PolicyRow.Timetable>管制：</BetterInspectPane.PolicyRow.Timetable>
+
+  <BetterInspectPane.PolicyRow.Outfit>着装：</BetterInspectPane.PolicyRow.Outfit>
+
+  <BetterInspectPane.PolicyRow.Area>区域：</BetterInspectPane.PolicyRow.Area>
+
+  <BetterInspectPane.PawnSection>Pawn面板</BetterInspectPane.PawnSection>
+
+  <BetterInspectPane.EnableThresholdMarkers>显示阈值标记（心情/血液/疼痛条）</BetterInspectPane.EnableThresholdMarkers>
+
+  <BetterInspectPane.EnableThresholdMarkers_Tip>在心情条上标注轻度/中度/重度崩溃阈值，在血液条上标注各流血阶段，在疼痛条上标注疼痛休克阈值（黑色竖线）。</BetterInspectPane.EnableThresholdMarkers_Tip>
+
+  <BetterInspectPane.ThresholdMarkerHeight>阈值标记高度：{0}px</BetterInspectPane.ThresholdMarkerHeight>
+
+  <BetterInspectPane.PawnHealthLabel>健康状态</BetterInspectPane.PawnHealthLabel>
+
+  <BetterInspectPane.BloodLabel>血液</BetterInspectPane.BloodLabel>
+
+  <BetterInspectPane.EnableBloodBar>显示血液条（Pawn）</BetterInspectPane.EnableBloodBar>
+
+  <BetterInspectPane.ColorBlood>血液条颜色：</BetterInspectPane.ColorBlood>
+
+  <BetterInspectPane.MoodLabel>心情</BetterInspectPane.MoodLabel>
+
+  <BetterInspectPane.EnableMoodBar>显示心情条（Pawn）</BetterInspectPane.EnableMoodBar>
+
+  <BetterInspectPane.ColorMood>心情条颜色：</BetterInspectPane.ColorMood>
+
+  <BetterInspectPane.FoodLabel>食物</BetterInspectPane.FoodLabel>
+
+  <BetterInspectPane.EnableFoodBar>显示食物条（Pawn）</BetterInspectPane.EnableFoodBar>
+
+  <BetterInspectPane.ColorFood>食物条颜色：</BetterInspectPane.ColorFood>
+
+  <BetterInspectPane.RestLabel>休息</BetterInspectPane.RestLabel>
+
+  <BetterInspectPane.EnableRestBar>显示休息条（Pawn）</BetterInspectPane.EnableRestBar>
+
+  <BetterInspectPane.ColorRest>休息条颜色：</BetterInspectPane.ColorRest>
+
+  <BetterInspectPane.JoyLabel>娱乐</BetterInspectPane.JoyLabel>
+
+  <BetterInspectPane.EnableJoyBar>显示娱乐条（Pawn）</BetterInspectPane.EnableJoyBar>
+
+  <BetterInspectPane.ColorJoy>娱乐条颜色：</BetterInspectPane.ColorJoy>
+
+  <BetterInspectPane.MechEnergyLabel>机械能量</BetterInspectPane.MechEnergyLabel>
+
+  <BetterInspectPane.EnableMechEnergyBar>显示机械能量条（机械体）</BetterInspectPane.EnableMechEnergyBar>
+
+  <BetterInspectPane.ColorMechEnergy>机械能量条颜色：</BetterInspectPane.ColorMechEnergy>
+
+  <BetterInspectPane.MilkLabel>产物</BetterInspectPane.MilkLabel>
+
+  <BetterInspectPane.EnableMilkBar>显示产物条（可挤奶动物）</BetterInspectPane.EnableMilkBar>
+
+  <BetterInspectPane.ColorMilk>产物条颜色：</BetterInspectPane.ColorMilk>
+
+  <BetterInspectPane.WoolLabel>产毛</BetterInspectPane.WoolLabel>
+
+  <BetterInspectPane.EnableWoolBar>显示产毛条（可剪毛动物）</BetterInspectPane.EnableWoolBar>
+
+  <BetterInspectPane.ColorWool>产毛条颜色：</BetterInspectPane.ColorWool>
+
+  <BetterInspectPane.BreedingLabel>繁殖</BetterInspectPane.BreedingLabel>
+
+  <BetterInspectPane.EnableBreedingBar>显示繁殖条（下蛋动物产蛋进度或怀孕进度）</BetterInspectPane.EnableBreedingBar>
+
+  <BetterInspectPane.ColorBreeding>繁殖条颜色：</BetterInspectPane.ColorBreeding>
+
+  <BetterInspectPane.PainLabel>疼痛</BetterInspectPane.PainLabel>
+
+  <BetterInspectPane.PainToleranceLabel>耐痛</BetterInspectPane.PainToleranceLabel>
+
+  <BetterInspectPane.EnablePainBar>显示疼痛条（Pawn）</BetterInspectPane.EnablePainBar>
+
+  <BetterInspectPane.InvertPainFill>反转疼痛条填充（疼痛越高条越空）</BetterInspectPane.InvertPainFill>
+
+  <BetterInspectPane.ColorPain>疼痛条颜色：</BetterInspectPane.ColorPain>
+
+  <BetterInspectPane.BladderLabel>膀胱</BetterInspectPane.BladderLabel>
+
+  <BetterInspectPane.EnableBladderBar>显示膀胱条（Dubs Bad Hygiene 等模组需求）</BetterInspectPane.EnableBladderBar>
+
+  <BetterInspectPane.InvertBladderFill>反转膀胱条需求比例（如 80%→20%）</BetterInspectPane.InvertBladderFill>
+
+  <BetterInspectPane.ColorBladder>膀胱条颜色：</BetterInspectPane.ColorBladder>
+
+  <BetterInspectPane.HygieneLabel>卫生</BetterInspectPane.HygieneLabel>
+
+  <BetterInspectPane.EnableHygieneBar>显示卫生条（Dubs Bad Hygiene 等模组需求）</BetterInspectPane.EnableHygieneBar>
+
+  <BetterInspectPane.ColorHygiene>卫生条颜色：</BetterInspectPane.ColorHygiene>
+
+  <BetterInspectPane.ThirstLabel>口渴</BetterInspectPane.ThirstLabel>
+
+  <BetterInspectPane.EnableThirstBar>显示口渴条（Dubs Bad Hygiene 等模组需求）</BetterInspectPane.EnableThirstBar>
+
+  <BetterInspectPane.InvertThirstFill>反转口渴条需求比例（如 80%→20%）</BetterInspectPane.InvertThirstFill>
+
+  <BetterInspectPane.ColorThirst>口渴条颜色：</BetterInspectPane.ColorThirst>
+
+  <BetterInspectPane.BatteryLabel>蓄电</BetterInspectPane.BatteryLabel>
+
+  <BetterInspectPane.EnableBatteryBar>显示电池蓄电条（电池）</BetterInspectPane.EnableBatteryBar>
+
+  <BetterInspectPane.ColorBattery>电池蓄电条颜色：</BetterInspectPane.ColorBattery>
+
+  <BetterInspectPane.PowerGridLabel>电网蓄电</BetterInspectPane.PowerGridLabel>
+
+  <BetterInspectPane.EnablePowerGridBar>显示电网蓄电条（电力设备）</BetterInspectPane.EnablePowerGridBar>
+
+  <BetterInspectPane.ColorPowerGrid>电网蓄电条颜色：</BetterInspectPane.ColorPowerGrid>
+
+  <BetterInspectPane.EnableRedraw>启用mod功能</BetterInspectPane.EnableRedraw>
+
+  <BetterInspectPane.EnableMultiSelectGrid>多选时显示 RTS 风格单位选择网格</BetterInspectPane.EnableMultiSelectGrid>
+
+  <BetterInspectPane.EnableMultiSelectGridZones>多选网格也作用于区域</BetterInspectPane.EnableMultiSelectGridZones>
+  <BetterInspectPane.EnableMultiSelectGridZones_Tip>在地图上多选多个区域时，检查面板改为显示这些区域的网格（按区域类型分组），而不是空白正文。</BetterInspectPane.EnableMultiSelectGridZones_Tip>
+  <BetterInspectPane.EnableMultiSelectGridWorldObjects>多选网格也作用于世界地图对象</BetterInspectPane.EnableMultiSelectGridWorldObjects>
+  <BetterInspectPane.EnableMultiSelectGridWorldObjects_Tip>在世界地图多选多个对象时，世界检查面板改为显示这些对象的网格（按对象类型分组）。</BetterInspectPane.EnableMultiSelectGridWorldObjects_Tip>
+
+  <BetterInspectPane.MultiSelectCellSize>网格单元大小：{0}</BetterInspectPane.MultiSelectCellSize>
+
+  <BetterInspectPane.MultiSelectCellGap>网格单元间距：{0}</BetterInspectPane.MultiSelectCellGap>
+
+  <BetterInspectPane.MultiSelectBorderWidth>单元格边框宽度：{0}</BetterInspectPane.MultiSelectBorderWidth>
+
+  <BetterInspectPane.MultiSelectCountAbbreviation>数量 ≥ 1000 时以 k 缩写显示</BetterInspectPane.MultiSelectCountAbbreviation>
+
+  <BetterInspectPane.MultiSelectBadgeShowX>数量角标显示「×」前缀</BetterInspectPane.MultiSelectBadgeShowX>
+
+  <BetterInspectPane.MultiSelectBadgeFontSize>数量角标字号：{0}</BetterInspectPane.MultiSelectBadgeFontSize>
+
+  <BetterInspectPane.MultiSelectBadgeScale>数量角标缩放比例：{0}</BetterInspectPane.MultiSelectBadgeScale>
+
+  <BetterInspectPane.MultiSelectRows>网格行数：{0}</BetterInspectPane.MultiSelectRows>
+
+  <BetterInspectPane.MultiSelectMore>+{0}</BetterInspectPane.MultiSelectMore>
+
+  <BetterInspectPane.MultiSelectGroupTip>{0} ×{1}</BetterInspectPane.MultiSelectGroupTip>
+
+  <BetterInspectPane.MultiSelectOverrideMinWidth>覆盖最小宽度</BetterInspectPane.MultiSelectOverrideMinWidth>
+
+  <BetterInspectPane.MultiSelectMinWidth>覆盖的最小宽度：{0}</BetterInspectPane.MultiSelectMinWidth>
+
+  <BetterInspectPane.MultiSelectOverrideMinHeight>覆盖最小高度</BetterInspectPane.MultiSelectOverrideMinHeight>
+
+  <BetterInspectPane.MultiSelectMinHeight>覆盖的最小高度：{0}</BetterInspectPane.MultiSelectMinHeight>
+
+  <BetterInspectPane.MultiSelectAdaptiveHeight>自适应高度（高度不足时自动增高面板以显示全部行）</BetterInspectPane.MultiSelectAdaptiveHeight>
+
+  <BetterInspectPane.MultiSelectGridBackgroundExact>背景底框以实际网格绘制（关闭时铺满整个内容区）</BetterInspectPane.MultiSelectGridBackgroundExact>
+
+  <BetterInspectPane.MultiSelectShiftDrag>使用 Shift 键多选（开启后与左键功能互换：Shift 多选 / 左键单选）</BetterInspectPane.MultiSelectShiftDrag>
+  <BetterInspectPane.MultiSelectShiftDrag_Tip>关闭：左键单击/拖拽为多选，Shift+左键为单选。开启后：按住 Shift 单击/拖拽为多选（拖拽批量框选），左键单击为单选。</BetterInspectPane.MultiSelectShiftDrag_Tip>
+
+  <BetterInspectPane.MultiSelectCtrlDrag>使用 Ctrl 键多重取消（开启后与右键功能互换：Ctrl 多重取消 / 右键取消）</BetterInspectPane.MultiSelectCtrlDrag>
+  <BetterInspectPane.MultiSelectCtrlDrag_Tip>关闭：右键单击/拖拽为多重取消，Ctrl+点击为取消。开启后：按住 Ctrl 单击/拖拽为多重取消（拖拽批量标记待移除），右键单击为取消选中。</BetterInspectPane.MultiSelectCtrlDrag_Tip>
+
+  <BetterInspectPane.MultiSelectExpandSingleGroupPawn>单组展开：Pawn</BetterInspectPane.MultiSelectExpandSingleGroupPawn>
+  <BetterInspectPane.MultiSelectExpandSingleGroupPawn_Tip>多选时若非殖民者 Pawn 恰为同一种，逐项显示每一名（关闭则按种类聚合为一个 ×N 单元）。</BetterInspectPane.MultiSelectExpandSingleGroupPawn_Tip>
+
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonPawn>单组展开：非 Pawn Thing</BetterInspectPane.MultiSelectExpandSingleGroupNonPawn>
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonPawn_Tip>多选时若非 Pawn 物品、建筑等恰为同一种，逐项显示每一堆（开启后不再聚合成一个 ×N 单元）。</BetterInspectPane.MultiSelectExpandSingleGroupNonPawn_Tip>
+
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonThing>单组展开：非 Thing（区域 / 世界对象）</BetterInspectPane.MultiSelectExpandSingleGroupNonThing>
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonThing_Tip>多选时若区域（或世界对象）恰为同一种（同阵营），逐项显示每一个，而不是聚合成一个 ×N 单元。</BetterInspectPane.MultiSelectExpandSingleGroupNonThing_Tip>
+
+  <BetterInspectPane.EnableMultiSelectHealthBar>在网格单元格顶部显示健康条</BetterInspectPane.EnableMultiSelectHealthBar>
+  <BetterInspectPane.MultiSelectHealthBarHeight>健康条高度：{0}</BetterInspectPane.MultiSelectHealthBarHeight>
+  <BetterInspectPane.MultiSelectHideFullPawnHealthBar>Pawn 健康满 100% 时隐藏健康条</BetterInspectPane.MultiSelectHideFullPawnHealthBar>
+  <BetterInspectPane.MultiSelectHideFullNonPawnHealthBar>非 Pawn 健康满 100% 时隐藏健康条</BetterInspectPane.MultiSelectHideFullNonPawnHealthBar>
+  <BetterInspectPane.UseHealthBackgroundInsteadOfBar>使用健康背景替代健康条</BetterInspectPane.UseHealthBackgroundInsteadOfBar>
+  <BetterInspectPane.InvertHealthBackground>反转健康背景比例（按受伤比例从上端填充）</BetterInspectPane.InvertHealthBackground>
+  <BetterInspectPane.MultiSelectMapIndicator>额外选中指示</BetterInspectPane.MultiSelectMapIndicator>
+  <BetterInspectPane.MultiSelectMapIndicator_Tip>鼠标悬停 / Shift 构建选区 / Ctrl 标记待移除的当前项，在地图上用原版指示箭头标出，便于从地图定位。</BetterInspectPane.MultiSelectMapIndicator_Tip>
+
+  <BetterInspectPane.ShowSeparators>显示灰色分隔条</BetterInspectPane.ShowSeparators>
+
+  <BetterInspectPane.DefaultBarHeight>条默认高度：{0}</BetterInspectPane.DefaultBarHeight>
+
+  <BetterInspectPane.SeparatorHeight>分隔条高度：{0}</BetterInspectPane.SeparatorHeight>
+
+  <BetterInspectPane.RowSpacing>行间距：{0}</BetterInspectPane.RowSpacing>
+
+  <BetterInspectPane.LabelWidth>标签宽度：{0}</BetterInspectPane.LabelWidth>
+
+  <BetterInspectPane.ValueWidth>数值宽度：{0}</BetterInspectPane.ValueWidth>
+
+  <BetterInspectPane.LabelFontSize>条标签字号：{0}</BetterInspectPane.LabelFontSize>
+
+  <BetterInspectPane.ValueFontSize>条数值字号：{0}</BetterInspectPane.ValueFontSize>
+
+  <BetterInspectPane.InfoFontSize>额外文字字号：{0}</BetterInspectPane.InfoFontSize>
+
+  <BetterInspectPane.PaneWidth>检查面板最小宽度：{0}</BetterInspectPane.PaneWidth>
+
+  <BetterInspectPane.PaneHeight>检查面板最小高度：{0}</BetterInspectPane.PaneHeight>
+
+  <BetterInspectPane.HealthValueStyle>耐久条数值显示</BetterInspectPane.HealthValueStyle>
+
+  <BetterInspectPane.ShieldValueStyle>护盾条数值显示</BetterInspectPane.ShieldValueStyle>
+
+  <BetterInspectPane.AmmoValueStyle>弹药条数值显示</BetterInspectPane.AmmoValueStyle>
+
+  <BetterInspectPane.FreshnessValueStyle>新鲜条数值显示</BetterInspectPane.FreshnessValueStyle>
+
+  <BetterInspectPane.WorkValueStyle>工作进度条数值显示</BetterInspectPane.WorkValueStyle>
+
+  <BetterInspectPane.Layout>布局：</BetterInspectPane.Layout>
+
+  <BetterInspectPane.Layout_Single>单列</BetterInspectPane.Layout_Single>
+
+  <BetterInspectPane.Layout_Two>两列</BetterInspectPane.Layout_Two>
+
+  <BetterInspectPane.Layout_Three>三列</BetterInspectPane.Layout_Three>
+
+  <BetterInspectPane.Layout_Four>四列</BetterInspectPane.Layout_Four>
+
+  <BetterInspectPane.ColumnGap>列间距：{0}</BetterInspectPane.ColumnGap>
+
+  <BetterInspectPane.EvenSplitTwoBarRows>双条行均分（三/四列）</BetterInspectPane.EvenSplitTwoBarRows>
+
+  <BetterInspectPane.EvenSplitTwoBarRowsTip>三列/四列布局下，当同一行只有 1~2 个单列宽的条（如单个单列条、两个单列条，或单列条+适应条）而占不满整行时，该行改为两列平分显示（单个单列条占左半、右半留空），避免条过窄与大片空白。</BetterInspectPane.EvenSplitTwoBarRowsTip>
+
+  <BetterInspectPane.BarSpan>占位：</BetterInspectPane.BarSpan>
+
+  <BetterInspectPane.BarSpan_FullRow>整行</BetterInspectPane.BarSpan_FullRow>
+
+  <BetterInspectPane.BarSpan_Column>单列</BetterInspectPane.BarSpan_Column>
+
+  <BetterInspectPane.BarSpan_TwoColumns>两列</BetterInspectPane.BarSpan_TwoColumns>
+
+  <BetterInspectPane.BarSpan_Adaptive>适应</BetterInspectPane.BarSpan_Adaptive>
+
+  <BetterInspectPane.BarOrder>顺序：</BetterInspectPane.BarOrder>
+
+  <BetterInspectPane.MoveUp>上移</BetterInspectPane.MoveUp>
+
+  <BetterInspectPane.MoveDown>下移</BetterInspectPane.MoveDown>
+
+  <BetterInspectPane.BarHeightOffset>高度偏移：{0}</BetterInspectPane.BarHeightOffset>
+
+  <BetterInspectPane.BarFontScale>字体缩放：{0}</BetterInspectPane.BarFontScale>
+
+  <BetterInspectPane.ValueStyleLabel>数值显示：</BetterInspectPane.ValueStyleLabel>
+
+  <BetterInspectPane.ValueStyle_Numeric>数值</BetterInspectPane.ValueStyle_Numeric>
+
+  <BetterInspectPane.ValueStyle_Percent>百分比</BetterInspectPane.ValueStyle_Percent>
+
+  <BetterInspectPane.ValueStyle_PercentOneDecimal>1位小数</BetterInspectPane.ValueStyle_PercentOneDecimal>
+
+  <BetterInspectPane.ValueStyle_PercentTwoDecimals>2位小数</BetterInspectPane.ValueStyle_PercentTwoDecimals>
+
+  <BetterInspectPane.ValueStyle_None>无</BetterInspectPane.ValueStyle_None>
+
+  <BetterInspectPane.LabelStyleLabel>标签样式：</BetterInspectPane.LabelStyleLabel>
+
+  <BetterInspectPane.LabelStyle_Normal>普通</BetterInspectPane.LabelStyle_Normal>
+
+  <BetterInspectPane.LabelStyle_Embedded>嵌入</BetterInspectPane.LabelStyle_Embedded>
+
+  <BetterInspectPane.BarValueStyleLabel>数值显示样式：</BetterInspectPane.BarValueStyleLabel>
+
+  <BetterInspectPane.BarValueStyle_Normal>普通</BetterInspectPane.BarValueStyle_Normal>
+
+  <BetterInspectPane.BarValueStyle_Embedded>嵌入</BetterInspectPane.BarValueStyle_Embedded>
+
+  <BetterInspectPane.BarValueStyle_Hidden>隐藏</BetterInspectPane.BarValueStyle_Hidden>
+
+  <BetterInspectPane.EmbedInsetLabel>标签嵌入收缩宽度：{0}</BetterInspectPane.EmbedInsetLabel>
+
+  <BetterInspectPane.EmbedInsetValue>数值嵌入收缩宽度：{0}</BetterInspectPane.EmbedInsetValue>
+
+  <BetterInspectPane.EnableEaseEffect>启用缓动效果</BetterInspectPane.EnableEaseEffect>
+
+  <BetterInspectPane.EaseSpeed>缓动速度：{0}</BetterInspectPane.EaseSpeed>
+
+  <BetterInspectPane.EasingStyle>缓动方式</BetterInspectPane.EasingStyle>
+
+  <BetterInspectPane.EasingStyle_Linear>线性</BetterInspectPane.EasingStyle_Linear>
+
+  <BetterInspectPane.EasingStyle_EaseIn>渐入</BetterInspectPane.EasingStyle_EaseIn>
+
+  <BetterInspectPane.EasingStyle_EaseOut>渐出</BetterInspectPane.EasingStyle_EaseOut>
+
+  <BetterInspectPane.EnableShieldBar>显示护盾条</BetterInspectPane.EnableShieldBar>
+
+  <BetterInspectPane.ColorShield>护盾颜色：</BetterInspectPane.ColorShield>
+
+  <BetterInspectPane.EnableAmmoBar>显示弹药条（有燃料组件的物体）</BetterInspectPane.EnableAmmoBar>
+
+  <BetterInspectPane.ColorAmmo>弹药条颜色：</BetterInspectPane.ColorAmmo>
+
+  <BetterInspectPane.EnableFreshnessBar>显示新鲜条（可腐烂物体）</BetterInspectPane.EnableFreshnessBar>
+
+  <BetterInspectPane.ColorFreshness>新鲜条颜色：</BetterInspectPane.ColorFreshness>
+
+  <BetterInspectPane.EnableWorkBar>显示工作进度条（未完成物品与建筑框架）</BetterInspectPane.EnableWorkBar>
+
+  <BetterInspectPane.ColorWork>工作进度条颜色：</BetterInspectPane.ColorWork>
+
+  <BetterInspectPane.EnableGrowthBar>显示生长条（植物）</BetterInspectPane.EnableGrowthBar>
+
+  <BetterInspectPane.ColorGrowth>生长条颜色：</BetterInspectPane.ColorGrowth>
+
+  <BetterInspectPane.EnableExplosiveThreshold>显示自爆阈值标记</BetterInspectPane.EnableExplosiveThreshold>
+
+  <BetterInspectPane.ThinExplosiveMarker>细标记（1px）</BetterInspectPane.ThinExplosiveMarker>
+
+  <BetterInspectPane.ColorExplosiveThreshold>自爆阈值标记颜色：</BetterInspectPane.ColorExplosiveThreshold>
+
+  <BetterInspectPane.ColorMultiSelectBorder>多选单元格边框颜色：</BetterInspectPane.ColorMultiSelectBorder>
+  <BetterInspectPane.ColorHealthBackground>健康背景颜色：</BetterInspectPane.ColorHealthBackground>
+
+  <BetterInspectPane.ColorFull>满血颜色：</BetterInspectPane.ColorFull>
+
+  <BetterInspectPane.ColorMid>中血颜色：</BetterInspectPane.ColorMid>
+
+  <BetterInspectPane.ColorLow>低血颜色：</BetterInspectPane.ColorLow>
+
+  <BetterInspectPane.ColorEmpty>条背景颜色：</BetterInspectPane.ColorEmpty>
+
+  <BetterInspectPane.ChangeColor>更改</BetterInspectPane.ChangeColor>
+
+  <BetterInspectPane.AlphaLabel>透明度</BetterInspectPane.AlphaLabel>
+
+  <BetterInspectPane.ResetColors>将所有颜色重置为默认值</BetterInspectPane.ResetColors>
+
+  <BetterInspectPane.OpenSettingsTip>在游戏进行中打开本模组设置</BetterInspectPane.OpenSettingsTip>
+
+  <BetterInspectPane.SettingsWindowTitle>更好的检查面板 · 设置</BetterInspectPane.SettingsWindowTitle>
+
+  <BetterInspectPane.EnableExtraNormalObjectText>在普通对象信息末尾显示额外信息</BetterInspectPane.EnableExtraNormalObjectText>
+
+  <BetterInspectPane.EnableExtraFactionText>显示所属势力</BetterInspectPane.EnableExtraFactionText>
+
+  <BetterInspectPane.HideFactionPlayerText>不显示玩家所属势力</BetterInspectPane.HideFactionPlayerText>
+
+  <BetterInspectPane.HideFactionNoneText>不显示无所属势力</BetterInspectPane.HideFactionNoneText>
+
+  <BetterInspectPane.EnableExtraNaturalGoodwillText>显示世界地图对象的自然阵营关系</BetterInspectPane.EnableExtraNaturalGoodwillText>
+
+  <BetterInspectPane.EnableExtraFactionDefLabelText>显示派系定居点的派系类别</BetterInspectPane.EnableExtraFactionDefLabelText>
+
+  <BetterInspectPane.EnableExtraMarketValueText>显示市场价值</BetterInspectPane.EnableExtraMarketValueText>
+
+  <BetterInspectPane.EnableExtraWeaponText>显示武器的额外信息</BetterInspectPane.EnableExtraWeaponText>
+
+  <BetterInspectPane.EnableExtraWeaponDamageText>显示武器单次伤害</BetterInspectPane.EnableExtraWeaponDamageText>
+
+  <BetterInspectPane.EnableExtraWeaponRangeText>显示武器射程</BetterInspectPane.EnableExtraWeaponRangeText>
+
+  <BetterInspectPane.EnableExtraWeaponCooldownText>显示武器冷却时间</BetterInspectPane.EnableExtraWeaponCooldownText>
+
+  <BetterInspectPane.EnableExtraWeaponDpsText>显示武器DPS</BetterInspectPane.EnableExtraWeaponDpsText>
+
+  <BetterInspectPane.EnableExtraWeaponArmorPenText>显示武器护甲穿透</BetterInspectPane.EnableExtraWeaponArmorPenText>
+
+  <BetterInspectPane.EnableExtraApparelText>显示衣物的额外信息</BetterInspectPane.EnableExtraApparelText>
+
+  <BetterInspectPane.EnableExtraApparelLayerText>显示覆盖服装层</BetterInspectPane.EnableExtraApparelLayerText>
+
+  <BetterInspectPane.EnableExtraApparelSharpArmorText>显示锐器护甲</BetterInspectPane.EnableExtraApparelSharpArmorText>
+
+  <BetterInspectPane.EnableExtraApparelBluntArmorText>显示钝器护甲</BetterInspectPane.EnableExtraApparelBluntArmorText>
+
+  <BetterInspectPane.EnableExtraApparelHeatArmorText>显示热能护甲</BetterInspectPane.EnableExtraApparelHeatArmorText>
+
+  <BetterInspectPane.EnableExtraNutritionText>显示营养值</BetterInspectPane.EnableExtraNutritionText>
+
+  <BetterInspectPane.EnableExtraBeautyText>显示美观</BetterInspectPane.EnableExtraBeautyText>
+
+  <BetterInspectPane.EnableExtraComfortText>显示舒适度</BetterInspectPane.EnableExtraComfortText>
+
+  <BetterInspectPane.EnableExtraCeHeightText>显示高度（Combat Extended）</BetterInspectPane.EnableExtraCeHeightText>
+
+  <BetterInspectPane.EnableExtraCeHeightPawnText>对 Pawn 显示高度</BetterInspectPane.EnableExtraCeHeightPawnText>
+
+  <BetterInspectPane.EnableExtraPawnText>在 Pawn 信息上方显示额外信息</BetterInspectPane.EnableExtraPawnText>
+
+  <BetterInspectPane.EnableExtraPawnTraitText>显示特性</BetterInspectPane.EnableExtraPawnTraitText>
+
+  <BetterInspectPane.EnableExtraMapTileText>在世界地图空地砖信息末尾显示靠近污染 / 靠近其它势力</BetterInspectPane.EnableExtraMapTileText>
+
+  <BetterInspectPane.EnableSelectionLimitModify>修改选择数量限制</BetterInspectPane.EnableSelectionLimitModify>
+  <BetterInspectPane.EnableSelectionLimitModify_Tip>开启后出现滑条，可调整单次最多能选中的对象数量。原版固定为 200；此修改同时作用于单击与拖拽框选。</BetterInspectPane.EnableSelectionLimitModify_Tip>
+  <BetterInspectPane.SelectionLimit>选择数量限制：{0}</BetterInspectPane.SelectionLimit>
+
+  <BetterInspectPane.EnableImprovedShiftSelection>改进的原版 Shift 选择</BetterInspectPane.EnableImprovedShiftSelection>
+  <BetterInspectPane.EnableImprovedShiftSelection_Tip>改变按住 Shift 选择时的行为。
+• 框选：当当前优先级（殖民者 → 人类 → 资源 → Pawn → 可选物）只匹配到已选中的物体时，不再就此结束，而是降级尝试下一优先级，从而仍能选入更低优先级的新物体。
+• 单击：若点选的对象与当前选择类型不同（例如已选 Pawn 后按住 Shift 点选区域，原版会清空已选 Pawn），则忽略此次选择，保留当前选择。</BetterInspectPane.EnableImprovedShiftSelection_Tip>
+
+  <BetterInspectPane.EnableCtrlSelection>Ctrl 选择功能（Ctrl+框选）</BetterInspectPane.EnableCtrlSelection>
+  <BetterInspectPane.EnableCtrlSelection_Tip>按住 Ctrl 框选时，按当前选择状态批量选择：
+• 未选中：优先选中框内所有属于玩家的 Pawn；若没有，则选中所有属于玩家的炮塔；若还没有，则选中所有建筑；若还没有，则按原版方式。
+• 已选中单个 / 多个（以首个选中为准）：先增量选中框内所有「相似」项（原版相似判断：同 def 且同阵营，Pawn 按等价种族等）；若没有新增，则按基准类型增量选择——区域→框内所有区域、Pawn→框内同阵营的所有 Pawn、Building→框内同阵营的所有建筑、Resource→框内所有 Resource、其它→框内所有非 Pawn 非 Resource 非 Building 的可选物；若还没有，则按原版方式。
+按住 Ctrl 不会清空当前选择。</BetterInspectPane.EnableCtrlSelection_Tip>
+
+  <BetterInspectPane.EnableRememberOpenTab>记忆已打开观察面板标签页</BetterInspectPane.EnableRememberOpenTab>
+  <BetterInspectPane.EnableRememberOpenTab_Tip>开启后，切换目标种类导致观察面板标签页关闭、再次选中同种目标时，若之前打开过的标签页仍可打开则自动打开。
+• 记忆最近 N 个目标种类（种类由可打开的标签页决定），N 为下方滑条设置的容量（2~10，默认 2）；如容量为 2 时 A→B→C→A 后 A 的记忆被淘汰。
+• 手动关闭标签页后不会立刻自动重开；切换到其它种类再切回时才按记忆自动打开。</BetterInspectPane.EnableRememberOpenTab_Tip>
+  <BetterInspectPane.RememberOpenTabCapacity>记忆目标种类数量：{0}</BetterInspectPane.RememberOpenTabCapacity>
+
+  <BetterInspectPane.MarketValueLabel>市场价值：{0}</BetterInspectPane.MarketValueLabel>
+
+  <BetterInspectPane.MarketValueStackLabel>市场价值：{0}（{1}）</BetterInspectPane.MarketValueStackLabel>
+
+  <BetterInspectPane.BeautyLabel>美观：{0}</BetterInspectPane.BeautyLabel>
+
+  <BetterInspectPane.ComfortLabel>舒适度：{0}</BetterInspectPane.ComfortLabel>
+
+  <BetterInspectPane.DamagePerShotLabel>单次伤害：{0}</BetterInspectPane.DamagePerShotLabel>
+
+  <BetterInspectPane.RangedRangeLabel>射程：{0}</BetterInspectPane.RangedRangeLabel>
+
+  <BetterInspectPane.RangedCooldownLabel>冷却时间：{0}s（+{1}s）</BetterInspectPane.RangedCooldownLabel>
+
+  <BetterInspectPane.MeleeCooldownLabel>冷却时间：{0}s</BetterInspectPane.MeleeCooldownLabel>
+
+  <BetterInspectPane.RangedDPSLabel>远程DPS：{0}</BetterInspectPane.RangedDPSLabel>
+
+  <BetterInspectPane.MeleeDPSLabel>近战DPS：{0}</BetterInspectPane.MeleeDPSLabel>
+
+  <BetterInspectPane.RangedArmorPenLabel>远程护甲穿透：{0}</BetterInspectPane.RangedArmorPenLabel>
+
+  <BetterInspectPane.MeleeArmorPenLabel>近战护甲穿透：{0}</BetterInspectPane.MeleeArmorPenLabel>
+
+  <BetterInspectPane.FactionLabel>所属势力：{0}</BetterInspectPane.FactionLabel>
+
+  <BetterInspectPane.NoFactionLabel>所属势力：无</BetterInspectPane.NoFactionLabel>
+
+  <BetterInspectPane.NaturalGoodwillNeutralLabel>自然中立 ({0})</BetterInspectPane.NaturalGoodwillNeutralLabel>
+
+  <BetterInspectPane.NaturalGoodwillFriendlyLabel>自然友善 ({0})</BetterInspectPane.NaturalGoodwillFriendlyLabel>
+
+  <BetterInspectPane.NaturalGoodwillHostileLabel>自然敌对 ({0})</BetterInspectPane.NaturalGoodwillHostileLabel>
+
+  <BetterInspectPane.FactionDefLabel>派系类别：{0}</BetterInspectPane.FactionDefLabel>
+
+  <BetterInspectPane.PermanentEnemyLabel>永久敌对</BetterInspectPane.PermanentEnemyLabel>
+
+  <BetterInspectPane.ApparelLayersLabel>覆盖服装层：{0}</BetterInspectPane.ApparelLayersLabel>
+
+  <BetterInspectPane.ApparelSharpArmorLabel>锐器护甲：{0}</BetterInspectPane.ApparelSharpArmorLabel>
+
+  <BetterInspectPane.ApparelBluntArmorLabel>钝器护甲：{0}</BetterInspectPane.ApparelBluntArmorLabel>
+
+  <BetterInspectPane.ApparelHeatArmorLabel>热能护甲：{0}</BetterInspectPane.ApparelHeatArmorLabel>
+
+  <BetterInspectPane.NutritionLabel>营养值：{0}</BetterInspectPane.NutritionLabel>
+
+  <BetterInspectPane.CeHeightLabel>高度：{0} 米</BetterInspectPane.CeHeightLabel>
+
+  <BetterInspectPane.TraitLabel>特性：{0}</BetterInspectPane.TraitLabel>
+
+  <BetterInspectPane.NearPollutionLabel>靠近污染：{0}</BetterInspectPane.NearPollutionLabel>
+
+  <BetterInspectPane.NearFactionLabel>靠近其它势力：{0}</BetterInspectPane.NearFactionLabel>
+
+  <BetterInspectPane.EnableInfoCardPlusPins>将 Info Card Plus 收藏的统计加入信息文字</BetterInspectPane.EnableInfoCardPlusPins>
+
+  <BetterInspectPane.EnableInfoCardPlusPins_Tip>需要安装 Info Card Plus。开启后，该 Mod 信息卡中收藏（图钉）的统计会加入本面板信息文字；与本模组额外信息重复的项只显示收藏版本。</BetterInspectPane.EnableInfoCardPlusPins_Tip>
+
+  <BetterInspectPane.EnableInfoCardPlusPinsHighlight>高亮收藏统计的名称标签（加粗 + 黄色）</BetterInspectPane.EnableInfoCardPlusPinsHighlight>
+
+  <BetterInspectPane.EnableInfoCardPlusPinsPawn>对 Pawn 加入收藏统计</BetterInspectPane.EnableInfoCardPlusPinsPawn>
+
+  <BetterInspectPane.EnableInfoCardPlusPinsPawn_Tip>需要安装并激活 Info Card Plus。开启后，对 Pawn 也会把该 Mod 信息卡中收藏（图钉）的统计加入 Pawn 的信息文字。</BetterInspectPane.EnableInfoCardPlusPinsPawn_Tip>
+
+  <BetterInspectPane.InfoCardPlusPinnedPosition>收藏统计位置：</BetterInspectPane.InfoCardPlusPinnedPosition>
+
+  <BetterInspectPane.InfoCardPlusPinnedPosition_Before>最前</BetterInspectPane.InfoCardPlusPinnedPosition_Before>
+
+  <BetterInspectPane.InfoCardPlusPinnedPosition_After>最后</BetterInspectPane.InfoCardPlusPinnedPosition_After>
+
+  <BetterInspectPane.InfoCardPlusPinnedLine>{0}：{1}</BetterInspectPane.InfoCardPlusPinnedLine>
+
+  <BetterInspectPane.InfoCardPlusPinnedLineHighlight>&lt;b&gt;&lt;color=#E6C75F&gt;{0}：&lt;/color&gt;&lt;/b&gt;{1}</BetterInspectPane.InfoCardPlusPinnedLineHighlight>
+
+  <BetterInspectPane.PageGeneral>常规</BetterInspectPane.PageGeneral>
+
+  <BetterInspectPane.PageBars>进度条</BetterInspectPane.PageBars>
+
+  <BetterInspectPane.PageEffects>效果与杂项</BetterInspectPane.PageEffects>
+
+  <BetterInspectPane.PageColors>颜色</BetterInspectPane.PageColors>
+
+  <BetterInspectPane.PageMultiSelect>多选检查面板</BetterInspectPane.PageMultiSelect>
+
+</LanguageData>

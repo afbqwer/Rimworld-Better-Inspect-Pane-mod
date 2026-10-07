@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+
+  <BetterInspectPane.SettingsCategory>Better Inspect Pane</BetterInspectPane.SettingsCategory>
+
+  <BetterInspectPane.OverrideInspectPane>Override vanilla inspect pane drawing (apply margins and title font size)</BetterInspectPane.OverrideInspectPane>
+
+  <BetterInspectPane.OverrideInspectString>Override inspect string drawing (cache InspectString at 15 frames)</BetterInspectPane.OverrideInspectString>
+
+  <BetterInspectPane.AdaptivePaneHeight>Adaptive pane height (auto-grow pane when inspect text does not fit)</BetterInspectPane.AdaptivePaneHeight>
+
+  <BetterInspectPane.PaneMargin>Inspect pane margin: {0}</BetterInspectPane.PaneMargin>
+
+  <BetterInspectPane.TitleFontSize>Title text font size: {0}</BetterInspectPane.TitleFontSize>
+
+  <BetterInspectPane.PawnShowFullName>Show Pawn's full name (override title with full name)</BetterInspectPane.PawnShowFullName>
+
+  <BetterInspectPane.PawnShowExtraButtons>Show extra Pawn buttons (xenotype, faction, ideology)</BetterInspectPane.PawnShowExtraButtons>
+
+  <BetterInspectPane.PawnTitleFontSize>Pawn panel title font size: {0}</BetterInspectPane.PawnTitleFontSize>
+
+  <BetterInspectPane.PawnShowSkills>Show Pawn skills (skill level bars below the regular bar area)</BetterInspectPane.PawnShowSkills>
+
+  <BetterInspectPane.PawnSkillWhiteFont>Skill bar text in white</BetterInspectPane.PawnSkillWhiteFont>
+
+  <BetterInspectPane.PawnSkillWhiteFontTip>When enabled, the skill name and level on skill bars always render in white, ignoring the fill ratio (embedded text no longer turns black over the filled area); when disabled, the fill-contrast mask is used (white on the unfilled part, black over the filled part).</BetterInspectPane.PawnSkillWhiteFontTip>
+
+  <BetterInspectPane.PawnSkillTotalProgress>Fill skill bars by total progres</BetterInspectPane.PawnSkillTotalProgress>
+
+  <BetterInspectPane.PawnSkillTotalProgressTip>When enabled, the skill bar fill ratio = (current level + current xp progress) / skill level cap 20, e.g. level 10.5 shows as 52.5%; when disabled, only the xp progress within the current level is shown (bar is empty right after leveling up from 0).</BetterInspectPane.PawnSkillTotalProgressTip>
+
+  <BetterInspectPane.PawnSkillColumns>Columns per row</BetterInspectPane.PawnSkillColumns>
+
+  <BetterInspectPane.PawnSkillColumns_Three>3 columns</BetterInspectPane.PawnSkillColumns_Three>
+
+  <BetterInspectPane.PawnSkillColumns_Four>4 columns</BetterInspectPane.PawnSkillColumns_Four>
+
+  <BetterInspectPane.PawnSkillColumns_Six>6 columns</BetterInspectPane.PawnSkillColumns_Six>
+
+  <BetterInspectPane.PawnSkillPassionStyle>Skill passion display</BetterInspectPane.PawnSkillPassionStyle>
+
+  <BetterInspectPane.PawnSkillPassionStyle_Text>Text (+ / ++)</BetterInspectPane.PawnSkillPassionStyle_Text>
+
+  <BetterInspectPane.PawnSkillPassionStyle_Icon>Icon</BetterInspectPane.PawnSkillPassionStyle_Icon>
+
+  <BetterInspectPane.PawnSkillPassionStyle_Tip>How skill passion is shown: Text = append + (minor) / ++ (major) after the skill name; Icon = draw the vanilla passion icon. With Vanilla Skills Expanded, both styles automatically use its passion defs, supporting extra types such as apathy / natural / critical.</BetterInspectPane.PawnSkillPassionStyle_Tip>
+
+  <BetterInspectPane.PawnSkillPassionIconAfterName>Passion icon after skill name</BetterInspectPane.PawnSkillPassionIconAfterName>
+
+  <BetterInspectPane.PawnSkillPassionIconAfterNameTip>Icon style only: when enabled, the passion icon is drawn to the right of the skill name (by default it is drawn to the left); the icon is skipped when the remaining bar width cannot fit it.</BetterInspectPane.PawnSkillPassionIconAfterNameTip>
+
+  <BetterInspectPane.PawnSkillFontSize>Skill bar font size: {0}</BetterInspectPane.PawnSkillFontSize>
+
+  <BetterInspectPane.PawnSkillBarHeight>Skill bar height: {0}</BetterInspectPane.PawnSkillBarHeight>
+
+  <BetterInspectPane.PawnSkillColumnGap>Skill bar column gap: {0}</BetterInspectPane.PawnSkillColumnGap>
+
+  <BetterInspectPane.PawnSkillSpacing>Skill area spacing: {0}</BetterInspectPane.PawnSkillSpacing>
+
+  <BetterInspectPane.ColorSkill>Skill bar color:</BetterInspectPane.ColorSkill>
+
+  <BetterInspectPane.Skill_Shooting>SHOT</BetterInspectPane.Skill_Shooting>
+
+  <BetterInspectPane.Skill_Melee>MEL</BetterInspectPane.Skill_Melee>
+
+  <BetterInspectPane.Skill_Construction>CON</BetterInspectPane.Skill_Construction>
+
+  <BetterInspectPane.Skill_Mining>MINE</BetterInspectPane.Skill_Mining>
+
+  <BetterInspectPane.Skill_Cooking>COOK</BetterInspectPane.Skill_Cooking>
+
+  <BetterInspectPane.Skill_Plants>PLAN</BetterInspectPane.Skill_Plants>
+
+  <BetterInspectPane.Skill_Animals>ANIM</BetterInspectPane.Skill_Animals>
+
+  <BetterInspectPane.Skill_Crafting>CRA</BetterInspectPane.Skill_Crafting>
+
+  <BetterInspectPane.Skill_Artistic>ART</BetterInspectPane.Skill_Artistic>
+
+  <BetterInspectPane.Skill_Medicine>MED</BetterInspectPane.Skill_Medicine>
+
+  <BetterInspectPane.Skill_Social>SOC</BetterInspectPane.Skill_Social>
+
+  <BetterInspectPane.Skill_Intellectual>INT</BetterInspectPane.Skill_Intellectual>
+
+  <BetterInspectPane.HealthLabel>Health</BetterInspectPane.HealthLabel>
+
+  <BetterInspectPane.ShowInfiniteDurabilityBar>Show durability bar for infinite-durability objects</BetterInspectPane.ShowInfiniteDurabilityBar>
+
+  <BetterInspectPane.ShowInfiniteDurabilityBar_Tip>Objects that don't use hit points are treated as having infinite durability. When enabled, selecting such an object shows a permanently full durability bar with an ∞ value.</BetterInspectPane.ShowInfiniteDurabilityBar_Tip>
+
+  <BetterInspectPane.InfiniteDurabilityValue>INF</BetterInspectPane.InfiniteDurabilityValue>
+
+  <BetterInspectPane.ShieldLabel>Shield</BetterInspectPane.ShieldLabel>
+
+  <BetterInspectPane.AmmoLabel>Ammo</BetterInspectPane.AmmoLabel>
+  <BetterInspectPane.FuelLabel>Fuel</BetterInspectPane.FuelLabel>
+
+  <BetterInspectPane.FreshnessLabel>Fresh</BetterInspectPane.FreshnessLabel>
+
+  <BetterInspectPane.WorkLabel>Work</BetterInspectPane.WorkLabel>
+
+  <BetterInspectPane.GrowthLabel>Growth</BetterInspectPane.GrowthLabel>
+
+  <BetterInspectPane.ResearchLabel>Research</BetterInspectPane.ResearchLabel>
+
+  <BetterInspectPane.MaintenanceLabel>Maint.</BetterInspectPane.MaintenanceLabel>
+
+  <BetterInspectPane.EnableMaintenanceBar>Show maintenance bar (Vanilla Gravship Expanded buildings)</BetterInspectPane.EnableMaintenanceBar>
+
+  <BetterInspectPane.ColorMaintenance>Maintenance bar color:</BetterInspectPane.ColorMaintenance>
+
+  <BetterInspectPane.PipeNetLabel>Pipe Net</BetterInspectPane.PipeNetLabel>
+
+  <BetterInspectPane.EnablePipeNetBar>Show pipe net bar (Vanilla Expanded Framework)</BetterInspectPane.EnablePipeNetBar>
+
+  <BetterInspectPane.ColorPipeNet>Pipe net bar color:</BetterInspectPane.ColorPipeNet>
+
+  <BetterInspectPane.UseResourceColor>Use resource color for pipe bars (capacity solid, pipe net at 70% alpha)</BetterInspectPane.UseResourceColor>
+
+  <BetterInspectPane.CooldownLabel>Cooldown</BetterInspectPane.CooldownLabel>
+
+  <BetterInspectPane.EnableCooldownBar>Show cooldown bar (turrets)</BetterInspectPane.EnableCooldownBar>
+
+  <BetterInspectPane.ColorCooldown>Cooldown bar color:</BetterInspectPane.ColorCooldown>
+
+  <BetterInspectPane.InvertCooldownFill>Invert cooldown fill (drains from full while cooling)</BetterInspectPane.InvertCooldownFill>
+
+  <BetterInspectPane.MinCooldownSeconds>Min cooldown to show bar: {0}s</BetterInspectPane.MinCooldownSeconds>
+
+  <BetterInspectPane.AutoHideBar>AutoHide</BetterInspectPane.AutoHideBar>
+
+  <BetterInspectPane.AutoHideBarTip>When enabled, this bar hides automatically at {0}; when disabled, it stays visible.</BetterInspectPane.AutoHideBarTip>
+
+  <BetterInspectPane.WhiteFont>WhiteFont</BetterInspectPane.WhiteFont>
+
+  <BetterInspectPane.WhiteFontTip>When enabled, this bar's label and value always render in white, ignoring the fill ratio (embedded text no longer turns black over the filled area).</BetterInspectPane.WhiteFontTip>
+
+  <BetterInspectPane.ChargeLabel>Charge</BetterInspectPane.ChargeLabel>
+
+  <BetterInspectPane.EnableChargeBar>Show charge bar</BetterInspectPane.EnableChargeBar>
+
+  <BetterInspectPane.ColorCharge>Charge bar color:</BetterInspectPane.ColorCharge>
+
+  <BetterInspectPane.EnableResearchBar>Show research bar</BetterInspectPane.EnableResearchBar>
+
+  <BetterInspectPane.ColorResearch>Research bar color:</BetterInspectPane.ColorResearch>
+
+  <BetterInspectPane.Mature>Mature</BetterInspectPane.Mature>
+
+  <BetterInspectPane.EnableWorldObjects>Apply inspect pane to world map objects</BetterInspectPane.EnableWorldObjects>
+
+  <BetterInspectPane.WorldObjectSection>World map objects</BetterInspectPane.WorldObjectSection>
+
+  <BetterInspectPane.TimeRemainingLabel>Remain</BetterInspectPane.TimeRemainingLabel>
+
+  <BetterInspectPane.EnableTimeRemainingBar>Show time remaining bar (world objects)</BetterInspectPane.EnableTimeRemainingBar>
+
+  <BetterInspectPane.ColorTimeRemaining>Time remaining bar color:</BetterInspectPane.ColorTimeRemaining>
+
+  <BetterInspectPane.FactionRelationLabel>Relation</BetterInspectPane.FactionRelationLabel>
+
+  <BetterInspectPane.EnableFactionRelationBar>Show faction relation bar (world objects)</BetterInspectPane.EnableFactionRelationBar>
+
+  <BetterInspectPane.ShowRelationThresholdMarker>Show relation threshold marker</BetterInspectPane.ShowRelationThresholdMarker>
+
+  <BetterInspectPane.ShowRelationThresholdMarker_Tip>Scale the faction relation bar by the relation cap and draw a marker at the vanilla ally threshold (75). With World Domination 2 active the cap comes from its settings (default 200); without it the vanilla goodwill cap (100) is used. When off, the bar keeps the vanilla scale (cap = ally threshold 75, no marker). The marker also obeys the threshold markers toggle on the Effects page.</BetterInspectPane.ShowRelationThresholdMarker_Tip>
+
+  <BetterInspectPane.StrengthLabel>Strength</BetterInspectPane.StrengthLabel>
+
+  <BetterInspectPane.EnableStrengthBar>Show strength bar on world objects (World Domination 2); hidden automatically when there is no strength cap (e.g. player colonies)</BetterInspectPane.EnableStrengthBar>
+
+  <BetterInspectPane.EnableZones>Apply inspect pane to zones</BetterInspectPane.EnableZones>
+
+  <BetterInspectPane.ZoneSection>Zones</BetterInspectPane.ZoneSection>
+
+  <BetterInspectPane.GrowingLabel>Planted</BetterInspectPane.GrowingLabel>
+
+  <BetterInspectPane.EnableGrowingBar>Show planted bar (growing zones)</BetterInspectPane.EnableGrowingBar>
+
+  <BetterInspectPane.ZoneGrowthLabel>Avg grow</BetterInspectPane.ZoneGrowthLabel>
+
+  <BetterInspectPane.EnableZoneGrowthBar>Show average growth bar (growing zones)</BetterInspectPane.EnableZoneGrowthBar>
+
+  <BetterInspectPane.StorageLabel>Capacity</BetterInspectPane.StorageLabel>
+
+  <BetterInspectPane.EnableStorageBar>Show space bar (stockpiles, storage buildings, and pipe storage containers)</BetterInspectPane.EnableStorageBar>
+
+  <BetterInspectPane.FishingLabel>Fish</BetterInspectPane.FishingLabel>
+
+  <BetterInspectPane.EnableFishingBar>Show fish bar (fishing zones)</BetterInspectPane.EnableFishingBar>
+
+  <BetterInspectPane.ShowFishingTargetPctMarker>Show target population threshold marker (fishing zones)</BetterInspectPane.ShowFishingTargetPctMarker>
+
+  <BetterInspectPane.ShowFishingTargetPctMarker_Tip>Draws a black threshold marker on the fish bar at the fishing zone's target population pct (default 50%). Below that share of the water body's fish population the zone stops fishing.</BetterInspectPane.ShowFishingTargetPctMarker_Tip>
+
+  <BetterInspectPane.ColorGrowing>Planted bar color:</BetterInspectPane.ColorGrowing>
+
+  <BetterInspectPane.ColorZoneGrowth>Average growth bar color:</BetterInspectPane.ColorZoneGrowth>
+
+  <BetterInspectPane.ColorStorage>Space bar color:</BetterInspectPane.ColorStorage>
+
+  <BetterInspectPane.ColorFishing>Fish bar color:</BetterInspectPane.ColorFishing>
+
+  <BetterInspectPane.EnablePawns>Pawn inspect pane (replace vanilla pane content for Pawns)</BetterInspectPane.EnablePawns>
+
+  <BetterInspectPane.EnablePawns_Tip>When enabled, selecting a Pawn replaces the vanilla pane content with this mod's progress bars (vanilla bottom tabs remain available; the timetable and allowed-area widgets are provided by this mod's self-drawn policy row). Off by default.</BetterInspectPane.EnablePawns_Tip>
+
+  <BetterInspectPane.EnablePawnPolicyRow>Show Pawn policy row (Food/Schedule/Outfit/Area)</BetterInspectPane.EnablePawnPolicyRow>
+
+  <BetterInspectPane.PolicyRowFontSize>Pawn policy row font size: {0}</BetterInspectPane.PolicyRowFontSize>
+
+  <BetterInspectPane.PolicyRowHeight>Pawn policy row height: {0}</BetterInspectPane.PolicyRowHeight>
+
+  <BetterInspectPane.PolicyRow.Food>Food: </BetterInspectPane.PolicyRow.Food>
+
+  <BetterInspectPane.PolicyRow.Timetable></BetterInspectPane.PolicyRow.Timetable>
+
+  <BetterInspectPane.PolicyRow.Outfit>Outfit: </BetterInspectPane.PolicyRow.Outfit>
+
+  <BetterInspectPane.PolicyRow.Area></BetterInspectPane.PolicyRow.Area>
+
+  <BetterInspectPane.PawnSection>Pawn</BetterInspectPane.PawnSection>
+
+  <BetterInspectPane.EnableThresholdMarkers>Show threshold markers (mood/blood/pain bars)</BetterInspectPane.EnableThresholdMarkers>
+
+  <BetterInspectPane.EnableThresholdMarkers_Tip>Shows minor/major/extreme mental break thresholds on the mood bar, bleeding stages on the blood bar, and the pain shock threshold on the pain bar (black lines).</BetterInspectPane.EnableThresholdMarkers_Tip>
+
+  <BetterInspectPane.ThresholdMarkerHeight>Threshold marker height: {0}px</BetterInspectPane.ThresholdMarkerHeight>
+
+  <BetterInspectPane.PawnHealthLabel>Health</BetterInspectPane.PawnHealthLabel>
+
+  <BetterInspectPane.BloodLabel>Blood</BetterInspectPane.BloodLabel>
+
+  <BetterInspectPane.EnableBloodBar>Show blood bar (Pawn)</BetterInspectPane.EnableBloodBar>
+
+  <BetterInspectPane.ColorBlood>Blood bar color:</BetterInspectPane.ColorBlood>
+
+  <BetterInspectPane.MoodLabel>Mood</BetterInspectPane.MoodLabel>
+
+  <BetterInspectPane.EnableMoodBar>Show mood bar (Pawn)</BetterInspectPane.EnableMoodBar>
+
+  <BetterInspectPane.ColorMood>Mood bar color:</BetterInspectPane.ColorMood>
+
+  <BetterInspectPane.FoodLabel>Food</BetterInspectPane.FoodLabel>
+
+  <BetterInspectPane.EnableFoodBar>Show food bar (Pawn)</BetterInspectPane.EnableFoodBar>
+
+  <BetterInspectPane.ColorFood>Food bar color:</BetterInspectPane.ColorFood>
+
+  <BetterInspectPane.RestLabel>Rest</BetterInspectPane.RestLabel>
+
+  <BetterInspectPane.EnableRestBar>Show rest bar (Pawn)</BetterInspectPane.EnableRestBar>
+
+  <BetterInspectPane.ColorRest>Rest bar color:</BetterInspectPane.ColorRest>
+
+  <BetterInspectPane.JoyLabel>Joy</BetterInspectPane.JoyLabel>
+
+  <BetterInspectPane.EnableJoyBar>Show joy bar (Pawn)</BetterInspectPane.EnableJoyBar>
+
+  <BetterInspectPane.ColorJoy>Joy bar color:</BetterInspectPane.ColorJoy>
+
+  <BetterInspectPane.MechEnergyLabel>Mech energy</BetterInspectPane.MechEnergyLabel>
+
+  <BetterInspectPane.EnableMechEnergyBar>Show mech energy bar (mechanoids)</BetterInspectPane.EnableMechEnergyBar>
+
+  <BetterInspectPane.ColorMechEnergy>Mech energy bar color:</BetterInspectPane.ColorMechEnergy>
+
+  <BetterInspectPane.MilkLabel>Milk</BetterInspectPane.MilkLabel>
+
+  <BetterInspectPane.EnableMilkBar>Show milk bar (milkable animals)</BetterInspectPane.EnableMilkBar>
+
+  <BetterInspectPane.ColorMilk>Milk bar color:</BetterInspectPane.ColorMilk>
+
+  <BetterInspectPane.WoolLabel>Wool</BetterInspectPane.WoolLabel>
+
+  <BetterInspectPane.EnableWoolBar>Show wool bar (shearable animals)</BetterInspectPane.EnableWoolBar>
+
+  <BetterInspectPane.ColorWool>Wool bar color:</BetterInspectPane.ColorWool>
+
+  <BetterInspectPane.BreedingLabel>Breeding</BetterInspectPane.BreedingLabel>
+
+  <BetterInspectPane.EnableBreedingBar>Show breeding bar (egg progress or pregnancy)</BetterInspectPane.EnableBreedingBar>
+
+  <BetterInspectPane.ColorBreeding>Breeding bar color:</BetterInspectPane.ColorBreeding>
+
+  <BetterInspectPane.PainLabel>Pain</BetterInspectPane.PainLabel>
+
+  <BetterInspectPane.PainToleranceLabel>PainTol</BetterInspectPane.PainToleranceLabel>
+
+  <BetterInspectPane.EnablePainBar>Show pain bar (Pawn)</BetterInspectPane.EnablePainBar>
+
+  <BetterInspectPane.InvertPainFill>Invert pain bar fill (drains from full as pain rises)</BetterInspectPane.InvertPainFill>
+
+  <BetterInspectPane.ColorPain>Pain bar color:</BetterInspectPane.ColorPain>
+
+  <BetterInspectPane.BladderLabel>Bladder</BetterInspectPane.BladderLabel>
+
+  <BetterInspectPane.EnableBladderBar>Show bladder bar (Dubs Bad Hygiene and similar needs)</BetterInspectPane.EnableBladderBar>
+
+  <BetterInspectPane.InvertBladderFill>Invert bladder bar ratio (e.g. 80% to 20%)</BetterInspectPane.InvertBladderFill>
+
+  <BetterInspectPane.ColorBladder>Bladder bar color:</BetterInspectPane.ColorBladder>
+
+  <BetterInspectPane.HygieneLabel>Hygiene</BetterInspectPane.HygieneLabel>
+
+  <BetterInspectPane.EnableHygieneBar>Show hygiene bar (Dubs Bad Hygiene and similar needs)</BetterInspectPane.EnableHygieneBar>
+
+  <BetterInspectPane.ColorHygiene>Hygiene bar color:</BetterInspectPane.ColorHygiene>
+
+  <BetterInspectPane.ThirstLabel>Thirst</BetterInspectPane.ThirstLabel>
+
+  <BetterInspectPane.EnableThirstBar>Show thirst bar (Dubs Bad Hygiene and similar needs)</BetterInspectPane.EnableThirstBar>
+
+  <BetterInspectPane.InvertThirstFill>Invert thirst bar ratio (e.g. 80% to 20%)</BetterInspectPane.InvertThirstFill>
+
+  <BetterInspectPane.ColorThirst>Thirst bar color:</BetterInspectPane.ColorThirst>
+
+  <BetterInspectPane.BatteryLabel>Battery</BetterInspectPane.BatteryLabel>
+
+  <BetterInspectPane.EnableBatteryBar>Show battery charge bar (batteries)</BetterInspectPane.EnableBatteryBar>
+
+  <BetterInspectPane.ColorBattery>Battery bar color:</BetterInspectPane.ColorBattery>
+
+  <BetterInspectPane.PowerGridLabel>Power</BetterInspectPane.PowerGridLabel>
+
+  <BetterInspectPane.EnablePowerGridBar>Show power grid charge bar (power devices)</BetterInspectPane.EnablePowerGridBar>
+
+  <BetterInspectPane.ColorPowerGrid>Power grid bar color:</BetterInspectPane.ColorPowerGrid>
+
+  <BetterInspectPane.EnableRedraw>Enable mod</BetterInspectPane.EnableRedraw>
+
+  <BetterInspectPane.EnableMultiSelectGrid>Show RTS-style unit selection grid when multiple objects are selected</BetterInspectPane.EnableMultiSelectGrid>
+
+  <BetterInspectPane.EnableMultiSelectGridZones>Apply the multi-select grid to zones</BetterInspectPane.EnableMultiSelectGridZones>
+  <BetterInspectPane.EnableMultiSelectGridZones_Tip>When you multi-select multiple zones on the map, the inspect pane shows a grid of them (grouped by zone type) instead of an empty body.</BetterInspectPane.EnableMultiSelectGridZones_Tip>
+  <BetterInspectPane.EnableMultiSelectGridWorldObjects>Apply the multi-select grid to world map objects</BetterInspectPane.EnableMultiSelectGridWorldObjects>
+  <BetterInspectPane.EnableMultiSelectGridWorldObjects_Tip>When you multi-select multiple world map objects, the world inspect pane shows a grid of them (grouped by object type).</BetterInspectPane.EnableMultiSelectGridWorldObjects_Tip>
+
+  <BetterInspectPane.MultiSelectCellSize>Grid cell size: {0}</BetterInspectPane.MultiSelectCellSize>
+
+  <BetterInspectPane.MultiSelectCellGap>Grid cell gap: {0}</BetterInspectPane.MultiSelectCellGap>
+
+  <BetterInspectPane.MultiSelectBorderWidth>Cell border width: {0}</BetterInspectPane.MultiSelectBorderWidth>
+
+  <BetterInspectPane.MultiSelectCountAbbreviation>Abbreviate counts ≥ 1000 with k</BetterInspectPane.MultiSelectCountAbbreviation>
+
+  <BetterInspectPane.MultiSelectBadgeShowX>Show "×" prefix on count badge</BetterInspectPane.MultiSelectBadgeShowX>
+
+  <BetterInspectPane.MultiSelectBadgeFontSize>Count badge font size: {0}</BetterInspectPane.MultiSelectBadgeFontSize>
+
+  <BetterInspectPane.MultiSelectBadgeScale>Count badge scale: {0}</BetterInspectPane.MultiSelectBadgeScale>
+
+  <BetterInspectPane.MultiSelectRows>Grid rows: {0}</BetterInspectPane.MultiSelectRows>
+
+  <BetterInspectPane.MultiSelectMore>+{0}</BetterInspectPane.MultiSelectMore>
+
+  <BetterInspectPane.MultiSelectGroupTip>{0} ×{1}</BetterInspectPane.MultiSelectGroupTip>
+
+  <BetterInspectPane.MultiSelectOverrideMinWidth>Override minimum width</BetterInspectPane.MultiSelectOverrideMinWidth>
+
+  <BetterInspectPane.MultiSelectMinWidth>Overridden minimum width: {0}</BetterInspectPane.MultiSelectMinWidth>
+
+  <BetterInspectPane.MultiSelectOverrideMinHeight>Override minimum height</BetterInspectPane.MultiSelectOverrideMinHeight>
+
+  <BetterInspectPane.MultiSelectMinHeight>Overridden minimum height: {0}</BetterInspectPane.MultiSelectMinHeight>
+
+  <BetterInspectPane.MultiSelectAdaptiveHeight>Adaptive height (raise the pane automatically when too short to show all rows)</BetterInspectPane.MultiSelectAdaptiveHeight>
+
+  <BetterInspectPane.MultiSelectGridBackgroundExact>Draw the background frame to match the actual grid (off = fill the whole content area)</BetterInspectPane.MultiSelectGridBackgroundExact>
+
+  <BetterInspectPane.MultiSelectShiftDrag>Use Shift for multi-select (swaps roles with left-click: Shift multi-selects / left-click single-selects)</BetterInspectPane.MultiSelectShiftDrag>
+  <BetterInspectPane.MultiSelectShiftDrag_Tip>off: left-click / left-drag multi-selects, Shift+left-click single-selects. When on: hold Shift and click or drag to multi-select (drag to box-select), left-click single-selects.</BetterInspectPane.MultiSelectShiftDrag_Tip>
+
+  <BetterInspectPane.MultiSelectCtrlDrag>Use Ctrl for multi-cancel (swaps roles with right-click: Ctrl multi-cancels / right-click cancels)</BetterInspectPane.MultiSelectCtrlDrag>
+  <BetterInspectPane.MultiSelectCtrlDrag_Tip>off: right-click / right-drag multi-cancels, Ctrl+click cancels. When on: hold Ctrl and click or drag to multi-cancel (drag to box-mark for removal), right-click cancels the selection.</BetterInspectPane.MultiSelectCtrlDrag_Tip>
+
+  <BetterInspectPane.MultiSelectExpandSingleGroupPawn>Expand single group: Pawns</BetterInspectPane.MultiSelectExpandSingleGroupPawn>
+  <BetterInspectPane.MultiSelectExpandSingleGroupPawn_Tip>When the selected non-colonist Pawns are all the same kind, show each one individually (off = aggregate the kind into one ×N cell).</BetterInspectPane.MultiSelectExpandSingleGroupPawn_Tip>
+
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonPawn>Expand single group: non-Pawn Thing</BetterInspectPane.MultiSelectExpandSingleGroupNonPawn>
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonPawn_Tip>When the selected non-Pawn items, structures, etc. are all the same kind, show each stack individually (on = stops aggregating them into one ×N cell).</BetterInspectPane.MultiSelectExpandSingleGroupNonPawn_Tip>
+
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonThing>Expand single group: non-Thing (zones / world objects)</BetterInspectPane.MultiSelectExpandSingleGroupNonThing>
+  <BetterInspectPane.MultiSelectExpandSingleGroupNonThing_Tip>When the selected zones (or world objects) are all the same type (and faction), show each one individually instead of aggregating them into one ×N cell.</BetterInspectPane.MultiSelectExpandSingleGroupNonThing_Tip>
+
+  <BetterInspectPane.EnableMultiSelectHealthBar>Show a health bar at the top of each grid cell</BetterInspectPane.EnableMultiSelectHealthBar>
+  <BetterInspectPane.MultiSelectHealthBarHeight>Health bar height: {0}</BetterInspectPane.MultiSelectHealthBarHeight>
+  <BetterInspectPane.MultiSelectHideFullPawnHealthBar>Hide health bar when a Pawn's health is at 100%</BetterInspectPane.MultiSelectHideFullPawnHealthBar>
+  <BetterInspectPane.MultiSelectHideFullNonPawnHealthBar>Hide health bar when a non-Pawn's health is at 100%</BetterInspectPane.MultiSelectHideFullNonPawnHealthBar>
+  <BetterInspectPane.UseHealthBackgroundInsteadOfBar>Use a health background instead of the health bar</BetterInspectPane.UseHealthBackgroundInsteadOfBar>
+  <BetterInspectPane.InvertHealthBackground>Invert health background fill (fill by damage, from the top)</BetterInspectPane.InvertHealthBackground>
+  <BetterInspectPane.MultiSelectMapIndicator>Extra selection indicator</BetterInspectPane.MultiSelectMapIndicator>
+  <BetterInspectPane.MultiSelectMapIndicator_Tip>Mark the currently hovered / Shift-built / Ctrl-marked items on the map with the vanilla indicator arrow, so you can locate them easily.</BetterInspectPane.MultiSelectMapIndicator_Tip>
+
+  <BetterInspectPane.ShowSeparators>Show gray separators</BetterInspectPane.ShowSeparators>
+
+  <BetterInspectPane.DefaultBarHeight>Bar default height: {0}</BetterInspectPane.DefaultBarHeight>
+
+  <BetterInspectPane.SeparatorHeight>Separator height: {0}</BetterInspectPane.SeparatorHeight>
+
+  <BetterInspectPane.RowSpacing>Row spacing: {0}</BetterInspectPane.RowSpacing>
+
+  <BetterInspectPane.LabelWidth>Label width: {0}</BetterInspectPane.LabelWidth>
+
+  <BetterInspectPane.ValueWidth>Value width: {0}</BetterInspectPane.ValueWidth>
+
+  <BetterInspectPane.LabelFontSize>Bar label font size: {0}</BetterInspectPane.LabelFontSize>
+
+  <BetterInspectPane.ValueFontSize>Bar value font size: {0}</BetterInspectPane.ValueFontSize>
+
+  <BetterInspectPane.InfoFontSize>Inspect string font size: {0}</BetterInspectPane.InfoFontSize>
+
+  <BetterInspectPane.PaneWidth>Minimum inspect pane width: {0}</BetterInspectPane.PaneWidth>
+
+  <BetterInspectPane.PaneHeight>Minimum inspect pane height: {0}</BetterInspectPane.PaneHeight>
+
+  <BetterInspectPane.HealthValueStyle>Health bar value</BetterInspectPane.HealthValueStyle>
+
+  <BetterInspectPane.ShieldValueStyle>Shield bar value</BetterInspectPane.ShieldValueStyle>
+
+  <BetterInspectPane.AmmoValueStyle>Ammo bar value</BetterInspectPane.AmmoValueStyle>
+
+  <BetterInspectPane.FreshnessValueStyle>Freshness bar value</BetterInspectPane.FreshnessValueStyle>
+
+  <BetterInspectPane.WorkValueStyle>Work bar value</BetterInspectPane.WorkValueStyle>
+
+  <BetterInspectPane.Layout>Layout:</BetterInspectPane.Layout>
+
+  <BetterInspectPane.Layout_Single>Single column</BetterInspectPane.Layout_Single>
+
+  <BetterInspectPane.Layout_Two>Two columns</BetterInspectPane.Layout_Two>
+
+  <BetterInspectPane.Layout_Three>Three columns</BetterInspectPane.Layout_Three>
+
+  <BetterInspectPane.Layout_Four>Four columns</BetterInspectPane.Layout_Four>
+
+  <BetterInspectPane.ColumnGap>Column gap: {0}</BetterInspectPane.ColumnGap>
+
+  <BetterInspectPane.EvenSplitTwoBarRows>Evenly split 2-bar rows (3/4 columns)</BetterInspectPane.EvenSplitTwoBarRows>
+
+  <BetterInspectPane.EvenSplitTwoBarRowsTip>In 3- or 4-column layout, when a row contains only one or two single-column bars (e.g. one single-column bar, two single-column bars, or a single-column bar plus an adaptive bar) leaving columns empty, that row is instead shown as two equal halves (a single bar takes the left half) to avoid the gap.</BetterInspectPane.EvenSplitTwoBarRowsTip>
+
+  <BetterInspectPane.BarSpan>Placement:</BetterInspectPane.BarSpan>
+
+  <BetterInspectPane.BarSpan_FullRow>Full row</BetterInspectPane.BarSpan_FullRow>
+
+  <BetterInspectPane.BarSpan_Column>Single column</BetterInspectPane.BarSpan_Column>
+
+  <BetterInspectPane.BarSpan_TwoColumns>Two columns</BetterInspectPane.BarSpan_TwoColumns>
+
+  <BetterInspectPane.BarSpan_Adaptive>Adaptive</BetterInspectPane.BarSpan_Adaptive>
+
+  <BetterInspectPane.BarOrder>Order:</BetterInspectPane.BarOrder>
+
+  <BetterInspectPane.MoveUp>Move up</BetterInspectPane.MoveUp>
+
+  <BetterInspectPane.MoveDown>Move down</BetterInspectPane.MoveDown>
+
+  <BetterInspectPane.BarHeightOffset>Height offset: {0}</BetterInspectPane.BarHeightOffset>
+
+  <BetterInspectPane.BarFontScale>Font scale: {0}</BetterInspectPane.BarFontScale>
+
+  <BetterInspectPane.ValueStyleLabel>Style:</BetterInspectPane.ValueStyleLabel>
+
+  <BetterInspectPane.ValueStyle_Numeric>Value</BetterInspectPane.ValueStyle_Numeric>
+
+  <BetterInspectPane.ValueStyle_Percent>Percent</BetterInspectPane.ValueStyle_Percent>
+
+  <BetterInspectPane.ValueStyle_PercentOneDecimal>1 decimal</BetterInspectPane.ValueStyle_PercentOneDecimal>
+
+  <BetterInspectPane.ValueStyle_PercentTwoDecimals>2 decimals</BetterInspectPane.ValueStyle_PercentTwoDecimals>
+
+  <BetterInspectPane.ValueStyle_None>None</BetterInspectPane.ValueStyle_None>
+
+  <BetterInspectPane.LabelStyleLabel>Label style:</BetterInspectPane.LabelStyleLabel>
+
+  <BetterInspectPane.LabelStyle_Normal>Normal</BetterInspectPane.LabelStyle_Normal>
+
+  <BetterInspectPane.LabelStyle_Embedded>Embedded</BetterInspectPane.LabelStyle_Embedded>
+
+  <BetterInspectPane.BarValueStyleLabel>Value style:</BetterInspectPane.BarValueStyleLabel>
+
+  <BetterInspectPane.BarValueStyle_Normal>Normal</BetterInspectPane.BarValueStyle_Normal>
+
+  <BetterInspectPane.BarValueStyle_Embedded>Embedded</BetterInspectPane.BarValueStyle_Embedded>
+
+  <BetterInspectPane.BarValueStyle_Hidden>Hidden</BetterInspectPane.BarValueStyle_Hidden>
+
+  <BetterInspectPane.EmbedInsetLabel>Label embed inset: {0}</BetterInspectPane.EmbedInsetLabel>
+
+  <BetterInspectPane.EmbedInsetValue>Value embed inset: {0}</BetterInspectPane.EmbedInsetValue>
+
+  <BetterInspectPane.EnableEaseEffect>Enable easing effect</BetterInspectPane.EnableEaseEffect>
+
+  <BetterInspectPane.EaseSpeed>Ease speed: {0}</BetterInspectPane.EaseSpeed>
+
+  <BetterInspectPane.EasingStyle>Easing style</BetterInspectPane.EasingStyle>
+
+  <BetterInspectPane.EasingStyle_Linear>Linear</BetterInspectPane.EasingStyle_Linear>
+
+  <BetterInspectPane.EasingStyle_EaseIn>Ease in</BetterInspectPane.EasingStyle_EaseIn>
+
+  <BetterInspectPane.EasingStyle_EaseOut>Ease out</BetterInspectPane.EasingStyle_EaseOut>
+
+  <BetterInspectPane.EnableShieldBar>Show shield bar</BetterInspectPane.EnableShieldBar>
+
+  <BetterInspectPane.ColorShield>Shield color:</BetterInspectPane.ColorShield>
+
+  <BetterInspectPane.EnableAmmoBar>Show ammo bar (things with fuel)</BetterInspectPane.EnableAmmoBar>
+
+  <BetterInspectPane.ColorAmmo>Ammo bar color:</BetterInspectPane.ColorAmmo>
+
+  <BetterInspectPane.EnableFreshnessBar>Show freshness bar (rotables)</BetterInspectPane.EnableFreshnessBar>
+
+  <BetterInspectPane.ColorFreshness>Freshness bar color:</BetterInspectPane.ColorFreshness>
+
+  <BetterInspectPane.EnableWorkBar>Show work bar (unfinished items and building frames)</BetterInspectPane.EnableWorkBar>
+
+  <BetterInspectPane.ColorWork>Work bar color:</BetterInspectPane.ColorWork>
+
+  <BetterInspectPane.EnableGrowthBar>Show growth bar (plants)</BetterInspectPane.EnableGrowthBar>
+
+  <BetterInspectPane.ColorGrowth>Growth bar color:</BetterInspectPane.ColorGrowth>
+
+  <BetterInspectPane.EnableExplosiveThreshold>Show explosive threshold marker</BetterInspectPane.EnableExplosiveThreshold>
+
+  <BetterInspectPane.ThinExplosiveMarker>Thin marker (1px)</BetterInspectPane.ThinExplosiveMarker>
+
+  <BetterInspectPane.ColorExplosiveThreshold>Explosive threshold color:</BetterInspectPane.ColorExplosiveThreshold>
+
+  <BetterInspectPane.ColorMultiSelectBorder>Multi-select cell border color:</BetterInspectPane.ColorMultiSelectBorder>
+  <BetterInspectPane.ColorHealthBackground>Health background color:</BetterInspectPane.ColorHealthBackground>
+
+  <BetterInspectPane.ColorFull>Full health color:</BetterInspectPane.ColorFull>
+
+  <BetterInspectPane.ColorMid>Mid health color:</BetterInspectPane.ColorMid>
+
+  <BetterInspectPane.ColorLow>Low health color:</BetterInspectPane.ColorLow>
+
+  <BetterInspectPane.ColorEmpty>Bar background color:</BetterInspectPane.ColorEmpty>
+
+  <BetterInspectPane.ChangeColor>Change</BetterInspectPane.ChangeColor>
+
+  <BetterInspectPane.AlphaLabel>Alpha</BetterInspectPane.AlphaLabel>
+
+  <BetterInspectPane.ResetColors>Reset all colors to default</BetterInspectPane.ResetColors>
+
+  <BetterInspectPane.OpenSettingsTip>Open this mod's settings during gameplay</BetterInspectPane.OpenSettingsTip>
+
+  <BetterInspectPane.SettingsWindowTitle>Better Inspect Pane · Settings</BetterInspectPane.SettingsWindowTitle>
+
+  <BetterInspectPane.EnableExtraNormalObjectText>Show extra info at the end of normal objects' inspect text</BetterInspectPane.EnableExtraNormalObjectText>
+
+  <BetterInspectPane.EnableExtraFactionText>Show owning faction</BetterInspectPane.EnableExtraFactionText>
+
+  <BetterInspectPane.HideFactionPlayerText>Hide the player faction</BetterInspectPane.HideFactionPlayerText>
+
+  <BetterInspectPane.HideFactionNoneText>Hide objects without a faction</BetterInspectPane.HideFactionNoneText>
+
+  <BetterInspectPane.EnableExtraNaturalGoodwillText>Show natural goodwill of world map objects</BetterInspectPane.EnableExtraNaturalGoodwillText>
+
+  <BetterInspectPane.EnableExtraFactionDefLabelText>Show faction type of faction settlements</BetterInspectPane.EnableExtraFactionDefLabelText>
+
+  <BetterInspectPane.EnableExtraMarketValueText>Show market value</BetterInspectPane.EnableExtraMarketValueText>
+
+  <BetterInspectPane.EnableExtraWeaponText>Show extra weapon info</BetterInspectPane.EnableExtraWeaponText>
+
+  <BetterInspectPane.EnableExtraWeaponDamageText>Show weapon damage per shot</BetterInspectPane.EnableExtraWeaponDamageText>
+
+  <BetterInspectPane.EnableExtraWeaponRangeText>Show weapon range</BetterInspectPane.EnableExtraWeaponRangeText>
+
+  <BetterInspectPane.EnableExtraWeaponCooldownText>Show weapon cooldown</BetterInspectPane.EnableExtraWeaponCooldownText>
+
+  <BetterInspectPane.EnableExtraWeaponDpsText>Show weapon DPS</BetterInspectPane.EnableExtraWeaponDpsText>
+
+  <BetterInspectPane.EnableExtraWeaponArmorPenText>Show weapon armor penetration</BetterInspectPane.EnableExtraWeaponArmorPenText>
+
+  <BetterInspectPane.EnableExtraApparelText>Show extra apparel info</BetterInspectPane.EnableExtraApparelText>
+
+  <BetterInspectPane.EnableExtraApparelLayerText>Show covering apparel layers</BetterInspectPane.EnableExtraApparelLayerText>
+
+  <BetterInspectPane.EnableExtraApparelSharpArmorText>Show sharp armor</BetterInspectPane.EnableExtraApparelSharpArmorText>
+
+  <BetterInspectPane.EnableExtraApparelBluntArmorText>Show blunt armor</BetterInspectPane.EnableExtraApparelBluntArmorText>
+
+  <BetterInspectPane.EnableExtraApparelHeatArmorText>Show heat armor</BetterInspectPane.EnableExtraApparelHeatArmorText>
+
+  <BetterInspectPane.EnableExtraNutritionText>Show nutrition</BetterInspectPane.EnableExtraNutritionText>
+
+  <BetterInspectPane.EnableExtraBeautyText>Show beauty</BetterInspectPane.EnableExtraBeautyText>
+
+  <BetterInspectPane.EnableExtraComfortText>Show comfort</BetterInspectPane.EnableExtraComfortText>
+
+  <BetterInspectPane.EnableExtraCeHeightText>Show height (Combat Extended)</BetterInspectPane.EnableExtraCeHeightText>
+
+  <BetterInspectPane.EnableExtraCeHeightPawnText>Show height for pawns</BetterInspectPane.EnableExtraCeHeightPawnText>
+
+  <BetterInspectPane.EnableExtraPawnText>Show extra info above pawns' inspect text</BetterInspectPane.EnableExtraPawnText>
+
+  <BetterInspectPane.EnableExtraPawnTraitText>Show traits</BetterInspectPane.EnableExtraPawnTraitText>
+
+  <BetterInspectPane.EnableExtraMapTileText>Show nearby pollution / nearby factions on empty world map tiles</BetterInspectPane.EnableExtraMapTileText>
+
+  <BetterInspectPane.EnableSelectionLimitModify>Modify selection count limit</BetterInspectPane.EnableSelectionLimitModify>
+  <BetterInspectPane.EnableSelectionLimitModify_Tip>When enabled, a slider appears to set the maximum number of objects you can select at once. The vanilla game hard-codes this to 200; the change applies to both clicking and drag-box selection.</BetterInspectPane.EnableSelectionLimitModify_Tip>
+  <BetterInspectPane.SelectionLimit>Selection count limit: {0}</BetterInspectPane.SelectionLimit>
+
+  <BetterInspectPane.EnableImprovedShiftSelection>Improved vanilla Shift selection</BetterInspectPane.EnableImprovedShiftSelection>
+  <BetterInspectPane.EnableImprovedShiftSelection_Tip>Changes how holding Shift changes the selection.
+•  Drag-box: when the current priority (colonists → humanlikes → resources → pawns → selectable) only matches objects that are already selected, it falls through to the next priority instead of stopping, so new objects of a lower priority can still be added.
+•  Clicking: if the clicked object is of a different type than your current selection (e.g. you have pawns selected and Shift-click a zone, which in vanilla would clear the pawns), that selection is ignored and your current selection is kept.</BetterInspectPane.EnableImprovedShiftSelection_Tip>
+
+  <BetterInspectPane.EnableCtrlSelection>Ctrl selection (Ctrl + drag)</BetterInspectPane.EnableCtrlSelection>
+  <BetterInspectPane.EnableCtrlSelection_Tip>When holding Ctrl and drag-boxing, selection depends on your current selection:
+• Nothing selected: select all of the player's pawns in the box; if none, all of the player's turret buildings; if none, all buildings; if none, vanilla behavior.
+• One or more selected (based on the first one): incrementally add all similar objects in the box (vanilla similarity: same def and faction, or equivalent pawns); if nothing new was added, select by the base object's type — zone → all zones, pawn → all pawns of the same faction, building → all buildings of the same faction, resource → all resources, otherwise → all non-pawn non-resource non-building selectables; if still nothing, vanilla behavior.
+Holding Ctrl never clears the current selection.</BetterInspectPane.EnableCtrlSelection_Tip>
+
+  <BetterInspectPane.EnableRememberOpenTab>Remember the open inspect tab</BetterInspectPane.EnableRememberOpenTab>
+  <BetterInspectPane.EnableRememberOpenTab_Tip>When enabled, after switching target types closes the inspect tab, re-selecting the same type of target will auto-open the previously opened tab if it can still be opened.
+• Remembers the last N target types (a type is determined by the tabs it can open), where N is the capacity set by the slider below (2-10, default 2); e.g. with capacity 2, after A→B→C→A the memory of A is lost.
+• Manually closing a tab won't re-open it immediately; it only auto-opens when you switch to another type and then back.</BetterInspectPane.EnableRememberOpenTab_Tip>
+  <BetterInspectPane.RememberOpenTabCapacity>Remembered target types: {0}</BetterInspectPane.RememberOpenTabCapacity>
+
+  <BetterInspectPane.MarketValueLabel>Market value: {0}</BetterInspectPane.MarketValueLabel>
+
+  <BetterInspectPane.MarketValueStackLabel>Market value: {0} ({1} each)</BetterInspectPane.MarketValueStackLabel>
+
+  <BetterInspectPane.BeautyLabel>Beauty: {0}</BetterInspectPane.BeautyLabel>
+
+  <BetterInspectPane.ComfortLabel>Comfort: {0}</BetterInspectPane.ComfortLabel>
+
+  <BetterInspectPane.DamagePerShotLabel>Damage per shot: {0}</BetterInspectPane.DamagePerShotLabel>
+
+  <BetterInspectPane.RangedRangeLabel>Range: {0}</BetterInspectPane.RangedRangeLabel>
+
+  <BetterInspectPane.RangedCooldownLabel>Cooldown: {0}s (+{1}s)</BetterInspectPane.RangedCooldownLabel>
+
+  <BetterInspectPane.MeleeCooldownLabel>Cooldown: {0}s</BetterInspectPane.MeleeCooldownLabel>
+
+  <BetterInspectPane.RangedDPSLabel>Ranged DPS: {0}</BetterInspectPane.RangedDPSLabel>
+
+  <BetterInspectPane.MeleeDPSLabel>Melee DPS: {0}</BetterInspectPane.MeleeDPSLabel>
+
+  <BetterInspectPane.RangedArmorPenLabel>Ranged armor penetration: {0}</BetterInspectPane.RangedArmorPenLabel>
+
+  <BetterInspectPane.MeleeArmorPenLabel>Melee armor penetration: {0}</BetterInspectPane.MeleeArmorPenLabel>
+
+  <BetterInspectPane.FactionLabel>Faction: {0}</BetterInspectPane.FactionLabel>
+
+  <BetterInspectPane.NoFactionLabel>Faction: none</BetterInspectPane.NoFactionLabel>
+
+  <BetterInspectPane.NaturalGoodwillNeutralLabel>Natural Neutral ({0})</BetterInspectPane.NaturalGoodwillNeutralLabel>
+
+  <BetterInspectPane.NaturalGoodwillFriendlyLabel>Natural Ally ({0})</BetterInspectPane.NaturalGoodwillFriendlyLabel>
+
+  <BetterInspectPane.NaturalGoodwillHostileLabel>Natural Hostile ({0})</BetterInspectPane.NaturalGoodwillHostileLabel>
+
+  <BetterInspectPane.FactionDefLabel>Faction type: {0}</BetterInspectPane.FactionDefLabel>
+
+  <BetterInspectPane.PermanentEnemyLabel>Permanent Enemy</BetterInspectPane.PermanentEnemyLabel>
+
+  <BetterInspectPane.ApparelLayersLabel>Covering layers: {0}</BetterInspectPane.ApparelLayersLabel>
+
+  <BetterInspectPane.ApparelSharpArmorLabel>Sharp armor: {0}</BetterInspectPane.ApparelSharpArmorLabel>
+
+  <BetterInspectPane.ApparelBluntArmorLabel>Blunt armor: {0}</BetterInspectPane.ApparelBluntArmorLabel>
+
+  <BetterInspectPane.ApparelHeatArmorLabel>Heat armor: {0}</BetterInspectPane.ApparelHeatArmorLabel>
+
+  <BetterInspectPane.NutritionLabel>Nutrition: {0}</BetterInspectPane.NutritionLabel>
+
+  <BetterInspectPane.CeHeightLabel>Height: {0} m</BetterInspectPane.CeHeightLabel>
+
+  <BetterInspectPane.TraitLabel>Traits: {0}</BetterInspectPane.TraitLabel>
+
+  <BetterInspectPane.NearPollutionLabel>Nearby pollution: {0}</BetterInspectPane.NearPollutionLabel>
+
+  <BetterInspectPane.NearFactionLabel>Nearby factions: {0}</BetterInspectPane.NearFactionLabel>
+
+  <BetterInspectPane.EnableInfoCardPlusPins>Add Info Card Plus pinned stats to the inspect text</BetterInspectPane.EnableInfoCardPlusPins>
+
+  <BetterInspectPane.EnableInfoCardPlusPins_Tip>Requires Info Card Plus. Stats pinned in that mod's info card are added to this pane's inspect text; items duplicating this mod's extra info show only the pinned version.</BetterInspectPane.EnableInfoCardPlusPins_Tip>
+
+  <BetterInspectPane.EnableInfoCardPlusPinsHighlight>Highlight pinned stat name labels (bold + yellow)</BetterInspectPane.EnableInfoCardPlusPinsHighlight>
+
+  <BetterInspectPane.EnableInfoCardPlusPinsPawn>Add pinned stats for pawns</BetterInspectPane.EnableInfoCardPlusPinsPawn>
+
+  <BetterInspectPane.EnableInfoCardPlusPinsPawn_Tip>Requires Info Card Plus. When enabled, stats pinned in that mod's info card are also added to pawns' inspect text.</BetterInspectPane.EnableInfoCardPlusPinsPawn_Tip>
+
+  <BetterInspectPane.InfoCardPlusPinnedPosition>Pinned stats position:</BetterInspectPane.InfoCardPlusPinnedPosition>
+
+  <BetterInspectPane.InfoCardPlusPinnedPosition_Before>Before</BetterInspectPane.InfoCardPlusPinnedPosition_Before>
+
+  <BetterInspectPane.InfoCardPlusPinnedPosition_After>After</BetterInspectPane.InfoCardPlusPinnedPosition_After>
+
+  <BetterInspectPane.InfoCardPlusPinnedLine>{0}: {1}</BetterInspectPane.InfoCardPlusPinnedLine>
+
+  <BetterInspectPane.InfoCardPlusPinnedLineHighlight>&lt;b&gt;&lt;color=#E6C75F&gt;{0}: &lt;/color&gt;&lt;/b&gt;{1}</BetterInspectPane.InfoCardPlusPinnedLineHighlight>
+
+  <BetterInspectPane.PageGeneral>General</BetterInspectPane.PageGeneral>
+
+  <BetterInspectPane.PageBars>Bars</BetterInspectPane.PageBars>
+
+  <BetterInspectPane.PageEffects>Effects &amp; Misc</BetterInspectPane.PageEffects>
+
+  <BetterInspectPane.PageColors>Colors</BetterInspectPane.PageColors>
+
+  <BetterInspectPane.PageMultiSelect>Multi-Select</BetterInspectPane.PageMultiSelect>
+
+</LanguageData>

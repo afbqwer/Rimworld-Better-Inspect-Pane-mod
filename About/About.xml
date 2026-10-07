@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ModMetaData>
+	<name>Better Inspect Pane</name>
+	<author>assssssqwww</author>
+	<supportedVersions>
+		<li>1.6</li>
+	</supportedVersions>
+	<url>https://github.com/afbqwer/Rimworld-Better-Inspect-Pane-mod</url>
+	<packageId>assssssqwww.BetterInspectPane</packageId>
+	<description>Better Inspect Pane overhauls the vanilla inspect pane, making it more informative and customizable.
+
+Features:
+Enhanced pane drawing with configurable margin and title font size.
+RTS-style unit selection grid for multi-select.
+Improved Shift selection, and Ctrl drag-box batch selection (select all player pawns / turrets / similar objects, default off).
+Optional status bars for health, shield, ammo, freshness, work progress, growth, battery...
+Works with buildings, plants, items, world map objects, zones and storage areas.
+Flexible two-column layout with adjustable bar order and spacing.
+Full color customization for bars and backgrounds.
+An in-game settings window to fine-tune everything at any time.
+
+Mod Compatibility:
+✓ [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1508850027]RimHUD[/url]
+✓ [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2023507013]Vanilla Expanded Framework[/url] Pipe Net / Process
+
+Performance Impact: Very Low
+In benchmark profiling , this mod's drawing code costs only ~0.05ms. For comparison, the vanilla inspect pane drawing (InspectPaneFiller.DrawInspectStringFor) alone takes ~0.1ms per frame, so the mod adds little overhead on top of what vanilla already does. You should notice no difference from vanilla in normal gameplay.
+</description>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>jaxe.rimhud</li>
+		<li>oskarpotocki.vanillafactionsexpanded.core</li>
+		<li>vanillaexpanded.gravship</li>
+		<li>ceteam.combatextended</li>
+	</loadAfter>
+</ModMetaData>
