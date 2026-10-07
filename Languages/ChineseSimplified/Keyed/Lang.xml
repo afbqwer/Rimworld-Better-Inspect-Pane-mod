@@ -21,6 +21,18 @@
 
   <BetterInspectPane.PawnShowSkills>显示 Pawn 技能（在普通条区域下方显示技能等级条）</BetterInspectPane.PawnShowSkills>
 
+  <BetterInspectPane.PawnSkillTooltip>技能条悬浮提示</BetterInspectPane.PawnSkillTooltip>
+
+  <BetterInspectPane.PawnSkillTooltipTip>开启后，鼠标悬停技能条时显示原版角色面板的技能提示（技能说明、当前等级、升级进度、学习速度等，与原版角色页悬浮提示一致）。</BetterInspectPane.PawnSkillTooltipTip>
+
+  <BetterInspectPane.PawnSkillPlainText>技能条纯文本样式</BetterInspectPane.PawnSkillPlainText>
+
+  <BetterInspectPane.PawnSkillPlainTextTip>开启后，技能条仅绘制技能名与等级文本，不绘制条背景与进度填充（激情显示与悬浮提示不受影响；白色字体开关在此样式下无意义）。</BetterInspectPane.PawnSkillPlainTextTip>
+
+  <BetterInspectPane.PawnSkillShowProgressText>技能等级显示升级进度</BetterInspectPane.PawnSkillShowProgressText>
+
+  <BetterInspectPane.PawnSkillShowProgressTextTip>开启后，技能等级以固定两位小数附带当前等级内的升级进度：如 5 级 + 55% 升级进度 = 5.55、5 级 + 5% = 5.05，整级 / 满级同样带小数 = 5.00 / 20.00。关闭则显示整数等级。</BetterInspectPane.PawnSkillShowProgressTextTip>
+
   <BetterInspectPane.PawnSkillWhiteFont>技能条文本使用白色字体</BetterInspectPane.PawnSkillWhiteFont>
 
   <BetterInspectPane.PawnSkillWhiteFontTip>开启后，技能条上的技能名与等级无视进度条比例，总是以白色显示（条内嵌入文字不再随进度反黑）；关闭后恢复进度反色遮罩（未覆盖区白色、已覆盖区黑色）。</BetterInspectPane.PawnSkillWhiteFontTip>

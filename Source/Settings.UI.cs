@@ -605,10 +605,28 @@ public partial class MyModTemplateSettings : ModSettings
 
             if (pawnShowSkills)
             {
+                // 技能条悬浮提示（默认开启）：悬停技能条时显示原版角色面板的技能提示。
+                Rect skillTooltipRect = new Rect(x, y, width, RowHeight);
+                Widgets.CheckboxLabeled(skillTooltipRect, "BetterInspectPane.PawnSkillTooltip".Translate(), ref pawnSkillTooltip);
+                TooltipHandler.TipRegion(skillTooltipRect, "BetterInspectPane.PawnSkillTooltipTip".Translate());
+                y += RowGap;
+
+                // 技能条纯文本样式（默认关闭）：仅绘制技能名与等级文本，不绘制条背景与进度填充。
+                Rect skillPlainTextRect = new Rect(x, y, width, RowHeight);
+                Widgets.CheckboxLabeled(skillPlainTextRect, "BetterInspectPane.PawnSkillPlainText".Translate(), ref pawnSkillPlainText);
+                TooltipHandler.TipRegion(skillPlainTextRect, "BetterInspectPane.PawnSkillPlainTextTip".Translate());
+                y += RowGap;
+
                 // 技能条按总进度填充（默认关闭）：开启后填充比例 = (当前等级 + 当前升级进度%) / 技能等级上限 20。
                 Rect skillTotalProgressRect = new Rect(x, y, width, RowHeight);
                 Widgets.CheckboxLabeled(skillTotalProgressRect, "BetterInspectPane.PawnSkillTotalProgress".Translate(), ref pawnSkillTotalProgress);
                 TooltipHandler.TipRegion(skillTotalProgressRect, "BetterInspectPane.PawnSkillTotalProgressTip".Translate());
+                y += RowGap;
+
+                // 技能等级显示升级进度小数（默认关闭）：等级以固定两位小数显示，如 5 级 + 55% 升级进度 = 5.55，整级 / 满级 = 5.00 / 20.00。
+                Rect skillProgressTextRect = new Rect(x, y, width, RowHeight);
+                Widgets.CheckboxLabeled(skillProgressTextRect, "BetterInspectPane.PawnSkillShowProgressText".Translate(), ref pawnSkillShowProgressText);
+                TooltipHandler.TipRegion(skillProgressTextRect, "BetterInspectPane.PawnSkillShowProgressTextTip".Translate());
                 y += RowGap;
 
                 // 技能条文本用白色字体（默认开启）：开启后标签与数值无视进度条比例，总是以白色显示。

@@ -21,6 +21,18 @@
 
   <BetterInspectPane.PawnShowSkills>Show Pawn skills (skill level bars below the regular bar area)</BetterInspectPane.PawnShowSkills>
 
+  <BetterInspectPane.PawnSkillTooltip>Skill bar tooltips</BetterInspectPane.PawnSkillTooltip>
+
+  <BetterInspectPane.PawnSkillTooltipTip>When enabled, hovering a skill bar shows the vanilla character tab skill tooltip (skill description, current level, xp progress, learning speed, etc., identical to the vanilla tooltip).</BetterInspectPane.PawnSkillTooltipTip>
+
+  <BetterInspectPane.PawnSkillPlainText>Plain text skill style</BetterInspectPane.PawnSkillPlainText>
+
+  <BetterInspectPane.PawnSkillPlainTextTip>When enabled, skill entries draw only the skill name and level text, without the bar background and progress fill (passion display and tooltips are unaffected; the white font toggle has no effect in this style).</BetterInspectPane.PawnSkillPlainTextTip>
+
+  <BetterInspectPane.PawnSkillShowProgressText>Show xp progress in skill level</BetterInspectPane.PawnSkillShowProgressText>
+
+  <BetterInspectPane.PawnSkillShowProgressTextTip>When enabled, the skill level is shown in fixed two-decimal format with the xp progress within the current level: e.g. level 5 + 55% progress = 5.55, level 5 + 5% = 5.05, whole / max levels also carry decimals = 5.00 / 20.00. When disabled, the integer level is shown.</BetterInspectPane.PawnSkillShowProgressTextTip>
+
   <BetterInspectPane.PawnSkillWhiteFont>Skill bar text in white</BetterInspectPane.PawnSkillWhiteFont>
 
   <BetterInspectPane.PawnSkillWhiteFontTip>When enabled, the skill name and level on skill bars always render in white, ignoring the fill ratio (embedded text no longer turns black over the filled area); when disabled, the fill-contrast mask is used (white on the unfilled part, black over the filled part).</BetterInspectPane.PawnSkillWhiteFontTip>

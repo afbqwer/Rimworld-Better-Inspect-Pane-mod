@@ -1125,23 +1125,31 @@ public static partial class InspectPanePatch
 
     /// <summary>
     /// 绘制单个技能嵌入样式条：底色 + 按升级进度填充的颜色 + 嵌入的标签（技能名，左）与数值（等级，右）。
+    /// 开启 pawnSkillPlainText 后改为纯文本样式：仅绘制技能名与等级文本，不绘制条背景与进度填充。
     /// 填充比例默认为当前等级内的升级进度（XpProgressPercent）；开启 pawnSkillTotalProgress 后
     /// 改为总进度 = (当前等级 + 当前升级进度) / 技能等级上限 20。
     /// 激情按 pawnSkillPassionStyle 表示：文本样式在技能名后附加 + / ++，图标样式绘制原版激情图标
     ///（SkillUI.PassionMinorIcon / PassionMajorIcon），默认在技能名左侧、开启 pawnSkillPassionIconAfterName 后改在技能名右侧。
     /// 标签与数值均嵌入条内：开启 pawnSkillWhiteFont（默认开启）时文本无视进度条比例、始终为白色，
-    /// 关闭后按 DrawBarTextMasked 的遮罩进度反色（未覆盖区白色、已覆盖区黑色）。
+    /// 关闭后按 DrawBarTextMasked 的遮罩进度反色（未覆盖区白色、已覆盖区黑色）；
+    /// 纯文本样式无进度可反色，文本始终为白色。
+    /// 开启 pawnSkillTooltip 时悬停条区显示原版角色面板的技能提示（见 DrawSkillTooltip）。
     /// </summary>
     private static void DrawSkillBar(Rect barRect, SkillRecord skill)
     {
-        Widgets.DrawBoxSolid(barRect, emptyColor);
-
-        float fill = pawnSkillTotalProgress
-            ? Mathf.Clamp01((skill.Level + skill.XpProgressPercent) / SkillRecord.MaxLevel)
-            : Mathf.Clamp01(skill.XpProgressPercent);
-        if (fill > 0f)
+        bool plainText = pawnSkillPlainText;
+        float fill = 0f;
+        if (!plainText)
         {
-            Widgets.DrawBoxSolid(new Rect(barRect.x, barRect.y, barRect.width * fill, barRect.height), pawnSkillColor);
+            Widgets.DrawBoxSolid(barRect, emptyColor);
+
+            fill = pawnSkillTotalProgress
+                ? Mathf.Clamp01((skill.Level + skill.XpProgressPercent) / SkillRecord.MaxLevel)
+                : Mathf.Clamp01(skill.XpProgressPercent);
+            if (fill > 0f)
+            {
+                Widgets.DrawBoxSolid(new Rect(barRect.x, barRect.y, barRect.width * fill, barRect.height), pawnSkillColor);
+            }
         }
 
         // 文本矩形比条高，垂直居中，避免小号字被条高度裁切（规则与 DrawBarRow 一致）。
@@ -1165,15 +1173,18 @@ public static partial class InspectPanePatch
             labelLeft += iconSize + 0f;
         }
 
+        // 纯文本样式无进度可反色，文本始终为白色（与白色字体设置等效）。
+        bool whiteFont = plainText || pawnSkillWhiteFont;
+
         // 数值（等级）：条内右侧，位置与宽度不随图标变化。
         Rect valueRect = new Rect(barRect.x + inset, textRectY, Mathf.Max(1f, barRect.width - 2f * inset), textRectHeight);
-        DrawBarTextMasked(valueRect, fill, skill.Level.ToStringCached(), TextAnchor.MiddleRight, size, inset, forceWhite: pawnSkillWhiteFont);
+        DrawBarTextMasked(valueRect, fill, SkillLevelText(skill), TextAnchor.MiddleRight, size, inset, forceWhite: whiteFont);
 
         // 技能名：自图标右侧起绘制；图标模式把标签左缘偏移传给遮罩，保证反色范围与进度对齐。
         string skillLabel = PawnSkillLabel(skill);
         Rect labelRect = new Rect(barRect.x + labelLeft, textRectY, Mathf.Max(1f, barRect.width - labelLeft - inset), textRectHeight);
         DrawBarTextMasked(labelRect, fill, skillLabel, TextAnchor.MiddleLeft, size, inset,
-            forceWhite: pawnSkillWhiteFont, maskLeftInset: labelLeft);
+            forceWhite: whiteFont, maskLeftInset: labelLeft);
 
         // 图标置于技能名后：按当前字号实测名称宽度，紧贴名称右侧绘制激情图标；
         // 剩余宽度放不下图标（会压到右侧等级）时跳过。
@@ -1192,6 +1203,41 @@ public static partial class InspectPanePatch
                 GUI.color = Color.white;
                 GUI.DrawTexture(new Rect(iconX, iconY, iconSize, iconSize), passionIcon);
             }
+        }
+
+        // 悬浮提示：悬停条区时显示原版角色面板的技能提示（原版方法，开关控制）。
+        if (pawnSkillTooltip)
+        {
+            DrawSkillTooltip(barRect, skill);
+        }
+    }
+
+    /// <summary>技能等级文本：开启 pawnSkillShowProgressText 时以固定两位小数显示等级与当前等级内的升级进度
+    ///（如 5 级 + 55% 升级进度 = 5.55、5 级 + 5% = 5.05；整级 / 满级同样带小数 = 5.00 / 20.00）；关闭则显示整数等级。</summary>
+    private static string SkillLevelText(SkillRecord skill)
+    {
+        if (!pawnSkillShowProgressText)
+        {
+            return skill.Level.ToStringCached();
+        }
+        return (skill.Level + skill.XpProgressPercent).ToString("0.00");
+    }
+
+    // 原版角色面板技能提示的内容方法（SkillUI 私有静态方法，反射获取；目标缺失时安全降级为无提示）。
+    private static readonly MethodInfo? SkillDescriptionMethod =
+        AccessTools.Method(typeof(SkillUI), "GetSkillDescription", new[] { typeof(SkillRecord) });
+
+    /// <summary>技能条悬浮提示：与原版 SkillUI.DrawSkill 相同的提示实现——内容取原版私有 GetSkillDescription
+    ///（技能说明、当前等级、升级进度、学习速度等），提示标识码与原版一致（def 派生），同一技能的提示稳定不闪烁。</summary>
+    private static void DrawSkillTooltip(Rect rect, SkillRecord skill)
+    {
+        if (SkillDescriptionMethod == null || !Mouse.IsOver(rect))
+        {
+            return;
+        }
+        if (SkillDescriptionMethod.Invoke(null, new object[] { skill }) is string text && !string.IsNullOrEmpty(text))
+        {
+            TooltipHandler.TipRegion(rect, new TipSignal(text, skill.def.GetHashCode() * 397945));
         }
     }
 
