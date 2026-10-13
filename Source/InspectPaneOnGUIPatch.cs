@@ -174,7 +174,7 @@ public static class InspectPaneOnGUIPatch
 
         // 阵营（有颜色图标）：以阵营颜色着色绘制，点击打开阵营信息卡。
         Faction faction = pawn.Faction;
-        if (faction != null)
+        if (faction != null && faction.def.FactionIcon != BaseContent.BadTex)
         {
             Rect r = new Rect(x, 0f, size, size);
             FactionUIUtility.DrawFactionIconWithTooltip(r, faction);

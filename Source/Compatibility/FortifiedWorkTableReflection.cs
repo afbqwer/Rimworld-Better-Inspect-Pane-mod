@@ -57,8 +57,8 @@ public static class FortifiedWorkTableReflection
         {
             return false;
         }
-        object cur = CurWorkAmountField!.GetValue(thing);
-        object total = TotalWorkAmountField!.GetValue(thing);
+        object? cur = CurWorkAmountField!.GetValue(thing);
+        object? total = TotalWorkAmountField!.GetValue(thing);
         if (cur is float c && total is float t)
         {
             remaining = Mathf.Max(0f, c + t);

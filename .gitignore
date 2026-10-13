@@ -363,3 +363,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# RimWorld mod asset bundle (auto-generated on Workshop upload, no need to track)
+Assets.zip*

@@ -69,13 +69,13 @@ public static class GravshipHeatsinkReflection
         {
             return false;
         }
-        object stats = CachedStatsProp!.GetValue(comp);
+        object? stats = CachedStatsProp!.GetValue(comp);
         if (stats == null)
         {
             return false;
         }
-        object s = ActualStoredHeatProp!.GetValue(comp);
-        object m = MaxHeatField!.GetValue(stats);
+        object? s = ActualStoredHeatProp!.GetValue(comp);
+        object? m = MaxHeatField!.GetValue(stats);
         if (s is float sf && m is float mf && mf > 0f)
         {
             stored = sf;

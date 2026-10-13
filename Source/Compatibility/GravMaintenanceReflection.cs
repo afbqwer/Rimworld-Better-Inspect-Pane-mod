@@ -64,8 +64,8 @@ public static class GravMaintenanceReflection
         {
             return false;
         }
-        object m = MaintenanceField!.GetValue(comp);
-        object f = MaintenanceFallsField!.GetValue(comp);
+        object? m = MaintenanceField!.GetValue(comp);
+        object? f = MaintenanceFallsField!.GetValue(comp);
         if (m is float mf && f is bool bf)
         {
             maintenance = mf;

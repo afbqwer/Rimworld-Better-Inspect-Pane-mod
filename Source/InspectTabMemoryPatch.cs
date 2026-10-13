@@ -78,7 +78,8 @@ public static class InspectTabMemoryPatch
             // 自动打开：切回同种目标时，若记忆中的标签页仍可打开则自动打开。
             if (typeKey.Length > 0
                 && suppressedTypeKey != typeKey
-                && rememberedTab.TryGetValue(typeKey, out Type remembered)
+                && rememberedTab.TryGetValue(typeKey, out Type? remembered)
+                && remembered != null
                 && FindOpenableTab(tabs, remembered, out InspectTabBase? tab))
             {
                 tab!.OnOpen();

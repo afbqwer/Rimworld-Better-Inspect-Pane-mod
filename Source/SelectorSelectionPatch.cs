@@ -115,7 +115,7 @@ public static class SelectorSelectionPatch
     public static class ImprovedShiftDragBoxPatch
     {
         // 原版 SelectUnderMouse 为 private，兜底「框内无可选对象按单击处理」时经反射调用。
-        private static readonly MethodInfo SelectUnderMouseMethod =
+        private static readonly MethodInfo? SelectUnderMouseMethod =
             typeof(Selector).GetMethod("SelectUnderMouse", BindingFlags.Instance | BindingFlags.NonPublic);
 
         static bool Prefix(Selector __instance)
@@ -190,7 +190,7 @@ public static class SelectorSelectionPatch
             // 兜底：框内无可选对象时按单击处理。
             if (!selectedSomething)
             {
-                SelectUnderMouseMethod.Invoke(__instance, null);
+                SelectUnderMouseMethod?.Invoke(__instance, null);
             }
             return false;
 

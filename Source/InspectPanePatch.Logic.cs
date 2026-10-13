@@ -933,31 +933,28 @@ public static partial class InspectPanePatch
         // 炮塔开火冷却：数据来自按选中对象缓存的 cachedTurretGun 反射读取 burstCooldownTicksLeft，
         // 就绪（剩余冷却刻数 ≤ 0）时自动隐藏开启则不显示整条，关闭则以满条显示。
         Building_TurretGun? turret = cachedTurretGun;
-        if (turret != null && TurretCooldownTicksField != null)
+        if (turret != null && TurretCooldownTicksField?.GetValue(turret) is int cooldownLeft)
         {
             int totalTicks = GetTurretTotalCooldownTicks(turret);
             // 总冷却低于设置的最短显示时长（默认 3 秒）的炮塔不显示，避免短冷却炮塔的条频繁闪动。
-            if (totalTicks >= Mathf.RoundToInt(minCooldownSeconds * 60f))
+            if (totalTicks >= Mathf.RoundToInt(minCooldownSeconds * 60f)
+                && (cooldownLeft > 0 || !autoHideCooldownAtHundred))
             {
-                int cooldownLeft = (int)TurretCooldownTicksField.GetValue(turret);
-                if (cooldownLeft > 0 || !autoHideCooldownAtHundred)
+                // 就绪/未冷却时：与游戏内进度条只在冷却期出现一致（自动隐藏开启时不显示）。
+                float clampedLeft = Math.Max(0, cooldownLeft);
+                float fill = Mathf.Clamp01(1f - clampedLeft / (float)totalTicks);
+                if (invertCooldownFill)
                 {
-                    // 就绪/未冷却时：与游戏内进度条只在冷却期出现一致（自动隐藏开启时不显示）。
-                    float clampedLeft = Math.Max(0, cooldownLeft);
-                    float fill = Mathf.Clamp01(1f - clampedLeft / (float)totalTicks);
-                    if (invertCooldownFill)
-                    {
-                        fill = 1f - fill; // 反转：冷却进行中由满渐空。
-                    }
-                    return BuildBar(
-                        "BetterInspectPane.CooldownLabel".Translate(),
-                        GetCooldownValueText(Math.Max(0, cooldownLeft), fill),
-                        fill,
-                        cooldownColor,
-                        BarHeightFor(cooldownBarHeightOffset), cooldownFontScale,
-                        cooldownBarSpan,
-                        BarType.Cooldown);
+                    fill = 1f - fill; // 反转：冷却进行中由满渐空。
                 }
+                return BuildBar(
+                    "BetterInspectPane.CooldownLabel".Translate(),
+                    GetCooldownValueText(Math.Max(0, cooldownLeft), fill),
+                    fill,
+                    cooldownColor,
+                    BarHeightFor(cooldownBarHeightOffset), cooldownFontScale,
+                    cooldownBarSpan,
+                    BarType.Cooldown);
             }
         }
 
@@ -1044,10 +1041,10 @@ public static partial class InspectPanePatch
         // 飞船反应堆：仅在启动过程（Starting）充能。
         if (cachedHibernatable != null && cachedHibernatable.parent == thing
             && cachedHibernatable.State == HibernatableStateDefOf.Starting
-            && HibernatableEndStartupTickField != null)
+            && HibernatableEndStartupTickField?.GetValue(cachedHibernatable) is int endStartupTick)
         {
             float totalTicks = cachedHibernatable.Props.startupDays * 60000f;
-            int remaining = (int)HibernatableEndStartupTickField.GetValue(cachedHibernatable) - Find.TickManager.TicksGame;
+            int remaining = endStartupTick - Find.TickManager.TicksGame;
             if (totalTicks > 0f && remaining >= 0)
             {
                 fill = Mathf.Clamp01(1f - remaining / totalTicks);
@@ -1086,14 +1083,13 @@ public static partial class InspectPanePatch
 
         // 清污泵：抽污循环充能（需有电）。
         if (cachedPollutionPump != null && cachedPollutionPump.parent == thing
-            && PumpPowerOn() && PollutionPumpTicksUntilPumpField != null)
+            && PumpPowerOn() && PollutionPumpTicksUntilPumpField?.GetValue(cachedPollutionPump) is int pumpTicksLeft)
         {
             int intervalTicks = cachedPollutionPump.Props.intervalTicks;
-            int remaining = (int)PollutionPumpTicksUntilPumpField.GetValue(cachedPollutionPump);
-            if (intervalTicks > 0 && remaining > 0)
+            if (intervalTicks > 0 && pumpTicksLeft > 0)
             {
-                fill = Mathf.Clamp01(1f - remaining / (float)intervalTicks);
-                remainingTicks = remaining;
+                fill = Mathf.Clamp01(1f - pumpTicksLeft / (float)intervalTicks);
+                remainingTicks = pumpTicksLeft;
                 return true;
             }
             return false;
@@ -1101,10 +1097,9 @@ public static partial class InspectPanePatch
 
         // 排水泵：排干半径扩展充能（需有电，且尚未扩展到满半径）。
         if (cachedTerrainPumpDry != null && cachedTerrainPumpDry.parent == thing
-            && PumpPowerOn() && TerrainPumpProgressTicksField != null)
+            && PumpPowerOn() && TerrainPumpProgressTicksField?.GetValue(cachedTerrainPumpDry) is int progress)
         {
             int daysToRadius = Mathf.RoundToInt(((CompProperties_TerrainPump)cachedTerrainPumpDry.props).daysToRadius);
-            int progress = (int)TerrainPumpProgressTicksField.GetValue(cachedTerrainPumpDry);
             if (daysToRadius > 0)
             {
                 int totalTicks = daysToRadius * 60000;
@@ -1685,7 +1680,7 @@ public static partial class InspectPanePatch
             && BiosculpterTicksRemainingField != null)
         {
             float totalTicks = cachedBiosculpter.CurrentCycle.Props.durationDays * 60000f;
-            if (BiosculpterTicksRemainingField.GetValue(cachedBiosculpter) is float ticksRemaining && totalTicks > 0f)
+            if (BiosculpterTicksRemainingField?.GetValue(cachedBiosculpter) is float ticksRemaining && totalTicks > 0f)
             {
                 EmitBuildingProgress(Mathf.Clamp01(1f - ticksRemaining / totalTicks), out workLeft, out totalWork);
                 return true;
@@ -1762,7 +1757,7 @@ public static partial class InspectPanePatch
             && subcoreScanner.def.building.subcoreScannerTicks > 0)
         {
             float totalTicks = subcoreScanner.def.building.subcoreScannerTicks;
-            float subcoreFill = SubcoreScannerFabricationTicksField.GetValue(subcoreScanner) is int ticksLeft
+            float subcoreFill = SubcoreScannerFabricationTicksField?.GetValue(subcoreScanner) is int ticksLeft
                 ? Mathf.Clamp01(1f - ticksLeft / totalTicks)
                 : 0f;
             if (subcoreFill > 0f)
@@ -1839,7 +1834,7 @@ public static partial class InspectPanePatch
     private static bool TryGetScannerProgress(CompScanner scanner, out float fill)
     {
         fill = 0f;
-        if (ScannerDaysWorkedField == null)
+        if (ScannerDaysWorkedField?.GetValue(scanner) is not float daysWorked)
         {
             return false;
         }
@@ -1848,7 +1843,7 @@ public static partial class InspectPanePatch
         {
             return false;
         }
-        fill = Mathf.Clamp01((float)ScannerDaysWorkedField.GetValue(scanner) / guaranteedDays);
+        fill = Mathf.Clamp01(daysWorked / guaranteedDays);
         return true;
     }
 
@@ -2485,7 +2480,7 @@ public static partial class InspectPanePatch
         {
             return false;
         }
-        return FermentingBarrelEstimatedTicksProp.GetValue(barrel) is int i
+        return FermentingBarrelEstimatedTicksProp?.GetValue(barrel) is int i
             && (ticksLeft = i) >= 0; // EstimatedTicksLeft 本身非负，此处仅防御性校验。
     }
 
@@ -2963,7 +2958,10 @@ public static partial class InspectPanePatch
 
         if (props.activated)
         {
-            int activatedTick = (int)ActivatedTickField.GetValue(interceptor);
+            if (ActivatedTickField?.GetValue(interceptor) is not int activatedTick)
+            {
+                return 0f;
+            }
             int remaining = activatedTick + props.activeDuration - ticksGame;
             if (remaining <= 0 || props.activeDuration <= 0)
             {
@@ -3092,11 +3090,10 @@ public static partial class InspectPanePatch
 
         if (props.activated)
         {
-            if (props.activeDuration <= 0)
+            if (props.activeDuration <= 0 || ActivatedTickField?.GetValue(interceptor) is not int activatedTick)
             {
                 return -1;
             }
-            int activatedTick = (int)ActivatedTickField.GetValue(interceptor);
             return Mathf.Max(0, activatedTick + props.activeDuration - ticksGame);
         }
 

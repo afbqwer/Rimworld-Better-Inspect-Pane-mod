@@ -83,7 +83,7 @@ public static class CombatExtendedHeightReflection
         }
         try
         {
-            object? cv = Activator.CreateInstance(CollisionVerticalType, thing);
+            object? cv = Activator.CreateInstance(CollisionVerticalType!, thing);
             if (cv == null || MaxProp!.GetValue(cv) is not float f || f <= 0f)
             {
                 return false;

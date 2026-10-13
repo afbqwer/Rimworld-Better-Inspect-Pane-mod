@@ -37,79 +37,79 @@ public static partial class InspectPanePatch
     private static int cachedExplosiveThreshold = -1;
 
     // 拦截器激活刻（private 字段）。
-    private static readonly FieldInfo ActivatedTickField =
+    private static readonly FieldInfo? ActivatedTickField =
         typeof(CompProjectileInterceptor).GetField("activatedTick",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 扫描组件累计扫描天数（CompScanner.daysWorkingSinceLastFinding 为 protected 字段，反射读取；
     // 地质扫描仪 CompDeepScanner 与远距离矿物扫描仪 CompLongRangeMineralScanner 共用此字段）。
-    private static readonly FieldInfo ScannerDaysWorkedField =
+    private static readonly FieldInfo? ScannerDaysWorkedField =
         typeof(CompScanner).GetField("daysWorkingSinceLastFinding",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 酿酒桶理论剩余刻数（Building_FermentingBarrel.EstimatedTicksLeft 为 private 属性，反射读取）。
     // 酿酒桶的进度仅在使用 tickRare 的每约 250 刻刷新一次，相邻两刻采样无法测速且跨隔采样会严重偏小，
     // 因此不回退到采样估算，而直接取原版按当前进度与温度速度计算的理论剩余刻数。
-    private static readonly PropertyInfo FermentingBarrelEstimatedTicksProp =
+    private static readonly PropertyInfo? FermentingBarrelEstimatedTicksProp =
         typeof(Building_FermentingBarrel).GetProperty("EstimatedTicksLeft",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 塑形舱当前周期剩余刻数（CompBiosculpterPod.currentCycleTicksRemaining 为 private 字段，反射读取；
     // 总时长 = CurrentCycle.Props.durationDays × 60000，进度口径与原版 CompTick 进度条一致）。
-    private static readonly FieldInfo BiosculpterTicksRemainingField =
+    private static readonly FieldInfo? BiosculpterTicksRemainingField =
         typeof(CompBiosculpterPod).GetField("currentCycleTicksRemaining",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 次核扫描仪剩余制造刻数（Building_SubcoreScanner.fabricationTicksLeft 为 private 字段，反射读取；
     // 总时长 = def.building.subcoreScannerTicks，进度口径与原版 Tick 进度条一致）。
-    private static readonly FieldInfo SubcoreScannerFabricationTicksField =
+    private static readonly FieldInfo? SubcoreScannerFabricationTicksField =
         typeof(Building_SubcoreScanner).GetField("fabricationTicksLeft",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 基因提取器剩余刻数（Building_GeneExtractor.ticksRemaining 为 private 字段，反射读取；
     // TryAcceptPawn 置 30000 后每 tick 递减，进度口径与原版进度条（1 - ticksRemaining/30000）一致）。
-    private static readonly FieldInfo GeneExtractorTicksRemainingField =
+    private static readonly FieldInfo? GeneExtractorTicksRemainingField =
         typeof(Building_GeneExtractor).GetField("ticksRemaining",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 炮塔开火冷却剩余刻数（Building_TurretGun.burstCooldownTicksLeft 为 protected 字段，反射读取；
     // 迫击炮开火后/刚建造时进入冷却，进度口径与原版进度条（1 - 剩余/总冷却）一致）。
-    private static readonly FieldInfo TurretCooldownTicksField =
+    private static readonly FieldInfo? TurretCooldownTicksField =
         typeof(Building_TurretGun).GetField("burstCooldownTicksLeft",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 树精茧完成时刻（CompDryadHolder.tickComplete 为 protected 字段，反射读取；
     // TryAcceptPawn 时置为 当前刻 + 60000 × daysToComplete，进度口径与原版 InspectString 的 TimeLeft 一致）。
-    private static readonly FieldInfo DryadHolderTickCompleteField =
+    private static readonly FieldInfo? DryadHolderTickCompleteField =
         typeof(CompDryadHolder).GetField("tickComplete",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 下蛋进度（CompEggLayer.eggProgress 为 private 字段，反射读取；进度口径与原版
     // CompInspectStringExtra 的 EggProgress 一致，1 = 可以下蛋/已满）。
-    private static readonly FieldInfo EggLayerProgressField =
+    private static readonly FieldInfo? EggLayerProgressField =
         typeof(CompEggLayer).GetField("eggProgress",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 飞船反应堆休眠启动结束刻（CompHibernatable.endStartupTick 为 private 字段，反射读取；
     // 用于反应堆启动过程的充能进度，总时长 = Props.startupDays × 60000）。
-    private static readonly FieldInfo HibernatableEndStartupTickField =
+    private static readonly FieldInfo? HibernatableEndStartupTickField =
         typeof(CompHibernatable).GetField("endStartupTick",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 清污泵距下一次抽污刻数（CompPollutionPump.ticksUntilPump 为 private 字段，反射读取；
     // 用于抽污循环的充能进度，总时长 = Props.intervalTicks）。
-    private static readonly FieldInfo PollutionPumpTicksUntilPumpField =
+    private static readonly FieldInfo? PollutionPumpTicksUntilPumpField =
         typeof(CompPollutionPump).GetField("ticksUntilPump",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 排水泵排干进度刻数（CompTerrainPump.progressTicks 为 private 字段，反射读取；
     // 用于排干半径扩展的充能进度，总时长 = ((CompProperties_TerrainPump)props).daysToRadius × 60000）。
-    private static readonly FieldInfo TerrainPumpProgressTicksField =
+    private static readonly FieldInfo? TerrainPumpProgressTicksField =
         typeof(CompTerrainPump).GetField("progressTicks",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
     // 额外文字滚动位置（InspectPaneFiller 的 private static 字段，接管 DrawInspectString 绘制时使用）。
-    internal static readonly FieldInfo InspectStringScrollPosField =
+    internal static readonly FieldInfo? InspectStringScrollPosField =
         typeof(InspectPaneFiller).GetField("inspectStringScrollPos",
             BindingFlags.Static | BindingFlags.NonPublic);
 

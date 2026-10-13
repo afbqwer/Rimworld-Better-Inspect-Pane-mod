@@ -252,9 +252,9 @@ public static partial class InspectPanePatch
         using (new FontSizeScope(infoFontSize))
         {
             // 沿用原版滚动位置（private static 字段），保证滚动状态与原版一致。
-            Vector2 scrollPos = (Vector2)InspectStringScrollPosField.GetValue(null);
+            Vector2 scrollPos = InspectStringScrollPosField?.GetValue(null) is Vector2 v ? v : default;
             Widgets.LabelScrollable(rect, str, ref scrollPos, dontConsumeScrollEventsIfNoScrollbar: true);
-            InspectStringScrollPosField.SetValue(null, scrollPos);
+            InspectStringScrollPosField?.SetValue(null, scrollPos);
         }
     }
 
