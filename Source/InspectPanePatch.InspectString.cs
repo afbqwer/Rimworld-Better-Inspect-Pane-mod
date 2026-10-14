@@ -111,6 +111,12 @@ public static partial class InspectPanePatch
         {
             return Find.WorldSelector.FirstSelectedObject as ISelectable;
         }
+        // 主菜单的世界视图下 UIRoot 是 UIRoot_Entry，Find.Selector 的属性 getter
+        // 会把 UIRoot 强转为 UIRoot_Play 而抛 InvalidCastException，先做安全检查。
+        if (Find.UIRoot is not UIRoot_Play)
+        {
+            return null;
+        }
         return Find.Selector.FirstSelectedObject as ISelectable;
     }
 
@@ -986,9 +992,11 @@ internal static class DrawInspectStringPatch
         // 另外主菜单的世界视图下 UIRoot 不是 UIRoot_Play，Find.Selector 会抛类型转换异常，
         // 世界分支先行可一并避开。
         bool world = WorldRendererUtility.WorldSelected;
+        // 选择对象统一走 GetCurrentSelected（内部含主菜单 UIRoot_Entry 的安全检查，
+        // 避免 Find.Selector 属性 getter 强转 UIRoot_Play 抛 InvalidCastException）。
         ISelectable? sel = world
             ? Find.WorldSelector.FirstSelectedObject as ISelectable
-            : Find.Selector.FirstSelectedObject as ISelectable;
+            : InspectPanePatch.GetCurrentSelected();
 
         // 计算需追加的额外信息文字与 Info Card Plus 收藏 Stat 文字。
         // 注意：本模组接管 InspectString 时（overrideInspectString）额外文字已在拼装阶段
