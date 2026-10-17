@@ -250,7 +250,7 @@ public partial class MyModTemplateSettings : ModSettings
 
     // 是否覆盖原版 InspectPaneOnGUI：开启后接管整体绘制以应用四周边距与标题字号，
     // 关闭则走原版绘制（不影响其它功能）。
-    public static bool overrideInspectPane = false;
+    public static bool overrideInspectPane = true;
 
     // 检查面板整体边距与标题字号（仅在 overrideInspectPane 开启时生效）：
     // 四周边距替换原版 InpectPaneOnGUI 里的 ContractedBy(12f)；标题字号替换原版固定 GameFont.Medium。
@@ -261,7 +261,7 @@ public partial class MyModTemplateSettings : ModSettings
     // 显示 Pawn 全名：覆盖默认标题，改用 Pawn.Name.ToStringFull。
     public static bool pawnShowFullName = false;
     // 显示 Pawn 额外按钮：在标题右侧原版按钮左侧依次绘制 异种类型 / 阵营 / 文化 三个图标按钮（顺序从右到左）。
-    public static bool pawnShowExtraButtons = false;
+    public static bool pawnShowExtraButtons = true;
     // Pawn 面板标题字号：单选 Pawn 时标题改用该字号（普通对象仍用 titleFontSize）。
     public static int pawnTitleFontSize = 23;
 
@@ -991,7 +991,7 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref enabled, "enabled", true);
         Scribe_Values.Look(ref enablePawns, "enablePawns", true);
         Scribe_Values.Look(ref enablePawnPolicyRow, "enablePawnPolicyRow", true);
-        Scribe_Values.Look(ref overrideInspectPane, "overrideInspectPane", false);
+        Scribe_Values.Look(ref overrideInspectPane, "overrideInspectPane", true);
 
         // 多选单位选择网格。
         Scribe_Values.Look(ref enableMultiSelectGrid, "enableMultiSelectGrid", true);
@@ -1041,7 +1041,7 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref paneMargin, "paneMargin", 8f);
         Scribe_Values.Look(ref titleFontSize, "titleFontSize", 23);
         Scribe_Values.Look(ref pawnShowFullName, "pawnShowFullName", false);
-        Scribe_Values.Look(ref pawnShowExtraButtons, "pawnShowExtraButtons", false);
+        Scribe_Values.Look(ref pawnShowExtraButtons, "pawnShowExtraButtons", true);
         Scribe_Values.Look(ref pawnTitleFontSize, "pawnTitleFontSize", 23);
 
         // Pawn 条悬浮提示（技能条与需求条统一开关）。
