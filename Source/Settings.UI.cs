@@ -1223,6 +1223,21 @@ public partial class MyModTemplateSettings : ModSettings
         TooltipHandler.TipRegion(ctrlRow, "BetterInspectPane.EnableCtrlSelection_Tip".Translate());
         y += RowGap;
 
+        // 框选预览：拖拽原版选择框时预览将要选中的对象（悬停查看详细说明）。
+        Rect previewRow = new Rect(x, y, width, RowHeight);
+        Widgets.CheckboxLabeled(previewRow, "BetterInspectPane.EnableDragBoxPreview".Translate(), ref enableDragBoxPreview);
+        TooltipHandler.TipRegion(previewRow, "BetterInspectPane.EnableDragBoxPreview_Tip".Translate());
+        y += RowGap;
+
+        if (enableDragBoxPreview)
+        {
+            const float previewIndent = 20f;
+            Rect countRow = new Rect(x + previewIndent, y, width - previewIndent, RowHeight);
+            Widgets.CheckboxLabeled(countRow, "BetterInspectPane.DragBoxPreviewShowCount".Translate(), ref dragBoxPreviewShowCount);
+            TooltipHandler.TipRegion(countRow, "BetterInspectPane.DragBoxPreviewShowCount_Tip".Translate());
+            y += RowGap;
+        }
+
         // 记忆已打开观察面板标签页（悬停查看详细说明）。
         Rect rememberRow = new Rect(x, y, width, RowHeight);
         Widgets.CheckboxLabeled(rememberRow, "BetterInspectPane.EnableRememberOpenTab".Translate(), ref rememberOpenTab);

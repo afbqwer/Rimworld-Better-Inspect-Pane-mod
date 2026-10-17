@@ -17,6 +17,10 @@ namespace ASQBetterInspectPane;
 ///   2) 改进的原版 Shift 选择：框选优先级降级 + 类型不同则忽略选择。
 /// 两个设置默认关闭，关闭时全部走原版行为。
 /// </summary>
+/// <remarks>
+/// 「框选预览」(<see cref="DragBoxPreview"/>) 会镜像这里的三条选择路径来预测松手后的选中结果，
+/// 修改任何选择规则时必须同步修改 DragBoxPreview 的 Predict / TryPredict 系列方法，否则预览会与实际结果不符。
+/// </remarks>
 public static class SelectorSelectionPatch
 {
     // ==================== 选择数量上限 ====================

@@ -427,6 +427,12 @@ public partial class MyModTemplateSettings : ModSettings
     // Ctrl 选择功能：按住 Ctrl 框选时按当前选择状态做「范围内同类型批量选择」。
     public static bool enableCtrlSelection = false;
 
+    // 框选预览：拖拽原版选择框（地图 / 世界地图）时，在松开鼠标前把「将被选中」的对象标出来（默认关闭）。
+    // 预测与实际选中逻辑一致（原版优先级链 + 上面两条 Shift / Ctrl 规则），并受选择数量上限影响。
+    public static bool enableDragBoxPreview = false;
+    // 框选预览的子开关：在选择框内显示本次将选中的数量（只计新增，不影响已选中的对象）。
+    public static bool dragBoxPreviewShowCount = true;
+
     /// <summary>当前生效的选择数量上限：关闭修改开关时沿用原版 200。</summary>
     public static int CurrentSelectionLimit => enableSelectionLimitModify ? selectionLimit : 200;
 
@@ -1027,6 +1033,8 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref selectionLimit, "selectionLimit", 200);
         Scribe_Values.Look(ref enableImprovedShiftSelection, "enableImprovedShiftSelection", false);
         Scribe_Values.Look(ref enableCtrlSelection, "enableCtrlSelection", false);
+        Scribe_Values.Look(ref enableDragBoxPreview, "enableDragBoxPreview", false);
+        Scribe_Values.Look(ref dragBoxPreviewShowCount, "dragBoxPreviewShowCount", true);
         Scribe_Values.Look(ref rememberOpenTab, "rememberOpenTab", false);
 
         // 检查面板整体边距与标题字号。

@@ -629,6 +629,18 @@
 • One or more selected (based on the first one): incrementally add all similar objects in the box (vanilla similarity: same def and faction, or equivalent pawns); if nothing new was added, select by the base object's type — zone → all zones, pawn → all pawns of the same faction, building → all buildings of the same faction, resource → all resources, otherwise → all non-pawn non-resource non-building selectables; if still nothing, vanilla behavior.
 Holding Ctrl never clears the current selection.</BetterInspectPane.EnableCtrlSelection_Tip>
 
+  <BetterInspectPane.EnableDragBoxPreview>Drag-box selection preview</BetterInspectPane.EnableDragBoxPreview>
+  <BetterInspectPane.EnableDragBoxPreview_Tip>While dragging a selection box (on the map or the world map), the outcome of the box is colour-coded before you release the mouse:
+• Cyan = will be added: not selected now, will be selected on release.
+• Orange = will be excluded: selected now, but will lose the selection on release (only in ordinary box selections that clear the selection first; Shift / Ctrl selections never clear, so orange won't appear).
+• White (vanilla brackets) = unchanged: selected and kept, or selected and unaffected by this box.
+• The preview follows the real selection rules: the vanilla priority chain (colonists → humanlikes → resources → pawns → selectables), zones and plans, plus the "Improved Shift selection" and "Ctrl selection" options above.
+• Respects "Modify selection limit": objects beyond the limit (which would be skipped on release) are not marked cyan.</BetterInspectPane.EnableDragBoxPreview_Tip>
+  <BetterInspectPane.DragBoxPreviewShowCount>Show selection count</BetterInspectPane.DragBoxPreviewShowCount>
+  <BetterInspectPane.DragBoxPreviewShowCount_Tip>While box-selecting, show how many objects this box will select inside the box; if the result includes already-selected objects, the number of newly added ones is shown as well.</BetterInspectPane.DragBoxPreviewShowCount_Tip>
+  <BetterInspectPane.DragBoxPreviewCount>Will select {0}</BetterInspectPane.DragBoxPreviewCount>
+  <BetterInspectPane.DragBoxPreviewCountNew>Will select {0} ({1} new)</BetterInspectPane.DragBoxPreviewCountNew>
+
   <BetterInspectPane.EnableRememberOpenTab>Remember the open inspect tab</BetterInspectPane.EnableRememberOpenTab>
   <BetterInspectPane.EnableRememberOpenTab_Tip>When enabled, after switching target types closes the inspect tab, re-selecting the same type of target will auto-open the previously opened tab if it can still be opened.
 • Remembers the last N target types (a type is determined by the tabs it can open), where N is the capacity set by the slider below (2-10, default 2); e.g. with capacity 2, after A→B→C→A the memory of A is lost.

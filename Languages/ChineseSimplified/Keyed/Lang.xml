@@ -629,6 +629,18 @@
 • 已选中单个 / 多个（以首个选中为准）：先增量选中框内所有「相似」项（原版相似判断：同 def 且同阵营，Pawn 按等价种族等）；若没有新增，则按基准类型增量选择——区域→框内所有区域、Pawn→框内同阵营的所有 Pawn、Building→框内同阵营的所有建筑、Resource→框内所有 Resource、其它→框内所有非 Pawn 非 Resource 非 Building 的可选物；若还没有，则按原版方式。
 按住 Ctrl 不会清空当前选择。</BetterInspectPane.EnableCtrlSelection_Tip>
 
+  <BetterInspectPane.EnableDragBoxPreview>框选预览</BetterInspectPane.EnableDragBoxPreview>
+  <BetterInspectPane.EnableDragBoxPreview_Tip>开启后，鼠标拖拽框选（地图 / 世界地图）时，框选结果会在松手前用括号颜色标出：
+• 青色 = 将要增加：当前未选中，松手后会被选中。
+• 橙色 = 将被排除：当前已选中，松手后会失去选择（只在会先清空选择的普通框选里出现；Shift / Ctrl 框选不会清空选择，因此不会出现橙色）。
+• 白色（原版括号）= 不变：已选中且仍在框内，或已选中且本次框选不影响它。
+• 预览与实际选中规则完全一致：原版优先级链（殖民者 → 人类 → 资源 → Pawn → 可选物）、区域与计划，以及上方「改进的原版 Shift 选择」「Ctrl 选择功能」的规则都会被考虑。
+• 受「修改选择数量限制」影响：超出上限、松手后会被跳过的对象不会标为青色。</BetterInspectPane.EnableDragBoxPreview_Tip>
+  <BetterInspectPane.DragBoxPreviewShowCount>显示选中数量</BetterInspectPane.DragBoxPreviewShowCount>
+  <BetterInspectPane.DragBoxPreviewShowCount_Tip>框选时在选择框内显示本次框选将选中的对象数量；若结果中包含已选中的对象，会同时标出其中新增的数量。</BetterInspectPane.DragBoxPreviewShowCount_Tip>
+  <BetterInspectPane.DragBoxPreviewCount>将选中 {0} 项</BetterInspectPane.DragBoxPreviewCount>
+  <BetterInspectPane.DragBoxPreviewCountNew>将选中 {0} 项（新增 {1}）</BetterInspectPane.DragBoxPreviewCountNew>
+
   <BetterInspectPane.EnableRememberOpenTab>记忆已打开观察面板标签页</BetterInspectPane.EnableRememberOpenTab>
   <BetterInspectPane.EnableRememberOpenTab_Tip>开启后，切换目标种类导致观察面板标签页关闭、再次选中同种目标时，若之前打开过的标签页仍可打开则自动打开。
 • 记忆最近 N 个目标种类（种类由可打开的标签页决定），N 为下方滑条设置的容量（2~10，默认 2）；如容量为 2 时 A→B→C→A 后 A 的记忆被淘汰。

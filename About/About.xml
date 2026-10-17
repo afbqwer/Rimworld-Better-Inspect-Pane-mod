@@ -15,6 +15,7 @@ Features:
 Enhanced pane drawing with configurable margin and title font size.
 RTS-style unit selection grid for multi-select.
 Improved Shift selection, and Ctrl drag-box batch selection (select all player pawns / turrets / similar objects, default off).
+Drag-box selection preview: while dragging a selection box, the outcome is colour-coded before you release the mouse (cyan = will be added, orange = will be excluded, white = unchanged; default off).
 Optional status bars for health, shield, ammo, freshness, work progress, growth, battery...
 Works with buildings, plants, items, world map objects, zones and storage areas.
 Flexible two-column layout with adjustable bar order and spacing.
