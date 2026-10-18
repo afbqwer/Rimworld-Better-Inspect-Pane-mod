@@ -6,6 +6,7 @@ using Verse;
 using Verse.Sound;
 using Verse.Steam;
 using RimWorld;
+using RimWorld.Planet;
 using HarmonyLib;
 
 namespace ASQBetterInspectPane;
@@ -126,9 +127,12 @@ public static class InspectPaneOnGUIPatch
                 // 稳态（标题与字号不变）下标题绘制零 CalcSize。所需总宽 = 完整标题宽 + 按钮条宽 + 边距，
                 // 供 PaneWidthFor / PaneSizeFor 取 max（见 UpdateRequiredPaneWidth）。
                 // 多选网格场景的标题为「xx xN」，沿用多选独立最小宽度体系，不在此更新。
-                if (MyModTemplateSettings.adaptivePaneWidth
-                    && !InspectPanePatch.IsMultiSelectGridActive()
-                    && !InspectPanePatch.IsWorldMultiSelectGridActive())
+                // 多选网格场景判定按面板类型短路（同 PaneSizeForPatch 口径）：地图场景检查走 Find.Selector，
+                // 主菜单世界视图（UIRoot_Entry）下该 getter 会把 UIRoot 强转 UIRoot_Play 抛异常，
+                // 因此地图面板只判地图网格、世界面板只判世界网格（走 WorldSelector，主菜单下安全）。
+                bool mapGrid = pane is MainTabWindow_Inspect && InspectPanePatch.IsMultiSelectGridActive();
+                bool worldGrid = pane is WorldInspectPane && InspectPanePatch.IsWorldMultiSelectGridActive();
+                if (MyModTemplateSettings.adaptivePaneWidth && !mapGrid && !worldGrid)
                 {
                     UpdateRequiredPaneWidth(label, effectiveTitleFontSize, lineEndWidth);
                 }

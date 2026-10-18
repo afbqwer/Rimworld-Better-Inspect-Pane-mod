@@ -475,6 +475,14 @@ public static partial class InspectPanePatch
             sceneCacheValue = MultiSelectScene.None;
             return MultiSelectScene.None;
         }
+        // 主菜单世界视图（UIRoot_Entry）下 Find.Selector 的 getter 会把 UIRoot 强转 UIRoot_Play 抛
+        // InvalidCastException；此时地图选择器无意义，直接按 None 处理（防护口径同 GetCurrentSelected）。
+        if (Find.UIRoot is not UIRoot_Play)
+        {
+            sceneCacheFrame = Time.frameCount;
+            sceneCacheValue = MultiSelectScene.None;
+            return MultiSelectScene.None;
+        }
         int frame = Time.frameCount;
         if (sceneCacheFrame == frame)
         {
