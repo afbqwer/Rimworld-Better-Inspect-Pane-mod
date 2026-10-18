@@ -13,6 +13,7 @@
 
 Features:
 Enhanced pane drawing with configurable margin and title font size.
+Adaptive pane width: the pane widens automatically when the title (name) would overlap the right-side buttons.
 RTS-style unit selection grid for multi-select.
 Improved Shift selection, and Ctrl drag-box batch selection (select all player pawns / turrets / similar objects, default off).
 Drag-box selection preview: while dragging a selection box, the outcome is colour-coded before you release the mouse (cyan = will be added, orange = will be excluded, white = unchanged; default off).

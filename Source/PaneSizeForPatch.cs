@@ -9,7 +9,8 @@ namespace ASQBetterInspectPane;
 /// <summary>
 /// 调整检查面板窗口尺寸。
 /// 原版：宽度按可见 Tab 数量动态计算（72 × max(6, tab 数)），高度固定 165f。
-/// 宽度与高度均取原版值与设置最小尺寸中的较大者（Tab 数量多时宽度仍随原版动态加宽）。
+/// 宽度与高度均取原版值与设置最小尺寸中的较大者（Tab 数量多时宽度仍随原版动态加宽）；
+/// 最小宽度用 EffectivePaneWidth，自适应宽度开启时包含运行时所需的加宽量（标题 + 按钮不重叠）。
 /// 多选网格激活时（地图 Things/Zones 场景，或世界地图对象网格场景）改用「多选检查面板」的独立最小尺寸：
 /// 覆盖最小宽/高（未开启则沿用全局），自适应高度开启时最小高度提升到能容纳配置行数网格的高度。
 /// </summary>
@@ -37,9 +38,9 @@ public static class PaneSizeForPatch
         // 或其它 mod 覆盖了检查面板、根本不走 DrawInspectString）时立即复位，
         // 否则 requiredPaneHeight 保留上一个对象被撑高的值，面板无法缩回。
         InspectPanePatch.SyncAdaptivePaneHeight(InspectPanePatch.GetCurrentSelected());
-        if (__result.x < MyModTemplateSettings.paneWidth)
+        if (__result.x < MyModTemplateSettings.EffectivePaneWidth)
         {
-            __result.x = MyModTemplateSettings.paneWidth;
+            __result.x = MyModTemplateSettings.EffectivePaneWidth;
         }
         if (__result.y < MyModTemplateSettings.EffectivePaneHeight)
         {

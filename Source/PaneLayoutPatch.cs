@@ -23,6 +23,7 @@ public static class PaneLayoutPatch
     /// <summary>
     /// gizmo 与标签页的横向基准：取 max(原版按 Tab 数量计算的宽度, 设置的最小宽度)。
     /// 原版宽度基于可见 Tab 数（72 × max(6, tab 数)），设置只增不减，Tab 多时仍随原版动态加宽。
+    /// 最小宽度用 EffectivePaneWidth：自适应宽度开启时包含运行时所需的加宽量（标题 + 按钮不重叠）。
     /// 多选网格激活时（仅地图面板）改用「多选检查面板」的覆盖最小宽度（未开启则沿用全局）。
     /// </summary>
     [HarmonyPatch(typeof(InspectPaneUtility), nameof(InspectPaneUtility.PaneWidthFor))]
@@ -38,9 +39,9 @@ public static class PaneLayoutPatch
                 }
                 return;
             }
-            if (__result < MyModTemplateSettings.paneWidth)
+            if (__result < MyModTemplateSettings.EffectivePaneWidth)
             {
-                __result = MyModTemplateSettings.paneWidth;
+                __result = MyModTemplateSettings.EffectivePaneWidth;
             }
         }
     }

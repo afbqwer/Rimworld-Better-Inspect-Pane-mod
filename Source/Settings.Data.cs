@@ -327,6 +327,22 @@ public partial class MyModTemplateSettings : ModSettings
     public static float CurrentEffectivePaneHeight =>
         InspectPanePatch.IsMultiSelectGridActive() ? MultiSelectEffectiveMinHeight : EffectivePaneHeight;
 
+    // 自适应面板宽度：标题文字（名称）与右侧按钮条放不下时自动加宽面板（需覆盖面板绘制开启）。
+    // 与自适应面板高度同构：requiredPaneWidth 为运行时所需总宽（不持久化），EffectivePaneWidth 供
+    // PaneWidthFor / PaneSizeFor 补丁取 max。所需宽度按「完整标题在真实标题字号下的宽度 + 按钮条宽 + 边距」
+    // 计算（见 InspectPaneOnGUIPatch.UpdateRequiredPaneWidth），与面板当前宽度无反馈关系，不会来回振荡。
+    public static bool adaptivePaneWidth = true;
+    public static float requiredPaneWidth = 0f;
+
+    /// <summary>
+    /// 面板有效宽度：仅在「覆盖检查面板绘制 + 自适应面板宽度」同时开启时，才把运行时所需宽度
+    /// 纳入计算；否则等于配置的最小宽度，避免功能关闭时残留值影响面板尺寸。
+    /// </summary>
+    public static float EffectivePaneWidth =>
+        overrideInspectPane && adaptivePaneWidth
+            ? Mathf.Max(paneWidth, requiredPaneWidth)
+            : paneWidth;
+
     // ==================== 多选单位选择网格 ====================
 
     // 多选单位选择网格：多选（>1 个 Thing）时在检查面板正文绘制 RTS 风格单位选择网格
@@ -1093,6 +1109,8 @@ public partial class MyModTemplateSettings : ModSettings
         // 检查面板尺寸。
         Scribe_Values.Look(ref paneWidth, "paneWidth", 432f);
         Scribe_Values.Look(ref paneHeight, "paneHeight", 170f);
+        // 自适应面板宽度（requiredPaneWidth 为运行时值，不持久化）。
+        Scribe_Values.Look(ref adaptivePaneWidth, "adaptivePaneWidth", true);
 
         // 覆盖 InspectString 绘制与自适应面板高度（requiredPaneHeight 为运行时值，不持久化）。
         Scribe_Values.Look(ref overrideInspectString, "overrideInspectString", true);

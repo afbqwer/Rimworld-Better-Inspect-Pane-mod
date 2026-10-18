@@ -9,6 +9,10 @@
 
   <BetterInspectPane.AdaptivePaneHeight>自适应面板高度（信息文字放不下时自动增高面板）</BetterInspectPane.AdaptivePaneHeight>
 
+  <BetterInspectPane.AdaptivePaneWidth>自适应面板宽度（名称与右侧按钮放不下时自动加宽面板）</BetterInspectPane.AdaptivePaneWidth>
+
+  <BetterInspectPane.AdaptivePaneWidth_Tip>按真实标题字号测量完整标题（名称），与右侧按钮条放不下时自动加宽检查面板，避免名称画进按钮区（上限与「面板最小宽度」滑杆一致，800）。需开启「覆盖原版检查面板绘制」。</BetterInspectPane.AdaptivePaneWidth_Tip>
+
   <BetterInspectPane.PaneMargin>检查面板四周边距：{0}</BetterInspectPane.PaneMargin>
 
   <BetterInspectPane.TitleFontSize>标题文本字号：{0}</BetterInspectPane.TitleFontSize>

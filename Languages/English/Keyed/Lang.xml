@@ -9,6 +9,10 @@
 
   <BetterInspectPane.AdaptivePaneHeight>Adaptive pane height (auto-grow pane when inspect text does not fit)</BetterInspectPane.AdaptivePaneHeight>
 
+  <BetterInspectPane.AdaptivePaneWidth>Adaptive pane width (auto-widen pane when the title does not fit next to the buttons)</BetterInspectPane.AdaptivePaneWidth>
+
+  <BetterInspectPane.AdaptivePaneWidth_Tip>Measures the full title (name) at the actual title font size and widens the pane when it would overlap the right-side buttons (capped at the minimum-width slider maximum of 800). Requires Override vanilla inspect pane drawing.</BetterInspectPane.AdaptivePaneWidth_Tip>
+
   <BetterInspectPane.PaneMargin>Inspect pane margin: {0}</BetterInspectPane.PaneMargin>
 
   <BetterInspectPane.TitleFontSize>Title text font size: {0}</BetterInspectPane.TitleFontSize>

@@ -227,6 +227,16 @@ public partial class MyModTemplateSettings : ModSettings
             label: "BetterInspectPane.PaneHeight".Translate(Mathf.RoundToInt(paneHeight)), roundTo: 1f);
         y += SliderGap;
 
+        // 自适应面板宽度：标题（名称）与右侧按钮条放不下时自动加宽面板（需覆盖面板绘制开启，
+        // 与覆盖路径的标题测量同源，见 InspectPaneOnGUIPatch.UpdateRequiredPaneWidth）。
+        if (overrideInspectPane)
+        {
+            Rect adaptiveWidthRect = new Rect(x, y, width, RowHeight);
+            Widgets.CheckboxLabeled(adaptiveWidthRect, "BetterInspectPane.AdaptivePaneWidth".Translate(), ref adaptivePaneWidth);
+            TooltipHandler.TipRegion(adaptiveWidthRect, "BetterInspectPane.AdaptivePaneWidth_Tip".Translate());
+            y += RowGap;
+        }
+
         // 覆盖 InspectString 绘制：自定义面板路径改用本模组实现（20 帧缓存）。
         // 自适应面板高度：信息文字放不下时自动增高面板（需覆盖 InspectString 绘制开启）。
         Widgets.CheckboxLabeled(new Rect(x, y, width, RowHeight), "BetterInspectPane.OverrideInspectString".Translate(), ref overrideInspectString);

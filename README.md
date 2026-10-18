@@ -37,8 +37,8 @@ My Mod Template 2/
 
 | 文件 | 补丁目标 | 说明 |
 |---|---|---|
-| `InspectPaneOnGUIPatch.cs` | `InspectPaneUtility.InspectPaneOnGUI` | 面板边距与标题字号可配置 |
-| `PaneSizeForPatch.cs` | `InspectPaneUtility.PaneSizeFor` | 面板最小宽 / 高可调 |
+| `InspectPaneOnGUIPatch.cs` | `InspectPaneUtility.InspectPaneOnGUI` | 面板边距与标题字号可配置；自适应面板宽度（按真实标题字号测量完整标题，名称与右侧按钮放不下时自动加宽面板）；Surveillance Shift 图标条接缝补偿 |
+| `PaneSizeForPatch.cs` | `InspectPaneUtility.PaneSizeFor` | 面板最小宽 / 高可调（宽度含自适应所需值） |
 | `PaneLayoutPatch.cs` | `PaneWidthFor` / `PaneTopY` 等 | 面板变大后让 gizmo 区与标签页让位 |
 | `InspectTabMemoryPatch.cs` | `InspectPaneUtility.UpdateTabs` | 记忆各类目标最近打开的标签页（LRU） |
 | `SelectorSelectionPatch.cs` | `Selector.SelectInternal` | 选择数量上限可调、改进 Shift 框选 |
