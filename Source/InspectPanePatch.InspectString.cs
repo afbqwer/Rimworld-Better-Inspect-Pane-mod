@@ -23,7 +23,7 @@ namespace ASQBetterInspectPane;
 public static partial class InspectPanePatch
 {
     // InspectString 文本缓存间隔帧数（本功能独立常量，不影响现有区域/储存/电网的 30 帧缓存）。
-    private const int InspectStringCacheIntervalFrames = 30;
+    private const int InspectStringCacheIntervalFrames = 15;
 
     // LabelScrollable 内部始终为滚动条预留 16px 宽，并按 rect.width - 16 测量/排版文本；
     // 自适应高度须与之一致地测量，否则会低估所需高度导致滚动条出现。
@@ -56,8 +56,8 @@ public static partial class InspectPanePatch
         if (adaptivePaneHeight)
         {
             // 自适应面板高度：所需高度 = 当前面板高度 + 文字不足量。
-            // 数学上恒等于「固定内容高(标题/条/页脚) + 文字高」，与当前面板高度无关，
-            // 因此不会来回振荡。rect 为信息文字区（其 yMax 已在 Prefix 中减去右下角设置按钮行的高度），
+            // 实数上恒等于「固定内容高(标题/条/页脚) + 文字高」，与当前面板高度无关。
+            // rect 为信息文字区（其 yMax 已在 Prefix 中减去右下角设置按钮行的高度），
             // 故不足量已把设置按钮行计入。
             // 只增不减：同一目标下文本高度波动（如统计数值逐帧/逐缓存刷新变化）只允许面板被撑高、
             // 不立即缩回，待目标切换时才按新目标的所需高度重新计算（此时可缩小），防止面板高度抖动。
@@ -65,6 +65,14 @@ public static partial class InspectPanePatch
             float deficit = cachedInspectStringHeight + AdaptiveHeightPadding - rect.height;
             // 上限截断：文本过长时高度封顶在 MaxAdaptivePaneHeight，超出部分走面板内滚动。
             float required = Mathf.Min(MaxAdaptivePaneHeight, currentPaneHeight + deficit);
+            // 像素量化（向上取整，往「文字放得下」的方向）：required 经由布局几何反推，而实际窗口高度
+            // 每帧被 Verse.Window 的 windowRect.Rounded() 取整——未量化时分数部分（required − 取整值）
+            // 会在「只增不减」回路里回流（required = 真实所需 + (R − Round(R))），切换对象时经由旧布局
+            // 几何再算一遍，分数部分跳变，像素对齐后表现为高度抖 1px 一帧。量化到整像素后：
+            // 实际窗口高度与 requiredPaneHeight 严格一致（取整成为恒等运算），反馈回路不再带回偏差；
+            // 同高对象切换时两条计算路径（旧窗口几何 / 新窗口几何）完全相同，复现同一整数，零抖动；
+            // 多出的不足 1px 由 AdaptiveHeightPadding 的余量语义覆盖。
+            required = Mathf.Ceil(required);
             if (adaptiveHeightTarget != sel)
             {
                 requiredPaneHeight = required; // 目标切换：立即按新目标所需高度（可缩回）

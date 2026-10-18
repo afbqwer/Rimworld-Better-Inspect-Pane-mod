@@ -323,7 +323,9 @@ public static class InspectPaneOnGUIPatch
         }
         float required = cachedMeasureTitleWidth + lineEndWidth
             + 2f * MyModTemplateSettings.paneMargin + AdaptiveWidthPadding;
-        MyModTemplateSettings.requiredPaneWidth = Mathf.Min(MaxAdaptivePaneWidth, required);
+        // 像素量化（向上取整，往「标题放得下」的方向）：窗口宽度同样被 Verse.Window 每帧取整，
+        // 量化后所需宽度与实际窗口宽度严格一致（渲染为整数宽更锐利），也不给反馈回路留浮数偏差。
+        MyModTemplateSettings.requiredPaneWidth = Mathf.Ceil(Mathf.Min(MaxAdaptivePaneWidth, required));
     }
 
     /// <summary>
