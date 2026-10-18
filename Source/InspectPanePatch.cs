@@ -350,7 +350,8 @@ public static partial class InspectPanePatch
                 {
                     Find.WindowStack.Add(new Dialog_MyModSettings());
                 }
-                TooltipHandler.TipRegion(settingsBtn, "BetterInspectPane.OpenSettingsTip".Translate());
+                // TipRegionByKey 内部先判定悬停再翻译：未悬停按钮时不产生 Translate 开销。
+                TooltipHandler.TipRegionByKey(settingsBtn, "BetterInspectPane.OpenSettingsTip");
             }
         }
         finally
@@ -614,7 +615,9 @@ public static partial class InspectPanePatch
         // 悬停：附加行为（如区域组件的地图标记）+ 1px 悬停边框（DrawBox 沿单元格四边各画 1px，不外扩）。
         // 边框矩形先对齐整逻辑像素：绘制矩形四边为小数时（如行高 16.8），1px 线会跨两个像素行，
         // 底边相对更明显，看起来像底部有 2px。对齐后四边均落在整像素边界上。
-        if (Mouse.IsOver(cellRect))
+        // 悬停判定只取一次，供边框 / 提示共用。
+        bool mouseOver = Mouse.IsOver(cellRect);
+        if (mouseOver)
         {
             hover?.Invoke();
             Widgets.DrawBox(SnapRectToWholePixels(cellRect));
@@ -640,7 +643,12 @@ public static partial class InspectPanePatch
         {
             onCell(cellRect);
         }
-        TooltipHandler.TipRegion(cellRect, text);
+        // 提示文本与条内标签共用同一个字符串（无额外拼接）；仅在悬停时注册，
+        // 避免为未悬停的单元格每帧走 TooltipHandler.TipRegion。
+        if (mouseOver)
+        {
+            TooltipHandler.TipRegion(cellRect, text);
+        }
     }
 
     /// <summary>

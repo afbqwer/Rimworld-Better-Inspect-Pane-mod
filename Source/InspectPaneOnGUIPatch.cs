@@ -353,7 +353,10 @@ public static class InspectPaneOnGUIPatch
                 {
                     Find.WindowStack.Add(new Dialog_InfoCard(xenotype));
                 }
-                TooltipHandler.TipRegion(r, xenotype.LabelCap);
+                if (Mouse.IsOver(r))
+                {
+                    TooltipHandler.TipRegion(r, xenotype.LabelCap);
+                }
                 x -= size;
                 lineEndWidth += size;
             }

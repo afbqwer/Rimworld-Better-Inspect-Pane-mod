@@ -352,7 +352,8 @@ public static partial class InspectPanePatch
             {
                 Find.WindowStack.Add(new Dialog_MyModSettings());
             }
-            TooltipHandler.TipRegion(settingsBtn, "BetterInspectPane.OpenSettingsTip".Translate());
+            // TipRegionByKey 内部先判定悬停再翻译：未悬停按钮时不产生 Translate 开销。
+            TooltipHandler.TipRegionByKey(settingsBtn, "BetterInspectPane.OpenSettingsTip");
             lineEndWidth += SettingsButtonHeight;
         }
     }
@@ -1746,7 +1747,8 @@ public static partial class InspectPanePatch
     /// <summary>绘制「+N」溢出提示格：灰化、不响应点击。</summary>
     private static void DrawMoreCell(Rect cell, int moreCount)
     {
-        if (Mouse.IsOver(cell))
+        bool mouseOver = Mouse.IsOver(cell);
+        if (mouseOver)
         {
             Widgets.DrawHighlight(cell);
         }
@@ -1766,7 +1768,11 @@ public static partial class InspectPanePatch
         {
             GUI.color = prevColor;
         }
-        TooltipHandler.TipRegion(cell, "BetterInspectPane.MultiSelectMore".Translate(moreCount));
+        // 仅在悬停时翻译 / 注册提示（与其它网格单元格一致）。
+        if (mouseOver)
+        {
+            TooltipHandler.TipRegion(cell, "BetterInspectPane.MultiSelectMore".Translate(moreCount));
+        }
     }
 
     /// <summary>单个 Thing 的健康填充（0..1）：Pawn 用总体健康比例，非 Pawn 用 HitPoints / MaxHitPoints。</summary>
