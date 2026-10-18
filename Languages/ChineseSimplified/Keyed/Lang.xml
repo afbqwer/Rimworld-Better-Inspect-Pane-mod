@@ -226,13 +226,13 @@
 
   <BetterInspectPane.EnablePawns_Tip>开启后，选中 Pawn 时用本模组的进度条面板替代原版内容（原版底部标签页仍可用；时间表与允许区域由本模组自行绘制的策略行组件提供）。默认关闭。</BetterInspectPane.EnablePawns_Tip>
 
-  <BetterInspectPane.EnablePawnPolicyRow>显示 Pawn 策略行（食物/管制/着装/区域/控制组/训练）</BetterInspectPane.EnablePawnPolicyRow>
+  <BetterInspectPane.EnablePawnPolicyRow>显示 Pawn 策略行（食物/管制/着装/控制组/训练/区域）</BetterInspectPane.EnablePawnPolicyRow>
 
   <BetterInspectPane.PolicyRowFontSize>Pawn 策略行字号：{0}</BetterInspectPane.PolicyRowFontSize>
 
   <BetterInspectPane.PawnPolicyRowUseTinyFont>策略行使用小号字体</BetterInspectPane.PawnPolicyRowUseTinyFont>
 
-  <BetterInspectPane.PawnPolicyRowUseTinyFontTip>开启后 Pawn 策略行（食物 / 管制 / 着装 / 区域 / 控制组 / 训练）的文本改用游戏内置的小号字体；字号仍由「Pawn 策略行字号」控制，行高保持不变。推荐字号 12px（即游戏小号字体的默认行高）。若游戏设置中禁用了小号字体（或使用 Steam Deck），游戏会自动回退为标准字体。</BetterInspectPane.PawnPolicyRowUseTinyFontTip>
+  <BetterInspectPane.PawnPolicyRowUseTinyFontTip>开启后 Pawn 策略行（食物 / 管制 / 着装 / 控制组 / 训练 / 区域）的文本改用游戏内置的小号字体；字号仍由「Pawn 策略行字号」控制，行高保持不变。推荐字号 12px（即游戏小号字体的默认行高）。若游戏设置中禁用了小号字体（或使用 Steam Deck），游戏会自动回退为标准字体。</BetterInspectPane.PawnPolicyRowUseTinyFontTip>
 
   <BetterInspectPane.PolicyRowHeight>Pawn 策略行高度：{0}</BetterInspectPane.PolicyRowHeight>
 

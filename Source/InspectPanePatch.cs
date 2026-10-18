@@ -481,9 +481,12 @@ public static partial class InspectPanePatch
         drawn = true;
 
         // 适用者平分整行；行高取设置下限（默认随字号自适应）。
+        // 行高向上取整到整像素：字体实测行高常带小数（如 16.8），直接用作高度会让悬停边框的
+        // 底边落在半像素处，1px 白线被 GUI 光栅化到两个像素行，看起来像 2px。
         float gap = pawnColumnGap;
         float cellWidth = (rect.width - gap * (count - 1)) / count;
-        float rowHeight = Mathf.Max(policyRowHeight, BarTextLineHeight(policyRowFontSize, pawnPolicyRowUseTinyFont));
+        float rowHeight = Mathf.Ceil(Mathf.Max(policyRowHeight,
+            BarTextLineHeight(policyRowFontSize, pawnPolicyRowUseTinyFont)));
         float x = 0f;
 
         if (foodApplicable)
@@ -539,6 +542,23 @@ public static partial class InspectPanePatch
             x += cellWidth + gap;
         }
 
+        if (controlGroupApplicable)
+        {
+            MechanitorControlGroup currentGroup = mechControlGroup!;
+            // 与原版控制组列一致：显示控制组序号（工作模式见浮窗中的「序号 (模式)」）。
+            DrawPolicyCell(new Rect(x, y, cellWidth, rowHeight), "BetterInspectPane.PolicyRow.ControlGroup",
+                currentGroup.Index.ToString(), null, _ => OpenMechControlGroupMenu(pawn, currentGroup));
+            x += cellWidth + gap;
+        }
+
+        if (trainingApplicable)
+        {
+            // 显示训练列表中最底部（列表末位）的已训练项目；尚未训练任何项目时显示「无」。
+            DrawPolicyCell(new Rect(x, y, cellWidth, rowHeight), "BetterInspectPane.PolicyRow.Training",
+                cachedPolicyRowTrainingLabel!, null, _ => OpenTrainingTab());
+            x += cellWidth + gap;
+        }
+
         if (areaApplicable)
         {
             Pawn_PlayerSettings settings = playerSettings!;
@@ -556,29 +576,23 @@ public static partial class InspectPanePatch
                     // 原版行为：悬停时在地图上标记该区域（悬停边框由 DrawPolicyCell 对所有组件统一绘制）。
                     settings.AreaRestrictionInPawnCurrentMap?.MarkForDraw();
                 });
-            x += cellWidth + gap;
-        }
-
-        if (controlGroupApplicable)
-        {
-            MechanitorControlGroup currentGroup = mechControlGroup!;
-            // 与原版控制组列一致：显示控制组序号（工作模式见浮窗中的「序号 (模式)」）。
-            DrawPolicyCell(new Rect(x, y, cellWidth, rowHeight), "BetterInspectPane.PolicyRow.ControlGroup",
-                currentGroup.Index.ToString(), null, _ => OpenMechControlGroupMenu(pawn, currentGroup));
-            x += cellWidth + gap;
-        }
-
-        if (trainingApplicable)
-        {
-            // 显示训练列表中最底部（列表末位）的已训练项目；尚未训练任何项目时显示「无」。
-            DrawPolicyCell(new Rect(x, y, cellWidth, rowHeight), "BetterInspectPane.PolicyRow.Training",
-                cachedPolicyRowTrainingLabel!, null, _ => OpenTrainingTab());
         }
 
         // 行尾分隔线：策略行与下方进度条区隔开（跟随分隔线设置；关闭时不绘制、仅保留行底），
         // 启用时先空出行距再画线，与行距/分隔线的整体节奏一致（调用方在 drawn 为真时再补一个 rowSpacing）。
         y += rowHeight;
         return showSeparators ? DrawSeparator(rect.width, y + rowSpacing) : y;
+    }
+
+    /// <summary>
+    /// 把矩形四边对齐到整逻辑像素（面板内容坐标即 UI 逻辑像素）。
+    /// 用于 1px 描边的绘制：小数坐标会被 GUI 光栅化到相邻两个像素行 / 列，视觉上变成 2px。
+    /// </summary>
+    private static Rect SnapRectToWholePixels(Rect rect)
+    {
+        return Rect.MinMaxRect(
+            Mathf.Round(rect.xMin), Mathf.Round(rect.yMin),
+            Mathf.Round(rect.xMax), Mathf.Round(rect.yMax));
     }
 
     /// <summary>
@@ -598,10 +612,12 @@ public static partial class InspectPanePatch
         }
 
         // 悬停：附加行为（如区域组件的地图标记）+ 1px 悬停边框（DrawBox 沿单元格四边各画 1px，不外扩）。
+        // 边框矩形先对齐整逻辑像素：绘制矩形四边为小数时（如行高 16.8），1px 线会跨两个像素行，
+        // 底边相对更明显，看起来像底部有 2px。对齐后四边均落在整像素边界上。
         if (Mouse.IsOver(cellRect))
         {
             hover?.Invoke();
-            Widgets.DrawBox(cellRect);
+            Widgets.DrawBox(SnapRectToWholePixels(cellRect));
         }
         var textRect = new Rect(cellRect.x + 4f, cellRect.y - 4f, cellRect.width - 4f , cellRect.height + 8f);
         // 条内单行文本：左侧缩进 4px（textRect），增加4px高度防显示不全，像素字号作用域 + 不换行 + 垂直居中，
