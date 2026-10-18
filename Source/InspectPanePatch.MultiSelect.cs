@@ -1404,12 +1404,16 @@ public static partial class InspectPanePatch
         GridCell gc = visual.cell;
         // 工具提示：单个项单元格（殖民者单列 / 单项目）→ 个人标签；分组 → 种类名 ×数量。
         // 用 Func 重载延迟求值：仅悬停显示提示时才拼接文本，避免每帧为所有单元格计算。
+        // 未悬停时不注册：同时避免每帧为所有单元格分配闭包（TipRegion 内部也只处理悬停格）。
         // uniqueId 取代表物的稳定键，跨帧稳定，提示不会因网格重建而闪烁。
-        TooltipHandler.TipRegion(cell,
-            gc.isSingle
-                ? (Func<string>)(() => PersonalLabel(gc.representative))
-                : () => "BetterInspectPane.MultiSelectGroupTip".Translate(GetGroupLabel(gc), gc.count),
-            ObjUniqueId(gc.representative));
+        if (Mouse.IsOver(cell) || DebugViewSettings.drawTooltipEdges)
+        {
+            TooltipHandler.TipRegion(cell,
+                gc.isSingle
+                    ? (Func<string>)(() => PersonalLabel(gc.representative))
+                    : () => "BetterInspectPane.MultiSelectGroupTip".Translate(GetGroupLabel(gc), gc.count),
+                ObjUniqueId(gc.representative));
+        }
 
         // 点击（须在绘制内容之后调用）。拖拽进行中/本次手势已发生拖拽时忽略松手的 MouseUp，
         // 避免拖拽结束恰好落在起始格（或某格）上被误判为一次切换点击：

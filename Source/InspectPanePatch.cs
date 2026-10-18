@@ -988,14 +988,18 @@ public static partial class InspectPanePatch
             GUI.color = Color.white;
             using (new FontSizeScope(fontSize))
             {
-                Widgets.Label(full, text);
+                float eased = Mathf.Clamp01(easedValue);
+                // 满进度时黑色遮罩会覆盖整段文本；白色底层完全不可见，直接跳过这次绘制（省一次文本/批次）。
+                if (forceWhite || eased < 1f)
+                {
+                    Widgets.Label(full, text);
+                }
 
                 // 白色字体：不绘制黑色遮罩，文本无视进度条比例，始终为白色。
-                if (!forceWhite)
+                if (!forceWhite && eased > 0f)
                 {
                     // 遮罩：进度条从左覆盖，文本起点缩进 leftInset（默认 insetX），
                     // 故覆盖到文本的宽度 = 全条覆盖宽 - 文本左缘偏移。
-                    float eased = Mathf.Clamp01(easedValue);
                     float leftInset = maskLeftInset >= 0f ? maskLeftInset : insetX;
                     float clipW = Mathf.Clamp((textRect.width + insetX + leftInset) * eased - leftInset, 0f, textRect.width);
                     if (clipW > 0f)
@@ -1089,6 +1093,9 @@ public static partial class InspectPanePatch
         float rowHeight = barHeight + colGap;
         int rows = (skills.Count + columns - 1) / columns;
 
+        // 先收集所有技能条的绘制状态，再分层绘制：底色/填充连续绘制可合并为少量批次；
+        // 文本仍按各自裁剪区绘制（不同技能条的裁剪矩形不同，无法跨条合并）。
+        skillBarVisuals.Clear();
         for (int i = 0; i < skills.Count; i++)
         {
             int row = i / columns;
@@ -1097,8 +1104,10 @@ public static partial class InspectPanePatch
             float width = baseColWidth + (col < extraPx ? 1 : 0);
             float x = col * colGap + col * baseColWidth + Mathf.Min(col, extraPx);
             float rowY = y + row * rowHeight;
-            DrawSkillBar(new Rect(x, rowY, width, barHeight), skills[i]);
+            PrepareSkillBarVisual(new Rect(x, rowY, width, barHeight), skills[i], out SkillBarVisual visual);
+            skillBarVisuals.Add(visual);
         }
+        DrawSkillBarLayers();
 
         // 与下方分隔线的间隔（网格底部）。
         y += rows * barHeight + (rows-1) * colGap + spacing;
@@ -1131,44 +1140,63 @@ public static partial class InspectPanePatch
         return result;
     }
 
-    /// <summary>
-    /// 绘制单个技能嵌入样式条：底色 + 按升级进度填充的颜色 + 嵌入的标签（技能名，左）与数值（等级，右）。
-    /// 开启 pawnSkillPlainText 后改为纯文本样式：仅绘制技能名与等级文本，不绘制条背景与进度填充。
-    /// 填充比例默认为当前等级内的升级进度（XpProgressPercent）；开启 pawnSkillTotalProgress 后
-    /// 改为总进度 = (当前等级 + 当前升级进度) / 技能等级上限 20。
-    /// 激情按 pawnSkillPassionStyle 表示：文本样式在技能名后附加 + / ++，图标样式绘制原版激情图标
-    ///（SkillUI.PassionMinorIcon / PassionMajorIcon），默认在技能名左侧、开启 pawnSkillPassionIconAfterName 后改在技能名右侧。
-    /// 标签与数值均嵌入条内：开启 pawnSkillWhiteFont（默认开启）时文本无视进度条比例、始终为白色，
-    /// 关闭后按 DrawBarTextMasked 的遮罩进度反色（未覆盖区白色、已覆盖区黑色）；
-    /// 纯文本样式无进度可反色，文本始终为白色。
-    /// 开启 pawnBarTooltips（统一悬浮提示开关）时悬停条区显示原版角色面板的技能提示（见 DrawSkillTooltip）。
-    /// </summary>
-    private static void DrawSkillBar(Rect barRect, SkillRecord skill)
+    /// <summary>技能条绘制状态：准备一次，按层批量绘制（底色/填充 → 图标 → 数值 → 标签 → 右侧图标）。</summary>
+    private struct SkillBarVisual
     {
-        bool plainText = pawnSkillPlainText;
-        float fill = 0f;
-        if (!plainText)
-        {
-            Widgets.DrawBoxSolid(barRect, emptyColor);
+        public Rect rect;
+        public SkillRecord skill;
+        public bool plainText;
+        public float fill;
+        public int size;
+        public float textRectHeight;
+        public float textRectY;
+        public float inset;
+        public float labelLeft;
+        public Texture2D? passionIcon;
+        public Rect leftIconRect;
+        public Rect rightIconRect;
+        public string valueText;
+        public string labelText;
+        public bool whiteFont;
+    }
 
-            fill = pawnSkillTotalProgress
+    private static readonly List<SkillBarVisual> skillBarVisuals = new List<SkillBarVisual>();
+    private static readonly Action<SkillBarVisual>[] skillBarDrawLayers =
+    {
+        DrawSkillBarBackground,
+        DrawSkillBarLeftIcon,
+        DrawSkillBarValueText,
+        DrawSkillBarLabelText,
+        DrawSkillBarRightIcon
+    };
+
+    /// <summary>收集单个技能条的绘制状态（不绘制）。</summary>
+    private static void PrepareSkillBarVisual(Rect barRect, SkillRecord skill, out SkillBarVisual visual)
+    {
+        visual = default;
+        visual.rect = barRect;
+        visual.skill = skill;
+        visual.plainText = pawnSkillPlainText;
+        visual.fill = visual.plainText
+            ? 0f
+            : (pawnSkillTotalProgress
                 ? Mathf.Clamp01((skill.Level + skill.XpProgressPercent) / SkillRecord.MaxLevel)
-                : Mathf.Clamp01(skill.XpProgressPercent);
-            if (fill > 0f)
-            {
-                Widgets.DrawBoxSolid(new Rect(barRect.x, barRect.y, barRect.width * fill, barRect.height), pawnSkillColor);
-            }
-        }
+                : Mathf.Clamp01(skill.XpProgressPercent));
 
         // 文本矩形比条高，垂直居中，避免小号字被条高度裁切（规则与 DrawBarRow 一致）。
         int size = pawnSkillFontSize;
+        visual.size = size;
         float textRectHeight = Mathf.Max(barRect.height, 24f);
         textRectHeight = Mathf.Max(textRectHeight, LineHeightForSize(size));
-        float textRectY = barRect.y + (barRect.height - textRectHeight) * 0.5f;
+        visual.textRectHeight = textRectHeight;
+        visual.textRectY = barRect.y + (barRect.height - textRectHeight) * 0.5f;
         float inset = 3f;
+        visual.inset = inset;
+
         // 图标样式的激情图标：默认绘制在条内最左侧、技能名相应右移；
         // 开启 pawnSkillPassionIconAfterName 后改绘制在技能名文本右侧（按当前字号实测名称宽度定位）。
         Texture2D? passionIcon = pawnSkillPassionStyle == SkillPassionStyle.Icon ? PassionIconFor(skill) : null;
+        visual.passionIcon = passionIcon;
         bool passionIconAfterName = passionIcon != null && pawnSkillPassionIconAfterName;
         float labelLeft = inset;
         if (passionIcon != null && !passionIconAfterName)
@@ -1176,48 +1204,107 @@ public static partial class InspectPanePatch
             labelLeft = 0f;
             float iconSize = Mathf.Max(1f, Mathf.Min(barRect.height, LineHeightForSize(size)));
             float iconY = barRect.y + (barRect.height - iconSize) * 0.5f;
-            GUI.color = Color.white;
-            GUI.DrawTexture(new Rect(barRect.x + labelLeft, iconY, iconSize, iconSize), passionIcon);
+            visual.leftIconRect = new Rect(barRect.x + labelLeft, iconY, iconSize, iconSize);
             labelLeft += iconSize + 0f;
         }
+        visual.labelLeft = labelLeft;
 
         // 纯文本样式无进度可反色，文本始终为白色（与白色字体设置等效）。
-        bool whiteFont = plainText || pawnSkillWhiteFont;
+        visual.whiteFont = visual.plainText || pawnSkillWhiteFont;
+        visual.valueText = SkillLevelText(skill);
+        visual.labelText = PawnSkillLabel(skill);
 
-        // 数值（等级）：条内右侧，位置与宽度不随图标变化。
-        Rect valueRect = new Rect(barRect.x + inset, textRectY, Mathf.Max(1f, barRect.width - 2f * inset), textRectHeight);
-        DrawBarTextMasked(valueRect, fill, SkillLevelText(skill), TextAnchor.MiddleRight, size, inset, forceWhite: whiteFont);
-
-        // 技能名：自图标右侧起绘制；图标模式把标签左缘偏移传给遮罩，保证反色范围与进度对齐。
-        string skillLabel = PawnSkillLabel(skill);
-        Rect labelRect = new Rect(barRect.x + labelLeft, textRectY, Mathf.Max(1f, barRect.width - labelLeft - inset), textRectHeight);
-        DrawBarTextMasked(labelRect, fill, skillLabel, TextAnchor.MiddleLeft, size, inset,
-            forceWhite: whiteFont, maskLeftInset: labelLeft);
-
-        // 图标置于技能名后：按当前字号实测名称宽度，紧贴名称右侧绘制激情图标；
-        // 剩余宽度放不下图标（会压到右侧等级）时跳过。
-        if (passionIconAfterName && passionIcon != null)
+        if (passionIconAfterName)
         {
             float nameWidth;
             using (new FontSizeScope(size))
             {
-                nameWidth = Text.CalcSize(skillLabel).x;
+                nameWidth = Text.CalcSize(visual.labelText).x;
             }
             float iconSize = Mathf.Max(1f, Mathf.Min(barRect.height, LineHeightForSize(size)));
             float iconX = barRect.x + labelLeft + nameWidth + 1f;
             if (iconX + iconSize <= barRect.x + barRect.width - inset)
             {
                 float iconY = barRect.y + (barRect.height - iconSize) * 0.5f;
-                GUI.color = Color.white;
-                GUI.DrawTexture(new Rect(iconX, iconY, iconSize, iconSize), passionIcon);
+                visual.rightIconRect = new Rect(iconX, iconY, iconSize, iconSize);
             }
         }
+    }
 
-        // 悬浮提示：悬停条区时显示原版角色面板的技能提示（原版方法，统一悬浮提示开关控制）。
+    /// <summary>按层绘制所有技能条：同类绘制连续，底色/填充与图标可合并批次。</summary>
+    private static void DrawSkillBarLayers()
+    {
+        for (int layer = 0; layer < skillBarDrawLayers.Length; layer++)
+        {
+            Action<SkillBarVisual> draw = skillBarDrawLayers[layer];
+            for (int i = 0; i < skillBarVisuals.Count; i++)
+            {
+                draw(skillBarVisuals[i]);
+            }
+        }
+        // 悬浮提示不产生绘制，放在所有层之后统一注册。
         if (pawnBarTooltips)
         {
-            DrawSkillTooltip(barRect, skill);
+            for (int i = 0; i < skillBarVisuals.Count; i++)
+            {
+                DrawSkillTooltip(skillBarVisuals[i].rect, skillBarVisuals[i].skill);
+            }
         }
+    }
+
+    /// <summary>技能条底色 + 按升级进度的填充（均为共享白色纹理）。</summary>
+    private static void DrawSkillBarBackground(SkillBarVisual visual)
+    {
+        if (visual.plainText)
+        {
+            return;
+        }
+        Widgets.DrawBoxSolid(visual.rect, emptyColor);
+        if (visual.fill > 0f)
+        {
+            Widgets.DrawBoxSolid(new Rect(visual.rect.x, visual.rect.y, visual.rect.width * visual.fill, visual.rect.height),
+                pawnSkillColor);
+        }
+    }
+
+    /// <summary>技能名左侧的激情图标（图标样式；默认文本样式下不存在）。</summary>
+    private static void DrawSkillBarLeftIcon(SkillBarVisual visual)
+    {
+        if (visual.passionIcon == null || visual.leftIconRect.width <= 0f)
+        {
+            return;
+        }
+        GUI.color = Color.white;
+        GUI.DrawTexture(visual.leftIconRect, visual.passionIcon);
+    }
+
+    /// <summary>技能条右侧数值（等级 / 等级+进度）。</summary>
+    private static void DrawSkillBarValueText(SkillBarVisual visual)
+    {
+        Rect valueRect = new Rect(visual.rect.x + visual.inset, visual.textRectY,
+            Mathf.Max(1f, visual.rect.width - 2f * visual.inset), visual.textRectHeight);
+        DrawBarTextMasked(valueRect, visual.fill, visual.valueText, TextAnchor.MiddleRight,
+            visual.size, visual.inset, forceWhite: visual.whiteFont);
+    }
+
+    /// <summary>技能条左侧技能名（含文本样式的激情后缀）。</summary>
+    private static void DrawSkillBarLabelText(SkillBarVisual visual)
+    {
+        Rect labelRect = new Rect(visual.rect.x + visual.labelLeft, visual.textRectY,
+            Mathf.Max(1f, visual.rect.width - visual.labelLeft - visual.inset), visual.textRectHeight);
+        DrawBarTextMasked(labelRect, visual.fill, visual.labelText, TextAnchor.MiddleLeft,
+            visual.size, visual.inset, forceWhite: visual.whiteFont, maskLeftInset: visual.labelLeft);
+    }
+
+    /// <summary>技能名右侧的激情图标（仅在「图标置于名称后」且放得下时绘制）。</summary>
+    private static void DrawSkillBarRightIcon(SkillBarVisual visual)
+    {
+        if (visual.passionIcon == null || visual.rightIconRect.width <= 0f)
+        {
+            return;
+        }
+        GUI.color = Color.white;
+        GUI.DrawTexture(visual.rightIconRect, visual.passionIcon);
     }
 
     /// <summary>技能等级文本：开启 pawnSkillShowProgressText 时以固定两位小数显示等级与当前等级内的升级进度
