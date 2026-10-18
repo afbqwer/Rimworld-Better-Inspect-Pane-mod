@@ -252,23 +252,19 @@ public partial class MyModTemplateSettings : ModSettings
 
         // 普通条标签 / 数值字号（像素）：并排显示在同一行的左右两列。
         // 默认 14；开启小号字体时仍由这里控制字号（推荐 12）。
-        if (!embedLabelShown || !embedValueShown)
+        // 字号与标签 / 数值的显示样式无关：嵌入样式同样使用该字号，因此恒显示。
         {
             float colW = (width - ItemGap) / 2f;
-            if (!embedLabelShown)
-            {
-                Rect labelSliderRect = new Rect(x, y, !embedValueShown ? colW : width, SliderHeight);
-                labelFontSize = Mathf.RoundToInt(HorizontalSlider(labelSliderRect, labelFontSize, 8f, 24f,
-                    label: "BetterInspectPane.LabelFontSize".Translate(labelFontSize), roundTo: 1f));
-                TooltipHandler.TipRegion(labelSliderRect, "BetterInspectPane.BarFontSizeTip".Translate());
-            }
-            if (!embedValueShown)
-            {
-                Rect valueSliderRect = new Rect(!embedLabelShown ? x + colW + ItemGap : x, y, !embedLabelShown ? colW : width, SliderHeight);
-                valueFontSize = Mathf.RoundToInt(HorizontalSlider(valueSliderRect, valueFontSize, 8f, 24f,
-                    label: "BetterInspectPane.ValueFontSize".Translate(valueFontSize), roundTo: 1f));
-                TooltipHandler.TipRegion(valueSliderRect, "BetterInspectPane.BarFontSizeTip".Translate());
-            }
+            Rect labelSliderRect = new Rect(x, y, colW, SliderHeight);
+            labelFontSize = Mathf.RoundToInt(HorizontalSlider(labelSliderRect, labelFontSize, 8f, 24f,
+                label: "BetterInspectPane.LabelFontSize".Translate(labelFontSize), roundTo: 1f));
+            TooltipHandler.TipRegion(labelSliderRect, "BetterInspectPane.BarFontSizeTip".Translate());
+
+            Rect valueSliderRect = new Rect(x + colW + ItemGap, y, colW, SliderHeight);
+            valueFontSize = Mathf.RoundToInt(HorizontalSlider(valueSliderRect, valueFontSize, 8f, 24f,
+                label: "BetterInspectPane.ValueFontSize".Translate(valueFontSize), roundTo: 1f));
+            TooltipHandler.TipRegion(valueSliderRect, "BetterInspectPane.BarFontSizeTip".Translate());
+
             y += SliderGap;
         }
 
