@@ -1091,16 +1091,13 @@ public static partial class InspectPanePatch
         // 文字矩形比条高，垂直居中，避免小号字被条高度裁切；
         // 高度取标签/数值两路字号中较高的行高（按像素字号计算）。
         // 字号按本条字体缩放（fontScale）缩放：缩放同时作用于标签与数值。
-        // Tiny 模式使用游戏内置 GameFont.Tiny 的原生字号，忽略像素字号与本条字体缩放。
+        // 小号字体只切换字体，字号仍取设置值（与滑杆保持一致），不能传 0。
         bool useTinyFont = barUseTinyFont;
-        int labelSize = useTinyFont ? 0 : Mathf.RoundToInt(labelFontSize * info.fontScale);
-        int valueSize = useTinyFont ? 0 : Mathf.RoundToInt(valueFontSize * info.fontScale);
+        int labelSize = Mathf.RoundToInt(labelFontSize * info.fontScale);
+        int valueSize = Mathf.RoundToInt(valueFontSize * info.fontScale);
         float textRectHeight = Mathf.Max(info.height, 24f);
         textRectHeight = Mathf.Max(textRectHeight, BarTextLineHeight(labelSize, useTinyFont));
-        if (!useTinyFont)
-        {
-            textRectHeight = Mathf.Max(textRectHeight, BarTextLineHeight(valueSize, false));
-        }
+        textRectHeight = Mathf.Max(textRectHeight, BarTextLineHeight(valueSize, useTinyFont));
         float textRectY = y + (info.height - textRectHeight) * 0.5f;
 
         GUI.color = Color.white;
