@@ -73,6 +73,7 @@ My Mod Template 2/
 | `WorldDominationReflection.cs` | World Domination 2 世界对象强度（强度条）与关系上限（关系阈值标记） |
 | `BoundedRationalityReflection.cs` | Bounded Rationality 信息隐藏同步：健康/需求/基础/技能条、策略行、观察文字特性与 Pawn 额外信息按钮按其「信息是否已知」判定同步显隐 |
 | `VSEPassionReflection.cs` | Vanilla Skills Expanded 额外激情种类：技能条激情图标 / 文本后缀改用其 PassionDef（支持冷漠 / 天赋 / 狂热等） |
+| `SurveillanceShiftReflection.cs` | Surveillance Shift 检查面板图标条：其图标与原版按钮链之间留有 24px 接缝但未计入 `lineEndWidth`，本模组额外图标（异种 / 阵营 / 文化）据此补偿，避免两组图标重合 |
 
 ## 构建
 

@@ -25,6 +25,7 @@ An in-game settings window to fine-tune everything at any time.
 Mod Compatibility:
 ✓ [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1508850027]RimHUD[/url]
 ✓ [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2023507013]Vanilla Expanded Framework[/url] Pipe Net / Process
+✓ [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3819508584]Surveillance Shift[/url] Inspect pane icon strip
 
 Performance Impact: Very Low
 In benchmark profiling , this mod's drawing code costs only ~0.05ms. For comparison, the vanilla inspect pane drawing (InspectPaneFiller.DrawInspectStringFor) alone takes ~0.1ms per frame, so the mod adds little overhead on top of what vanilla already does. You should notice no difference from vanilla in normal gameplay.

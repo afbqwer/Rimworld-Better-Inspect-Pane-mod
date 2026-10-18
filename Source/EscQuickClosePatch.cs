@@ -26,7 +26,7 @@ public static class EscQuickClosePatch
 
         // 只处理 Esc 按下事件（其余帧事件直接放行，避免每帧读取输入焦点）。
         Event current = Event.current;
-        if (current == null || current.type != EventType.keyDown || current.keyCode != KeyCode.Escape)
+        if (current == null || current.type != EventType.KeyDown || current.keyCode != KeyCode.Escape)
         {
             return true;
         }

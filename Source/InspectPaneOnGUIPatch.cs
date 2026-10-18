@@ -14,6 +14,7 @@ namespace ASQBetterInspectPane;
 /// 绘制标题文字。本补丁把这两个硬编码值改为可配置：
 ///   - 四周边距（paneMargin）：替换 ContractedBy 的 12f，其余保留原版的上下微调（yMin-4 / yMax+6）。
 ///   - 标题文本字号（titleFontSize）：用 FontSizeScope 以像素字号代替原版固定 Medium 档。
+/// 另含 Surveillance Shift 兼容：接管绘制后额外图标与 SS 图标的排布衔接（见按钮组内 ExtraStripGapWidth 调用）。
 /// 未启用覆盖（overrideInspectPane 为 false）时返回 true，走原版绘制，不影响其它行为。
 /// </summary>
 [HarmonyPatch(typeof(InspectPaneUtility), nameof(InspectPaneUtility.InspectPaneOnGUI))]
@@ -82,6 +83,14 @@ public static class InspectPaneOnGUIPatch
                     }
 
                     pane.DoInspectPaneButtons(rect, ref lineEndWidth);
+
+                    // Surveillance Shift 兼容：SS 在本调用内的 Postfix 里会再画图标，且其横向占位比实际占用少 24px
+                    // （见 SurveillanceShiftReflection），这里先补齐再接排本模组的额外图标，避免两组图标重合。
+                    // SS 的补丁只挂在地图检查面板上，世界面板无需补偿。
+                    if (pane is MainTabWindow_Inspect)
+                    {
+                        lineEndWidth += SurveillanceShiftReflection.ExtraStripGapWidth(singlePawn);
+                    }
 
                     // Pawn 单选检查面板：在原版右侧按钮左侧绘制额外图标按钮（异种类型 / 阵营 / 文化）。
                     // Bounded Rationality 同步：与原版信息卡按钮同一口径（Meta + Control），
