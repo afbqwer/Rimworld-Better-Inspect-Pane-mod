@@ -14,7 +14,7 @@ namespace ASQBetterInspectPane;
 /// InspectPaneOnGUIPatch），BR 的补丁不再作用于自定义内容，因此用与 BR 各补丁相同的判定口径同步隐藏：
 ///   - 健康 / 血液 / 疼痛条：Health（原版 DrawHealth 口径）；
 ///   - 心情 / 食物 / 休息 / 娱乐 / 机械能量 / 模组需求条：Needs（原版 DrawMood / DrawHunger / DrawMechEnergy 口径）；
-///   - 产物 / 产毛 / 繁殖条与策略行的食物 / 管制 / 着装：Basic（原版 DrawTimetableSetting 与组件检查文字口径）；
+///   - 产物 / 产毛 / 繁殖条与策略行的食物 / 管制 / 着装 / 控制组 / 训练：Basic（原版 DrawTimetableSetting 与组件检查文字口径）；
 ///   - 区域策略组件：Basic + Control（原版 DrawAreaAllowed 口径，可点击时跟随 BR「不隐藏管制」设置）；
 ///   - 技能区：Skills（BR 隐藏技能页口径）；且逐条技能按 KnowledgeUtility.IsSkillKnown 过滤
 ///     （技能与特性一样按等级从高到低、随在殖民地时间逐个解锁），全部未知时整区不显示；

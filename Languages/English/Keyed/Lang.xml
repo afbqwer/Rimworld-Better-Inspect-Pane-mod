@@ -226,13 +226,13 @@
 
   <BetterInspectPane.EnablePawns_Tip>When enabled, selecting a Pawn replaces the vanilla pane content with this mod's progress bars (vanilla bottom tabs remain available; the timetable and allowed-area widgets are provided by this mod's self-drawn policy row). Off by default.</BetterInspectPane.EnablePawns_Tip>
 
-  <BetterInspectPane.EnablePawnPolicyRow>Show Pawn policy row (Food/Schedule/Outfit/Area)</BetterInspectPane.EnablePawnPolicyRow>
+  <BetterInspectPane.EnablePawnPolicyRow>Show Pawn policy row (Food/Schedule/Outfit/Area/Control group/Training)</BetterInspectPane.EnablePawnPolicyRow>
 
   <BetterInspectPane.PolicyRowFontSize>Pawn policy row font size: {0}</BetterInspectPane.PolicyRowFontSize>
 
   <BetterInspectPane.PawnPolicyRowUseTinyFont>Policy row uses Tiny font</BetterInspectPane.PawnPolicyRowUseTinyFont>
 
-  <BetterInspectPane.PawnPolicyRowUseTinyFontTip>When enabled, the text of pawn policy row cells (food / schedule / outfit / allowed area) uses the game's built-in Tiny font; the pawn policy row font size setting still applies, as does row height. Recommended font size: 12px (also the default line height of the game's Tiny font). If tiny text is disabled in game options (or on Steam Deck), the game automatically falls back to the standard font.</BetterInspectPane.PawnPolicyRowUseTinyFontTip>
+  <BetterInspectPane.PawnPolicyRowUseTinyFontTip>When enabled, the text of pawn policy row cells (food / schedule / outfit / allowed area / control group / training) uses the game's built-in Tiny font; the pawn policy row font size setting still applies, as does row height. Recommended font size: 12px (also the default line height of the game's Tiny font). If tiny text is disabled in game options (or on Steam Deck), the game automatically falls back to the standard font.</BetterInspectPane.PawnPolicyRowUseTinyFontTip>
 
   <BetterInspectPane.PolicyRowHeight>Pawn policy row height: {0}</BetterInspectPane.PolicyRowHeight>
 
@@ -243,6 +243,10 @@
   <BetterInspectPane.PolicyRow.Outfit>Outfit: </BetterInspectPane.PolicyRow.Outfit>
 
   <BetterInspectPane.PolicyRow.Area></BetterInspectPane.PolicyRow.Area>
+
+  <BetterInspectPane.PolicyRow.ControlGroup>Control group: </BetterInspectPane.PolicyRow.ControlGroup>
+
+  <BetterInspectPane.PolicyRow.Training>Training: </BetterInspectPane.PolicyRow.Training>
 
   <BetterInspectPane.PawnSection>Pawn</BetterInspectPane.PawnSection>
 

@@ -117,6 +117,15 @@ public static partial class InspectPanePatch
     // 检查面板同一时间只显示一个单位，选中单位切换时整体重建。
     // 「管制」标签页（MainButtonDef defName = Schedule，tabWindowClass = MainTabWindow_Schedule），首次点击时解析并缓存。
     private static MainButtonDef? cachedScheduleTab;
+
+    // 策略行数据缓存（选中 Pawn）：控制组查找涉及机械师全部分组 × 机械列表遍历，
+    // 训练标签涉及训练列表与可见性判定，均按帧缓存；切换选中 Pawn 时立即重算，
+    // 控制组经本行改派后同步更新，其它来源的改派最迟 30 帧后反映。
+    private static Pawn? cachedPolicyRowPawn;
+    private static int cachedPolicyRowRefreshFrame = -1000;
+    private static MechanitorControlGroup? cachedPolicyRowControlGroup;
+    private static string? cachedPolicyRowTrainingLabel; // null = 当前 Pawn 不显示训练组件（或无训练标签页）
+
     private static Thing? cachedCompOwner;
     private static CompProjectileInterceptor? cachedInterceptor;
     private static CompDestroyAfterDelay? cachedDestroyAfterDelay; // 自毁计时组件（被动常开且会自毁的拦截器，如护盾投射仪）
@@ -397,13 +406,15 @@ public static partial class InspectPanePatch
     }
 
     /// <summary>
-    /// Pawn 专用策略行：食物（食物方案）/ 管制（时间表安排）/ 着装（服装方案）/ 区域（允许区）
-    /// 四个自行绘制的单行色条组件，适用者平分整行（全部不适用时不预留任何高度与间距，返回原 y，
+    /// Pawn 专用策略行：食物（食物方案）/ 管制（时间表安排）/ 着装（服装方案）/ 区域（允许区），
+    /// 机械体追加 控制组，动物追加 训练；适用者平分整行（全部不适用时不预留任何高度与间距，返回原 y，
     /// 由调用方以 drawn 判定是否补行距）。
     /// 组件均带原版等价交互：
     ///   食物 / 着装：点击浮窗选择方案 + 「编辑...」打开原版方案管理窗口（任务租客的着装显示「不可更改」且不可点击）；
     ///   管制：点击打开原版「管制」（Schedule）标签页；
-    ///   区域：悬停高亮 + 地图区域标记（原版行为），点击浮出允许区域菜单。
+    ///   区域：悬停高亮 + 地图区域标记（原版行为），点击浮出允许区域菜单；
+    ///   控制组：显示当前控制组序号，点击浮窗选择机械师的控制组（当前组禁用）；
+    ///   训练：显示训练列表最底部的已训练项目，点击打开原版「训练」标签页。
     /// 行绘制后在其与进度条区之间补一条分隔线（跟随分隔线设置；未启用时仅返回行底）。
     /// 需在 Widgets.BeginGroup 内调用（鼠标交互依赖当前组）。
     /// </summary>
@@ -414,6 +425,9 @@ public static partial class InspectPanePatch
         Pawn_OutfitTracker? outfitTracker = pawn.outfits;
         Pawn_PlayerSettings? playerSettings = pawn.playerSettings;
         Pawn_TimetableTracker? timetable = pawn.timetable;
+
+        // 策略行数据（控制组 / 训练标签）按帧缓存：选中 Pawn 未变且未超过间隔时复用上次结果。
+        RefreshPolicyRowCache(pawn);
 
         // Bounded Rationality 同步：BR 隐藏原版 DrawTimetableSetting（Basic）时，
         // 同口径隐藏策略行的食物 / 管制 / 着装组件；未装 BR 时恒为已知，不影响原行为。
@@ -439,8 +453,26 @@ public static partial class InspectPanePatch
             && !(pawn.IsMutant && !pawn.mutant.Def.respectsAllowedArea)
             && BoundedRationalityReflection.IsAreaKnown(pawn);
 
+        // 控制组适用条件：玩家殖民地机械体、已连接机械师且机械师拥有控制组（Biotech）；
+        // 与其它策略组件一致，BR 隐藏基础信息时一并隐藏。
+        MechanitorControlGroup? mechControlGroup = cachedPolicyRowControlGroup;
+        bool controlGroupApplicable = false;
+        if (mechControlGroup != null)
+        {
+            List<MechanitorControlGroup>? controlGroups = mechControlGroup.Tracker?.controlGroups;
+            controlGroupApplicable = !controlGroups.NullOrEmpty()
+                && BoundedRationalityReflection.IsBasicKnown(pawn);
+        }
+
+        // 训练适用条件：与原版训练标签页（ITab_Pawn_Training）的可见性判定一致
+        //（有训练追踪器、玩家阵营、未禁用训练标签页；变异体需可驯服）。
+        // 标签缓存为 null 表示当前 Pawn 不显示训练组件。
+        bool trainingApplicable = cachedPolicyRowTrainingLabel != null
+            && BoundedRationalityReflection.IsBasicKnown(pawn);
+
         int count = (foodApplicable ? 1 : 0) + (timetableApplicable ? 1 : 0)
-            + (outfitApplicable ? 1 : 0) + (areaApplicable ? 1 : 0);
+            + (outfitApplicable ? 1 : 0) + (areaApplicable ? 1 : 0)
+            + (controlGroupApplicable ? 1 : 0) + (trainingApplicable ? 1 : 0);
         if (count == 0)
         {
             drawn = false;
@@ -524,6 +556,23 @@ public static partial class InspectPanePatch
                     // 原版行为：悬停时在地图上标记该区域（悬停边框由 DrawPolicyCell 对所有组件统一绘制）。
                     settings.AreaRestrictionInPawnCurrentMap?.MarkForDraw();
                 });
+            x += cellWidth + gap;
+        }
+
+        if (controlGroupApplicable)
+        {
+            MechanitorControlGroup currentGroup = mechControlGroup!;
+            // 与原版控制组列一致：显示控制组序号（工作模式见浮窗中的「序号 (模式)」）。
+            DrawPolicyCell(new Rect(x, y, cellWidth, rowHeight), "BetterInspectPane.PolicyRow.ControlGroup",
+                currentGroup.Index.ToString(), null, _ => OpenMechControlGroupMenu(pawn, currentGroup));
+            x += cellWidth + gap;
+        }
+
+        if (trainingApplicable)
+        {
+            // 显示训练列表中最底部（列表末位）的已训练项目；尚未训练任何项目时显示「无」。
+            DrawPolicyCell(new Rect(x, y, cellWidth, rowHeight), "BetterInspectPane.PolicyRow.Training",
+                cachedPolicyRowTrainingLabel!, null, _ => OpenTrainingTab());
         }
 
         // 行尾分隔线：策略行与下方进度条区隔开（跟随分隔线设置；关闭时不绘制、仅保留行底），
@@ -576,6 +625,157 @@ public static partial class InspectPanePatch
             onCell(cellRect);
         }
         TooltipHandler.TipRegion(cellRect, text);
+    }
+
+    /// <summary>
+    /// 刷新策略行数据缓存（按帧）：控制组查找涉及机械师全部分组 × 机械列表遍历，
+    /// 训练标签涉及训练列表与可见性判定，二者都不适合每帧重算。
+    /// 缓存键为选中 Pawn，切换 Pawn 或超过 CacheRefreshIntervalFrames 时重算；
+    /// 读取失败按「无控制组 / 无训练标签」降级（记录一次性警告），不影响面板其它内容绘制。
+    /// </summary>
+    private static void RefreshPolicyRowCache(Pawn pawn)
+    {
+        if (!NeedsFrameRefresh(ref cachedPolicyRowPawn, ref cachedPolicyRowRefreshFrame, pawn))
+        {
+            return;
+        }
+
+        cachedPolicyRowControlGroup = null;
+        cachedPolicyRowTrainingLabel = null;
+
+        // 控制组与训练分别容错：任一数据源异常只降级对应组件，不影响另一项与面板其它内容。
+        try
+        {
+            // 控制组：仅玩家殖民地机械体需要查找（GetMechControlGroup 内部会遍历机械师的分组）。
+            if (ModsConfig.BiotechActive && pawn.IsColonyMech)
+            {
+                cachedPolicyRowControlGroup = pawn.GetMechControlGroup();
+            }
+        }
+        catch (Exception ex)
+        {
+            cachedPolicyRowControlGroup = null;
+            Log.WarningOnce("ASQBetterInspectPane: 读取机械控制组失败，本次按无控制组处理。ex="
+                + ex.Message, 81752344);
+        }
+
+        try
+        {
+            // 训练：与原版训练标签页（ITab_Pawn_Training）的可见性判定一致
+            //（有训练追踪器、玩家阵营、未禁用训练标签页；变异体需可驯服）。
+            if (pawn.training != null
+                && pawn.Faction == Faction.OfPlayer
+                && !pawn.RaceProps.hideTrainingTab
+                && (!pawn.IsMutant || pawn.mutant.Def.tameable))
+            {
+                cachedPolicyRowTrainingLabel = BottomLearnedTrainingLabel(pawn);
+            }
+        }
+        catch (Exception ex)
+        {
+            cachedPolicyRowTrainingLabel = null;
+            Log.WarningOnce("ASQBetterInspectPane: 读取训练信息失败，本次按无训练处理。ex="
+                + ex.Message, 81752345);
+        }
+    }
+
+    /// <summary>
+    /// 打开机械控制组选择浮窗（与原版控制组列一致）：列出机械师的全部控制组，
+    /// 当前控制组以禁用项显示「已编组」原因，其余项点击后把机械分配到该组。
+    /// 追踪器 / 分组列表缺失时静默跳过；构建菜单失败时记录一次性警告。
+    /// </summary>
+    private static void OpenMechControlGroupMenu(Pawn mech, MechanitorControlGroup currentGroup)
+    {
+        List<MechanitorControlGroup>? groups = currentGroup.Tracker?.controlGroups;
+        if (groups == null || groups.Count == 0)
+        {
+            return;
+        }
+        try
+        {
+            List<FloatMenuOption> options = new List<FloatMenuOption>(groups.Count);
+            for (int i = 0; i < groups.Count; i++)
+            {
+                MechanitorControlGroup group = groups[i];
+                if (group == currentGroup)
+                {
+                    options.Add(new FloatMenuOption(
+                        "CannotAssignMechToControlGroup".Translate(group.LabelIndexWithWorkMode)
+                        + ": " + "AssignMechAlreadyAssigned".Translate(), null));
+                }
+                else
+                {
+                    MechanitorControlGroup captured = group;
+                    options.Add(new FloatMenuOption(
+                        "AssignMechToControlGroup".Translate(group.LabelIndexWithWorkMode),
+                        () => AssignMechToControlGroup(mech, captured)));
+                }
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+        catch (Exception ex)
+        {
+            Log.WarningOnce("ASQBetterInspectPane: 构建机械控制组菜单失败。ex=" + ex.Message, 81752346);
+        }
+    }
+
+    /// <summary>把机械分配到指定控制组；成功后同步策略行缓存，使本行立即显示新组。</summary>
+    private static void AssignMechToControlGroup(Pawn mech, MechanitorControlGroup group)
+    {
+        try
+        {
+            group.Assign(mech);
+            if (ReferenceEquals(cachedPolicyRowPawn, mech))
+            {
+                cachedPolicyRowControlGroup = group;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.WarningOnce("ASQBetterInspectPane: 分配机械控制组失败。ex=" + ex.Message, 81752347);
+        }
+    }
+
+    /// <summary>打开原版「训练」标签页；标签页被其它模组替换 / 缺失导致失败时记录一次性警告。</summary>
+    private static void OpenTrainingTab()
+    {
+        try
+        {
+            InspectPaneUtility.OpenTab(typeof(ITab_Pawn_Training));
+        }
+        catch (Exception ex)
+        {
+            Log.WarningOnce("ASQBetterInspectPane: 打开训练标签页失败。ex=" + ex.Message, 81752348);
+        }
+    }
+
+    /// <summary>
+    /// 训练列表中最底部（列表末位）的已训练项目：训练页按 TrainableDefsInListOrder 从上到下绘制，
+    /// 从末位向前找第一个已学会且对该动物可见的项目；尚无已训练项目时返回「无」。
+    /// 调用方仅在缓存刷新时调用（每 30 帧一次），并负责捕获异常。
+    /// </summary>
+    private static string BottomLearnedTrainingLabel(Pawn pawn)
+    {
+        Pawn_TrainingTracker? training = pawn.training;
+        if (training == null)
+        {
+            return "NoneLower".Translate();
+        }
+        List<TrainableDef> trainables = TrainableUtility.TrainableDefsInListOrder;
+        for (int i = trainables.Count - 1; i >= 0; i--)
+        {
+            TrainableDef td = trainables[i];
+            if (!training.HasLearned(td))
+            {
+                continue;
+            }
+            training.CanAssignToTrain(td, out bool visible);
+            if (visible)
+            {
+                return td.LabelCap;
+            }
+        }
+        return "NoneLower".Translate();
     }
 
     /// <summary>打开原版「管制」（Schedule）标签页：按 defName 解析 MainButtonDef，
