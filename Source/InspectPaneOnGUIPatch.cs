@@ -117,11 +117,26 @@ public static class InspectPaneOnGUIPatch
                 // 标题文字：字号改为可配置像素值；原版 GameFont.Medium 对应高度约 50，按字号计算标题区高度。
                 // 记录绘制前的字体与锚点，绘制后还原，避免污染后续 DoPaneContents 的绘制上下文。
                 Rect titleRect = new Rect(0f, 0f, rect.width - lineEndWidth, titleHeight);
-                // 标题文字按「选中对象 + 是否全名 + 字号」缓存：名称随对象基本不变，改名 / 堆叠数 / 多选计数
-                // 等低频变化由 30 帧间隔刷新兜底（口径与 InspectString 缓存一致），稳态下零拼装、零测量。
-                // 全名 / 自适应开关只影响重建时的取值来源（见 GetTitleLabel）。
-                bool fromFullName = singlePawn != null && MyModTemplateSettings.pawnShowFullName && singlePawn.Name != null;
-                string label = GetTitleLabel(pane, singlePawn, titleRect, titleHeight, fromFullName, effectiveTitleFontSize);
+                // 标题每帧现取（与原版同频，名称显示不滞后于改名 / 堆叠数 / 多选计数变化）：
+                //   - 全名路径：Name.ToStringFull；
+                //   - 自适应宽度开启：取「完整标题」（GetFullTitle，借用原版拼装口径，但以临时缓存 +
+                //     超大宽度绕开其按当前面板宽度的截断——原版截断结果按文本冻结缓存，面板加宽后不放开）；
+                //   - 自适应宽度关闭：沿用原版 GetLabel 口径，零额外开销。
+                // 截断统一由 TruncateToWidth 按真实字号现算；宽度测量按标题文本缓存（名称不变则命中，
+                // 名称一变同帧重测），因此显示与宽度都不需要时间维度的缓存。
+                string label;
+                if (singlePawn != null && MyModTemplateSettings.pawnShowFullName && singlePawn.Name != null)
+                {
+                    label = singlePawn.Name.ToStringFull;
+                }
+                else if (MyModTemplateSettings.adaptivePaneWidth)
+                {
+                    label = GetFullTitle(pane, titleHeight) ?? pane.GetLabel(titleRect);
+                }
+                else
+                {
+                    label = pane.GetLabel(titleRect);
+                }
 
                 // 自适应面板宽度更新放在标题绘制之前：绘制侧 TruncateToWidth 直接复用本帧测量缓存，
                 // 稳态（标题与字号不变）下标题绘制零 CalcSize。所需总宽 = 完整标题宽 + 按钮条宽 + 边距，
@@ -192,51 +207,11 @@ public static class InspectPaneOnGUIPatch
         AccessTools.Field(typeof(InspectPaneUtility), "truncatedLabelsCached");
     private static readonly Dictionary<string, string> fullTitleMeasureCache = new Dictionary<string, string>();
 
-    // 测量缓存：同一标题文本 + 字号只测一次（标题随选中对象变化，换选时重测一次，成本为一次 CalcSize）。
+    // 测量缓存：同一标题文本 + 字号只测一次。标题文本本身每帧现取（显示不滞后），
+    // 文本不变（同一选中对象的常态）时命中缓存零 CalcSize，名称一变则键变化、同帧重测。
     private static string? cachedMeasureTitle;
     private static int cachedMeasureFontSize = -1;
     private static float cachedMeasureTitleWidth;
-
-    // ---------- 标题缓存 ----------
-
-    /// <summary>标题缓存间隔帧数：与 InspectString 缓存同口径（30 帧），改名 / 堆叠数 / 多选计数等低频变化最迟此时生效。</summary>
-    private const int TitleCacheIntervalFrames = 30;
-
-    // 标题缓存：键 = 选中对象 + 是否全名 + 字号，值 = 标题文本（完整口径，见 GetFullTitle）。
-    private static ISelectable? cachedTitleOwner;
-    private static bool cachedTitleFromFullName;
-    private static int cachedTitleFontSize = -1;
-    private static int cachedTitleFrame = -1000;
-    private static string cachedTitleLabel = "";
-
-    /// <summary>
-    /// 取标题文字，按「选中对象 + 是否全名 + 字号 + 30 帧间隔」缓存。标题随选中对象基本不变，
-    /// 命中时零字符串拼装、零 CalcSize（宽度与截断结果缓存随后均命中）；仅重建帧付出一次
-    /// AdjustedLabelFor（或全名拼装）+ 一次测量。全名来源要求单选 Pawn（原口径）；其余对象在
-    /// 自适应宽度开启时取完整标题（GetFullTitle），关闭时沿用原版 GetLabel 口径零额外开销。
-    /// </summary>
-    private static string GetTitleLabel(IInspectPane pane, Pawn? singlePawn, Rect titleRect, float titleHeight,
-        bool fromFullName, int fontSize)
-    {
-        ISelectable? owner = InspectPanePatch.GetCurrentSelected();
-        if (owner != null && ReferenceEquals(cachedTitleOwner, owner)
-            && cachedTitleFromFullName == fromFullName && cachedTitleFontSize == fontSize
-            && Time.frameCount - cachedTitleFrame < TitleCacheIntervalFrames)
-        {
-            return cachedTitleLabel;
-        }
-        string label = fromFullName && singlePawn?.Name != null
-            ? singlePawn.Name.ToStringFull
-            : MyModTemplateSettings.adaptivePaneWidth
-                ? (GetFullTitle(pane, titleHeight) ?? pane.GetLabel(titleRect))
-                : pane.GetLabel(titleRect);
-        cachedTitleOwner = owner;
-        cachedTitleFromFullName = fromFullName;
-        cachedTitleFontSize = fontSize;
-        cachedTitleFrame = Time.frameCount;
-        cachedTitleLabel = label;
-        return label;
-    }
 
     /// <summary>
     /// 取未截断的完整标题：把原版截断缓存临时换成本类空字典后，以超大宽度调用 GetLabel ——
