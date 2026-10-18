@@ -121,6 +121,39 @@ public static partial class InspectPanePatch
     private const int CellHealthCacheFrames = 20;
     private static int cellHealthRefreshFrame = -1000;
 
+    // 网格分层绘制缓存：先收集每格状态，再按「底层填充 → 内容 → 文本 → 健康条 → 边框 → 角标」分层绘制。
+    // ImGui 只会合并相邻且同纹理的绘制；分层后同类纹理连续（白底/边框/角标各自一个批次），
+    // 避免原先「每格立绘 → 边框 → 白底」交替切换纹理导致每格多出若干 draw call。
+    private struct GridCellVisual
+    {
+        public Rect rect;
+        public GridCell cell;
+        public bool shiftSelected;
+        public bool ctrlMarked;
+        public bool destroyed;
+        public float easedHealth;
+        public bool showHealth;
+        public bool hasBadge;
+        public Rect badgeRect;
+        public string? badgeText;
+    }
+
+    private static readonly List<GridCellVisual> gridCellVisuals = new List<GridCellVisual>();
+    private static bool[] gridCellVisualFailed = new bool[0];
+
+    // 绘制层顺序固定：先铺底层，再画内容与文本，最后叠边框/健康条/角标（与原先单格内的相对顺序一致）。
+    // 委托在静态构造时创建一次，避免每帧分配。
+    private static readonly Action<GridCellVisual>[] gridCellDrawLayers =
+    {
+        DrawGridCellBase,
+        DrawGridCellGraphics,
+        DrawGridCellContentText,
+        DrawGridCellBorder,
+        DrawGridCellHealthBarLayer,
+        DrawGridCellBadgeBackground,
+        DrawGridCellBadgeText
+    };
+
     // 当前拖拽手势（一次「按下→移动→松开」的完整状态）。
     private static MultiSelectDragGesture multiSelectDrag;
 
@@ -966,15 +999,36 @@ public static partial class InspectPanePatch
             }
 
             // 单格异常隔离：一格绘制失败只跳过该格并记录日志，避免拖垮整个网格（也防止 GUI 状态残留）。
+            // 先收集全部可见格状态，再分层批量绘制：同类纹理连续，显著减少 ImGui 批次切换。
+            gridCellVisuals.Clear();
             for (int i = 0; i < shown; i++)
             {
                 try
                 {
-                    DrawGridCell(CellRect(gridY, columns, i, cellSize, gap), cells[i], scene);
+                    PrepareGridCellVisual(CellRect(gridY, columns, i, cellSize, gap), cells[i], scene, out GridCellVisual visual);
+                    gridCellVisuals.Add(visual);
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("BetterInspectPane: 绘制多选单元格失败，已跳过该格：" + ex);
+                    Log.Error("BetterInspectPane: 准备多选单元格失败，已跳过该格：" + ex);
+                }
+            }
+
+            DrawGridCellVisualLayers();
+
+            for (int i = 0; i < gridCellVisuals.Count; i++)
+            {
+                if (gridCellVisualFailed[i])
+                {
+                    continue;
+                }
+                try
+                {
+                    HandleGridCellInteraction(gridCellVisuals[i], scene);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("BetterInspectPane: 处理多选单元格交互失败，已跳过该格：" + ex);
                 }
             }
 
@@ -1072,17 +1126,20 @@ public static partial class InspectPanePatch
         }
     }
 
-    /// <summary>绘制单个单元格：按类型绘制内容 + shift/ctrl 高亮 + 边框 + 健康条（仅 Things）+ 数量角标 + 提示 + 点击热区。</summary>
-    private static void DrawGridCell(Rect cell, GridCell gc, MultiSelectScene scene)
+    /// <summary>准备单个单元格的绘制状态（高亮、健康缓动、角标文本/位置）；不产生绘制调用。</summary>
+    private static void PrepareGridCellVisual(Rect rect, GridCell gc, MultiSelectScene scene, out GridCellVisual visual)
     {
+        visual = default;
+        visual.rect = rect;
+        visual.cell = gc;
+
         object rep = gc.representative;
-        bool isShiftSelected = shiftSelectedThings.Contains(rep);
-        bool isCtrlMarked = ctrlMarkedForRemoval.Contains(rep);
+        visual.shiftSelected = shiftSelectedThings.Contains(rep);
+        visual.ctrlMarked = ctrlMarkedForRemoval.Contains(rep);
+        visual.destroyed = ObjDestroyed(rep);
 
         // 健康值 + 每格缓动（仅 Things）：目标值 gc.healthFill 来自 20 帧缓存。
-        // 提前到内容绘制之前计算：健康背景需画在内容之下，必须先拿到缓动值。
-        float easedHealth = 0f;
-        bool showHealth = false;
+        // 统一在绘制前计算一次，保证每帧每格只步进一次缓动（与原单格绘制时一致）。
         if (scene == MultiSelectScene.Things && IsThingCell(gc))
         {
             float healthFill = gc.healthFill;
@@ -1100,15 +1157,77 @@ public static partial class InspectPanePatch
                 ease.Set(healthFill);
             }
             cellHealthEase[healthKey] = ease;
-            easedHealth = ease.easedValue;
-            showHealth = ShouldShowCellHealthBar(gc, healthFill);
+            visual.easedHealth = ease.easedValue;
+            visual.showHealth = ShouldShowCellHealthBar(gc, healthFill);
         }
 
+        // 数量角标：非殖民者单元格右下角 ×N（带半透明底，保证可读性；可关闭「×」前缀只显示数字）。
+        // 数量 ≥ 1000 时以 k 缩写显示（如 ×1.2k），宽度按角标文本实测并缓存，保持右对齐并关闭换行。
+        // 文本/位置在此预计算，绘制层只负责画，避免背景与文字分属两层时重复计算。
+        if (!gc.isColonist && gc.count > 1)
+        {
+            string digits = FormatCountText(gc.count);
+            visual.hasBadge = true;
+            visual.badgeText = multiSelectBadgeShowX ? "×" + digits : digits;
+            // 首次测量须使用角标字号；缓存命中后不再调用 Text.CalcSize。
+            using (new FontSizeScope(multiSelectBadgeFontSize))
+            {
+                float scale = multiSelectBadgeScale;
+                float badgeWidth = MultiSelectBadgeWidthFor(digits.Length) * scale;
+                if (multiSelectBadgeShowX)
+                {
+                    badgeWidth += MultiSelectBadgeXWidth() * scale;
+                }
+                float badgeHeight = MultiSelectBadgeHeight * scale;
+                // 右、下两侧各向格内收缩一个边框宽度，避免灰色底盖住单元格边框。
+                int borderWidth = multiSelectCellBorderWidth;
+                visual.badgeRect = new Rect(rect.xMax - borderWidth - badgeWidth, rect.yMax - borderWidth - badgeHeight,
+                    badgeWidth, badgeHeight);
+            }
+        }
+    }
+
+    /// <summary>按固定层序绘制所有可见格：同层绘制连续，便于 ImGui 按纹理合并批次。</summary>
+    private static void DrawGridCellVisualLayers()
+    {
+        int count = gridCellVisuals.Count;
+        if (gridCellVisualFailed.Length < count)
+        {
+            gridCellVisualFailed = new bool[Math.Max(8, count)];
+        }
+        Array.Clear(gridCellVisualFailed, 0, count);
+
+        for (int layer = 0; layer < gridCellDrawLayers.Length; layer++)
+        {
+            Action<GridCellVisual> draw = gridCellDrawLayers[layer];
+            for (int i = 0; i < count; i++)
+            {
+                if (gridCellVisualFailed[i])
+                {
+                    continue; // 该格已出错：跳过后续层（含交互），与原先整格跳过的行为一致。
+                }
+                try
+                {
+                    draw(gridCellVisuals[i]);
+                }
+                catch (Exception ex)
+                {
+                    gridCellVisualFailed[i] = true;
+                    Log.Error("BetterInspectPane: 绘制多选单元格失败，已跳过该格：" + ex);
+                }
+            }
+        }
+    }
+
+    /// <summary>底层填充：健康背景、悬停高亮、shift/ctrl 底色、Zone 色块。全部使用共享白色纹理，可合成一个批次。</summary>
+    private static void DrawGridCellBase(GridCellVisual visual)
+    {
+        Rect cell = visual.rect;
         // 健康背景（替代健康条时）：内容之下的最底层背景。
         // 默认按健康比例自下而上填充；反转后按受伤比例（1-健康）自上而下填充。
-        if (showHealth && useHealthBackgroundInsteadOfBar)
+        if (visual.showHealth && useHealthBackgroundInsteadOfBar)
         {
-            DrawCellHealthBackground(cell, easedHealth);
+            DrawCellHealthBackground(cell, visual.easedHealth);
         }
 
         if (Mouse.IsOver(cell))
@@ -1117,70 +1236,172 @@ public static partial class InspectPanePatch
         }
 
         // 背景高亮（置于内容之下，不遮挡立绘/图标）：shift 构建选区 = 淡黄，ctrl 待移除 = 橙色。
-        if (isShiftSelected)
+        if (visual.shiftSelected)
         {
             Widgets.DrawBoxSolid(cell, MultiSelectShiftFill);
         }
-        else if (isCtrlMarked)
+        else if (visual.ctrlMarked)
         {
             Widgets.DrawBoxSolid(cell, MultiSelectCtrlFill);
         }
 
-        // 内容：Thing 立绘/图标；Zone 色块 + 标签；WorldObject 图标。代表物可能恰在被销毁的那一帧
-        // （选择通常随后即被移除，这里仅防御绘制窗口）：销毁则跳过内容绘制，只保留边框/提示/点击。
-        DrawCellContent(cell, gc);
-
-        // 边框：shift 构建选区用黄色、ctrl 待移除用橙色，否则用默认色（颜色与粗细均为可调设置；
-        // 粗细由设置处烘焙进边框纹理，绘制时不再传参）。
-        int borderWidth = multiSelectCellBorderWidth;
-        if (isShiftSelected)
+        // Zone 的色块底衬原本画在内容阶段；它同样是共享白色纹理，提前到本层可与其他白底合并。
+        if (!visual.destroyed && visual.cell.representative is Zone zone)
         {
-            DrawRectOutline(cell, MultiSelectShiftBorder);
+            Color c = zone.color;
+            Widgets.DrawBoxSolid(cell, new Color(c.r, c.g, c.b, 0.45f));
         }
-        else if (isCtrlMarked)
+    }
+
+    /// <summary>内容图形：Thing 立绘/图标；WorldObject 图标。Zone 色块已在底层绘制。</summary>
+    private static void DrawGridCellGraphics(GridCellVisual visual)
+    {
+        if (visual.destroyed)
         {
-            DrawRectOutline(cell, MultiSelectCtrlBorder);
+            return; // 销毁则跳过内容（边框/提示/点击保留）。
+        }
+        Rect cell = visual.rect;
+        object rep = visual.cell.representative;
+        if (rep is Thing t)
+        {
+            if (t is Pawn pawn)
+            {
+                RenderTexture tex = PortraitsCache.Get(pawn, new Vector2(cell.width, cell.height), Rot4.South);
+                if (tex != null)
+                {
+                    GUI.DrawTexture(cell, tex);
+                }
+            }
+            else
+            {
+                Widgets.ThingIcon(cell, t);
+            }
+        }
+        else if (rep is WorldObject wo)
+        {
+            Texture2D icon = wo.ExpandingIcon;
+            if (icon != null)
+            {
+                Color prev = GUI.color;
+                GUI.color = wo.ExpandingIconColor;
+                GUI.DrawTexture(cell, icon);
+                GUI.color = prev;
+            }
+        }
+    }
+
+    /// <summary>内容文本：Zone 色块上的缩写标签、WorldObject 无图标时的名称回退。集中绘制以复用字体图集批次。</summary>
+    private static void DrawGridCellContentText(GridCellVisual visual)
+    {
+        if (visual.destroyed)
+        {
+            return;
+        }
+        Rect cell = visual.rect;
+        object rep = visual.cell.representative;
+        if (rep is Zone zone)
+        {
+            // 用区域自身颜色填充底衬（已在底层）+ 居中显示区域标签的前三个字（字号沿用数量角标字号）。
+            string initial = zone.InspectLabel;
+            if (string.IsNullOrEmpty(initial))
+            {
+                return; // 空标签无内容可画（并防止下方取末位越界）。
+            }
+            char last = initial[initial.Length - 1];
+            bool singleDigitEnd = last >= '0' && last <= '9'
+                                  && (initial.Length < 2 || initial[initial.Length - 2] < '0' || initial[initial.Length - 2] > '9');
+            bool twoDigitEnd = !singleDigitEnd
+                               && initial.Length >= 2
+                               && last >= '0' && last <= '9'
+                               && initial[initial.Length - 2] >= '0' && initial[initial.Length - 2] <= '9'
+                               && (initial.Length < 3 || initial[initial.Length - 3] < '0' || initial[initial.Length - 3] > '9');
+            int labelLen = twoDigitEnd ? 2 : singleDigitEnd ? 1 : 0;
+            if (labelLen > 0)
+            {
+                // 单数字结尾（如“种植区 1”）取前二字+数字（种植1）；双数字结尾（如“种植区 11”）取前一字+两数字（种11）。
+                int keep = Math.Max(0, 3 - labelLen);
+                if (keep > 0 && keep >= initial.Length - labelLen) keep = initial.Length - labelLen;
+                initial = initial.Substring(0, keep) + initial.Substring(initial.Length - labelLen, labelLen);
+            }
+            else if (initial.Length > 3)
+            {
+                initial = initial.Substring(0, 3);
+            }
+            using (new WordWrapScope(false))
+            using (new FontSizeScope(multiSelectBadgeFontSize))
+            using (new AnchorScope(TextAnchor.MiddleCenter))
+            {
+                Widgets.Label(cell, initial);
+            }
+        }
+        else if (rep is WorldObject wo && wo.ExpandingIcon == null)
+        {
+            using (new WordWrapScope(false))
+            using (new FontSizeScope(multiSelectBadgeFontSize))
+            using (new AnchorScope(TextAnchor.MiddleCenter))
+            {
+                Widgets.Label(cell, wo.LabelShortCap);
+            }
+        }
+    }
+
+    /// <summary>边框层：所有格使用同一张烘焙边框纹理，连续绘制可合并为一个批次。</summary>
+    private static void DrawGridCellBorder(GridCellVisual visual)
+    {
+        if (visual.shiftSelected)
+        {
+            DrawRectOutline(visual.rect, MultiSelectShiftBorder);
+        }
+        else if (visual.ctrlMarked)
+        {
+            DrawRectOutline(visual.rect, MultiSelectCtrlBorder);
         }
         else
         {
-            DrawRectOutline(cell, multiSelectCellBorderColor);
+            DrawRectOutline(visual.rect, multiSelectCellBorderColor);
         }
+    }
 
-        // 健康条（仅 Things）：顶部横条，未启用「健康背景替代」时绘制（缓动值已在方法开头计算）。
-        if (showHealth && !useHealthBackgroundInsteadOfBar)
+    /// <summary>健康条层：共享白色纹理，与其他格连续绘制可合并批次。</summary>
+    private static void DrawGridCellHealthBarLayer(GridCellVisual visual)
+    {
+        if (visual.showHealth && !useHealthBackgroundInsteadOfBar)
         {
-            DrawCellHealthBar(cell, easedHealth);
+            DrawCellHealthBar(visual.rect, visual.easedHealth);
         }
+    }
 
-        // 数量角标：非殖民者单元格右下角 ×N（带半透明底，保证可读性；可关闭「×」前缀只显示数字）。
-        // 数量 ≥ 1000 时以 k 缩写显示（如 ×1.2k），宽度按角标文本实测并缓存，保持右对齐并关闭换行。
-        if (!gc.isColonist && gc.count > 1)
+    /// <summary>角标底：与角标文本分成两层，避免每格「白底 → 字体图集」来回切换。</summary>
+    private static void DrawGridCellBadgeBackground(GridCellVisual visual)
+    {
+        if (!visual.hasBadge)
         {
-            bool showX = multiSelectBadgeShowX;
-            string digits = FormatCountText(gc.count);
-            string countText = showX ? "×" + digits : digits;
-            // WordWrap / Anchor / Font 均用作用域对象管理，异常时也能还原，防止 GUI 文本状态泄漏。
-            using (new WordWrapScope(false))
-            using (new FontSizeScope(multiSelectBadgeFontSize))
-            using (new AnchorScope(TextAnchor.MiddleRight))
-            {
-                // 宽度按数字字符数查表（假定 '.' 与 'k' 与数字等宽，同长度宽度一致），
-                // 每帧无需测量实际文本；开启「×」前缀时再把「×」字形宽度加回。角标框整体再乘以缩放比例设置。
-                float scale = multiSelectBadgeScale;
-                float badgeWidth = MultiSelectBadgeWidthFor(digits.Length) * scale;
-                if (showX)
-                {
-                    badgeWidth += MultiSelectBadgeXWidth() * scale;
-                }
-                float badgeHeight = MultiSelectBadgeHeight * scale;
-                // 右、下两侧各向格内收缩一个边框宽度，避免灰色底盖住单元格边框。
-                Rect badge = new Rect(cell.xMax - borderWidth - badgeWidth, cell.yMax - borderWidth - badgeHeight,
-                    badgeWidth, badgeHeight);
-                Widgets.DrawBoxSolid(badge, new Color(0f, 0f, 0f, 0.6f));
-                Widgets.Label(badge, countText);
-            }
+            return;
         }
+        Widgets.DrawBoxSolid(visual.badgeRect, new Color(0f, 0f, 0f, 0.6f));
+    }
 
+    /// <summary>角标文本：所有格连续绘制，共用字体图集批次。</summary>
+    private static void DrawGridCellBadgeText(GridCellVisual visual)
+    {
+        if (!visual.hasBadge || visual.badgeText == null)
+        {
+            return;
+        }
+        // WordWrap / Anchor / Font 均用作用域对象管理，异常时也能还原，防止 GUI 文本状态泄漏。
+        using (new WordWrapScope(false))
+        using (new FontSizeScope(multiSelectBadgeFontSize))
+        using (new AnchorScope(TextAnchor.MiddleRight))
+        {
+            Widgets.Label(visual.badgeRect, visual.badgeText);
+        }
+    }
+
+    /// <summary>单格交互（提示 + 点击）：不产生绘制，放在所有绘制层之后统一处理。</summary>
+    private static void HandleGridCellInteraction(GridCellVisual visual, MultiSelectScene scene)
+    {
+        Rect cell = visual.rect;
+        GridCell gc = visual.cell;
         // 工具提示：单个项单元格（殖民者单列 / 单项目）→ 个人标签；分组 → 种类名 ×数量。
         // 用 Func 重载延迟求值：仅悬停显示提示时才拼接文本，避免每帧为所有单元格计算。
         // uniqueId 取代表物的稳定键，跨帧稳定，提示不会因网格重建而闪烁。
@@ -1218,88 +1439,6 @@ public static partial class InspectPanePatch
 
     /// <summary>该格是否为 Thing 单元格（代表物为 Thing；决定是否绘制健康条）。</summary>
     private static bool IsThingCell(GridCell gc) => gc.representative is Thing;
-
-    /// <summary>单元格内容分发：Thing 立绘/图标；Zone 色块 + 居中标签；WorldObject 图标（null 回退标签）。</summary>
-    private static void DrawCellContent(Rect cell, GridCell gc)
-    {
-        object rep = gc.representative;
-        if (ObjDestroyed(rep))
-        {
-            return; // 销毁则跳过内容（边框/提示/点击保留）。
-        }
-        if (rep is Thing t)
-        {
-            if (t is Pawn pawn)
-            {
-                RenderTexture tex = PortraitsCache.Get(pawn, new Vector2(cell.width, cell.height), Rot4.South);
-                if (tex != null)
-                {
-                    GUI.DrawTexture(cell, tex);
-                }
-            }
-            else
-            {
-                Widgets.ThingIcon(cell, t);
-            }
-        }
-        else if (rep is Zone zone)
-        {
-            // 用区域自身颜色填充底衬 + 居中显示区域标签的前三个字（字号沿用数量角标字号）。
-            Color c = zone.color;
-            Widgets.DrawBoxSolid(cell, new Color(c.r, c.g, c.b, 0.45f));
-            string initial = zone.InspectLabel;
-            if (string.IsNullOrEmpty(initial))
-            {
-                return; // 空标签无内容可画（并防止下方取末位越界）。
-            }
-            char last = initial[initial.Length - 1];
-            bool singleDigitEnd = last >= '0' && last <= '9'
-                                  && (initial.Length < 2 || initial[initial.Length - 2] < '0' || initial[initial.Length - 2] > '9');
-            bool twoDigitEnd = !singleDigitEnd
-                               && initial.Length >= 2
-                               && last >= '0' && last <= '9'
-                               && initial[initial.Length - 2] >= '0' && initial[initial.Length - 2] <= '9'
-                               && (initial.Length < 3 || initial[initial.Length - 3] < '0' || initial[initial.Length - 3] > '9');
-            int labelLen = twoDigitEnd ? 2 : singleDigitEnd ? 1 : 0;
-            if (labelLen > 0)
-            {
-                // 单数字结尾（如“种植区 1”）取前二字+数字（种植1）；双数字结尾（如“种植区 11”）取前一字+两数字（种11）。
-                int keep = Math.Max(0, 3 - labelLen);
-                if (keep > 0 && keep >= initial.Length - labelLen) keep = initial.Length - labelLen;
-                initial = initial.Substring(0, keep) + initial.Substring(initial.Length - labelLen, labelLen);
-            }
-            else if (initial.Length > 3)
-            {
-                initial = initial.Substring(0, 3);
-            }
-            using (new WordWrapScope(false))
-            using (new FontSizeScope(multiSelectBadgeFontSize))
-            using (new AnchorScope(TextAnchor.MiddleCenter))
-            {
-                Widgets.Label(cell, initial);
-            }
-        }
-        else if (rep is WorldObject wo)
-        {
-            Texture2D icon = wo.ExpandingIcon;
-            if (icon != null)
-            {
-                Color prev = GUI.color;
-                GUI.color = wo.ExpandingIconColor;
-                GUI.DrawTexture(cell, icon);
-                GUI.color = prev;
-            }
-            else
-            {
-                using (new WordWrapScope(false))
-                using (new FontSizeScope(multiSelectBadgeFontSize))
-                using (new AnchorScope(TextAnchor.MiddleCenter))
-                {
-                    Widgets.Label(cell, wo.LabelShortCap);
-                }
-            }
-        }
-    }
 
     /// <summary>绘制指定颜色的边框：从设置处烘焙好的「白色边框、内部透明」纹理按 GUI.color 染色一次绘制完成
     /// （替代每格四段 DrawBoxSolid 的开销）。尺寸/边框宽度由设置决定，本方法不参与烘焙判断。</summary>
