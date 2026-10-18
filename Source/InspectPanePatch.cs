@@ -451,7 +451,7 @@ public static partial class InspectPanePatch
         // 适用者平分整行；行高取设置下限（默认随字号自适应）。
         float gap = pawnColumnGap;
         float cellWidth = (rect.width - gap * (count - 1)) / count;
-        float rowHeight = Mathf.Max(policyRowHeight, LineHeightForSize(policyRowFontSize));
+        float rowHeight = Mathf.Max(policyRowHeight, BarTextLineHeight(policyRowFontSize, pawnPolicyRowUseTinyFont));
         float x = 0f;
 
         if (foodApplicable)
@@ -563,7 +563,7 @@ public static partial class InspectPanePatch
         bool prevWordWrap = Text.WordWrap;
         Text.WordWrap = false;
         Text.Anchor = TextAnchor.MiddleLeft;
-        using (new FontSizeScope(policyRowFontSize))
+        using (new FontSizeScope(policyRowFontSize, pawnPolicyRowUseTinyFont))
         {
             Widgets.Label(textRect, text.Truncate(Mathf.Max(1f, textRect.width)));
         }
@@ -875,11 +875,16 @@ public static partial class InspectPanePatch
         // 文字矩形比条高，垂直居中，避免小号字被条高度裁切；
         // 高度取标签/数值两路字号中较高的行高（按像素字号计算）。
         // 字号按本条字体缩放（fontScale）缩放：缩放同时作用于标签与数值。
-        int labelSize = Mathf.RoundToInt(labelFontSize * info.fontScale);
-        int valueSize = Mathf.RoundToInt(valueFontSize * info.fontScale);
+        // Tiny 模式使用游戏内置 GameFont.Tiny 的原生字号，忽略像素字号与本条字体缩放。
+        bool useTinyFont = barUseTinyFont;
+        int labelSize = useTinyFont ? 0 : Mathf.RoundToInt(labelFontSize * info.fontScale);
+        int valueSize = useTinyFont ? 0 : Mathf.RoundToInt(valueFontSize * info.fontScale);
         float textRectHeight = Mathf.Max(info.height, 24f);
-        textRectHeight = Mathf.Max(textRectHeight, LineHeightForSize(labelSize));
-        textRectHeight = Mathf.Max(textRectHeight, LineHeightForSize(valueSize));
+        textRectHeight = Mathf.Max(textRectHeight, BarTextLineHeight(labelSize, useTinyFont));
+        if (!useTinyFont)
+        {
+            textRectHeight = Mathf.Max(textRectHeight, BarTextLineHeight(valueSize, false));
+        }
         float textRectY = y + (info.height - textRectHeight) * 0.5f;
 
         GUI.color = Color.white;
@@ -896,7 +901,8 @@ public static partial class InspectPanePatch
         {
             DrawBarTextMasked(
                 new Rect(barRect.x + embedInsetLabel, textRectY + 1f, Mathf.Max(1f, barRect.width - 2f * embedInsetLabel), textRectHeight),
-                info.eased, info.label, TextAnchor.MiddleLeft, labelSize, embedInsetLabel, info.whiteFont);
+                info.eased, info.label, TextAnchor.MiddleLeft, labelSize, embedInsetLabel, info.whiteFont,
+                useTinyFont: useTinyFont);
         }
         else
         {
@@ -905,7 +911,7 @@ public static partial class InspectPanePatch
             try
             {
                 Text.Anchor = TextAnchor.MiddleLeft;
-                using (new FontSizeScope(labelSize))
+                using (new FontSizeScope(labelSize, useTinyFont))
                 {
                     Widgets.Label(labelTextRect.AtZero(), info.label);
                 }
@@ -921,7 +927,8 @@ public static partial class InspectPanePatch
         {
             DrawBarTextMasked(
                 new Rect(barRect.x + embedInsetValue, textRectY + 1f, Mathf.Max(1f, barRect.width - 2f * embedInsetValue), textRectHeight),
-                info.eased, info.value, TextAnchor.MiddleRight, valueSize, embedInsetValue, info.whiteFont);
+                info.eased, info.value, TextAnchor.MiddleRight, valueSize, embedInsetValue, info.whiteFont,
+                useTinyFont: useTinyFont);
         }
         else if (barValueStyle == BarValueStyle.Normal)
         {
@@ -930,7 +937,7 @@ public static partial class InspectPanePatch
             try
             {
                 Text.Anchor = TextAnchor.MiddleRight;
-                using (new FontSizeScope(valueSize))
+                using (new FontSizeScope(valueSize, useTinyFont))
                 {
                     Widgets.Label(valueTextRect.AtZero(), info.value);
                 }
@@ -978,7 +985,7 @@ public static partial class InspectPanePatch
     /// （如技能条左侧的激情图标）时由调用方传入实际偏移，保证遮罩反色范围与进度对齐。
     /// </summary>
     private static void DrawBarTextMasked(Rect textRect, float easedValue, string text, TextAnchor anchor,
-        int fontSize, float insetX, bool forceWhite = false, float maskLeftInset = -1f)
+        int fontSize, float insetX, bool forceWhite = false, float maskLeftInset = -1f, bool useTinyFont = false)
     {
         if (string.IsNullOrEmpty(text) || textRect.width <= 0f)
         {
@@ -990,7 +997,7 @@ public static partial class InspectPanePatch
             Rect full = textRect.AtZero(); // 与 textRect 同尺寸、原点 (0,0)
             Text.Anchor = anchor;
             GUI.color = Color.white;
-            using (new FontSizeScope(fontSize))
+            using (new FontSizeScope(fontSize, useTinyFont))
             {
                 float eased = Mathf.Clamp01(easedValue);
                 // 满进度时黑色遮罩会覆盖整段文本；白色底层完全不可见，直接跳过这次绘制（省一次文本/批次）。
@@ -1152,6 +1159,7 @@ public static partial class InspectPanePatch
         public Rect rect;
         public SkillRecord skill;
         public bool plainText;
+        public bool useTinyFont;
         public float fill;
         public int size;
         public float textRectHeight;
@@ -1191,10 +1199,14 @@ public static partial class InspectPanePatch
                 : Mathf.Clamp01(skill.XpProgressPercent));
 
         // 文本矩形比条高，垂直居中，避免小号字被条高度裁切（规则与 DrawBarRow 一致）。
+        // Tiny 模式使用游戏内置 GameFont.Tiny 的原生字号，忽略像素字号设置。
+        bool useTinyFont = pawnSkillUseTinyFont;
+        visual.useTinyFont = useTinyFont;
         int size = pawnSkillFontSize;
         visual.size = size;
+        float lineHeight = BarTextLineHeight(size, useTinyFont);
         float textRectHeight = Mathf.Max(barRect.height, 24f);
-        textRectHeight = Mathf.Max(textRectHeight, LineHeightForSize(size));
+        textRectHeight = Mathf.Max(textRectHeight, lineHeight);
         visual.textRectHeight = textRectHeight;
         visual.textRectY = barRect.y + (barRect.height - textRectHeight) * 0.5f;
         float inset = 3f;
@@ -1209,7 +1221,7 @@ public static partial class InspectPanePatch
         if (passionIcon != null && !passionIconAfterName)
         {
             labelLeft = 0f;
-            float iconSize = Mathf.Max(1f, Mathf.Min(barRect.height, LineHeightForSize(size)));
+            float iconSize = Mathf.Max(1f, Mathf.Min(barRect.height, lineHeight));
             float iconY = barRect.y + (barRect.height - iconSize) * 0.5f;
             visual.leftIconRect = new Rect(barRect.x + labelLeft, iconY, iconSize, iconSize);
             labelLeft += iconSize + 0f;
@@ -1224,11 +1236,11 @@ public static partial class InspectPanePatch
         if (passionIconAfterName)
         {
             float nameWidth;
-            using (new FontSizeScope(size))
+            using (new FontSizeScope(size, useTinyFont))
             {
                 nameWidth = Text.CalcSize(visual.labelText).x;
             }
-            float iconSize = Mathf.Max(1f, Mathf.Min(barRect.height, LineHeightForSize(size)));
+            float iconSize = Mathf.Max(1f, Mathf.Min(barRect.height, lineHeight));
             float iconX = barRect.x + labelLeft + nameWidth + 1f;
             if (iconX + iconSize <= barRect.x + barRect.width - inset)
             {
@@ -1291,7 +1303,7 @@ public static partial class InspectPanePatch
         Rect valueRect = new Rect(visual.rect.x + visual.inset, visual.textRectY,
             Mathf.Max(1f, visual.rect.width - 2f * visual.inset), visual.textRectHeight);
         DrawBarTextMasked(valueRect, visual.fill, visual.valueText, TextAnchor.MiddleRight,
-            visual.size, visual.inset, forceWhite: visual.whiteFont);
+            visual.size, visual.inset, forceWhite: visual.whiteFont, useTinyFont: visual.useTinyFont);
     }
 
     /// <summary>技能条左侧技能名（含文本样式的激情后缀）。</summary>
@@ -1300,7 +1312,8 @@ public static partial class InspectPanePatch
         Rect labelRect = new Rect(visual.rect.x + visual.labelLeft, visual.textRectY,
             Mathf.Max(1f, visual.rect.width - visual.labelLeft - visual.inset), visual.textRectHeight);
         DrawBarTextMasked(labelRect, visual.fill, visual.labelText, TextAnchor.MiddleLeft,
-            visual.size, visual.inset, forceWhite: visual.whiteFont, maskLeftInset: visual.labelLeft);
+            visual.size, visual.inset, forceWhite: visual.whiteFont, maskLeftInset: visual.labelLeft,
+            useTinyFont: visual.useTinyFont);
     }
 
     /// <summary>技能名右侧的激情图标（仅在「图标置于名称后」且放得下时绘制）。</summary>

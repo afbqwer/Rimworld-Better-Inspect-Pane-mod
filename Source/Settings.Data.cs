@@ -272,6 +272,8 @@ public partial class MyModTemplateSettings : ModSettings
     public static PawnSkillColumns pawnSkillColumns = PawnSkillColumns.Six;
     // 技能条文本字号（像素）。
     public static int pawnSkillFontSize = 12;
+    // 技能条使用游戏内置的 Tiny 字体（只切换字体，字号仍由 pawnSkillFontSize 控制）。
+    public static bool pawnSkillUseTinyFont = false;
     // 技能条高度。
     public static float pawnSkillBarHeight = 13f;
     // 技能条列间距：相邻两列之间的空隙。
@@ -488,8 +490,14 @@ public partial class MyModTemplateSettings : ModSettings
     public static int valueFontSize = 14;
     public static int infoFontSize = 14;
 
+    // 普通进度条（含 Pawn 需求条 / 区域条 / 世界对象条等所有非技能条）的标签与数值
+    // 使用游戏内置的 Tiny 字体（只切换字体，字号仍由 labelFontSize / valueFontSize 控制）。
+    public static bool barUseTinyFont = false;
+
     // Pawn 策略行（食物/管制/着装/区域）字号（像素）与行高（像素）。
     public static int policyRowFontSize = 14;
+    // 策略行使用游戏内置的 Tiny 字体（只切换字体，字号仍由 policyRowFontSize 控制）。
+    public static bool pawnPolicyRowUseTinyFont = false;
     // 策略行行高下限（像素）：字号过大导致文本放不下时自动增高（默认与原自动高度一致）。
     public static float policyRowHeight = 16f;
 
@@ -1072,6 +1080,7 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref pawnShowSkills, "pawnShowSkills", true);
         Scribe_Values.Look(ref pawnSkillColumns, "pawnSkillColumns", PawnSkillColumns.Six);
         Scribe_Values.Look(ref pawnSkillFontSize, "pawnSkillFontSize", 12);
+        Scribe_Values.Look(ref pawnSkillUseTinyFont, "pawnSkillUseTinyFont", false);
         Scribe_Values.Look(ref pawnSkillBarHeight, "pawnSkillBarHeight", 13f);
         Scribe_Values.Look(ref pawnSkillColumnGap, "pawnSkillColumnGap", 1f);
         Scribe_Values.Look(ref pawnSkillSpacing, "pawnSkillSpacing", 2f);
@@ -1103,7 +1112,9 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref labelFontSize, "labelFontSize", 14);
         Scribe_Values.Look(ref valueFontSize, "valueFontSize", 14);
         Scribe_Values.Look(ref infoFontSize, "infoFontSize", 14);
+        Scribe_Values.Look(ref barUseTinyFont, "barUseTinyFont", false);
         Scribe_Values.Look(ref policyRowFontSize, "policyRowFontSize", 14);
+        Scribe_Values.Look(ref pawnPolicyRowUseTinyFont, "pawnPolicyRowUseTinyFont", false);
         Scribe_Values.Look(ref policyRowHeight, "policyRowHeight", 16f);
 
         // 检查面板尺寸。

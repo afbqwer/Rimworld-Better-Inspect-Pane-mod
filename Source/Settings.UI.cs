@@ -196,6 +196,13 @@ public partial class MyModTemplateSettings : ModSettings
             y += SliderGap;
         }
 
+        // 普通条使用小号字体（游戏内置 Tiny 字体）：
+        // 开启后条标签 / 数值改用小号字体，字号仍由下面的标签 / 数值字号滑杆控制（额外文字字号不受影响）。
+        Rect tinyFontRect = new Rect(x, y, width, RowHeight);
+        Widgets.CheckboxLabeled(tinyFontRect, "BetterInspectPane.BarUseTinyFont".Translate(), ref barUseTinyFont);
+        TooltipHandler.TipRegion(tinyFontRect, "BetterInspectPane.BarUseTinyFontTip".Translate());
+        y += RowGap;
+
         // 字号（像素，可调具体数值）：条标签 / 条数值 / 额外文字。
         // 条标签 / 条数值字号并排显示在同一行的左右两列。
         if (!embedLabelShown || !embedValueShown)
@@ -603,13 +610,22 @@ public partial class MyModTemplateSettings : ModSettings
 
             if (enablePawnPolicyRow)
             {
+                // 策略行使用小号字体（游戏内置 Tiny 字体）：
+                // 开启后策略行文本改用小号字体，字号仍由行字号滑杆控制（行高不受影响）。
+                Rect policyTinyFontRect = new Rect(x, y, width, RowHeight);
+                Widgets.CheckboxLabeled(policyTinyFontRect, "BetterInspectPane.PawnPolicyRowUseTinyFont".Translate(), ref pawnPolicyRowUseTinyFont);
+                TooltipHandler.TipRegion(policyTinyFontRect, "BetterInspectPane.PawnPolicyRowUseTinyFontTip".Translate());
+                y += RowGap;
+
                 // 行字号 / 行高：并排显示在同一行的左右两列。
-                float colW = (width - ItemGap) / 2f;
-                policyRowFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(x, y, colW, SliderHeight), policyRowFontSize, 8f, 24f,
-                    label: "BetterInspectPane.PolicyRowFontSize".Translate(policyRowFontSize), roundTo: 1f));
-                policyRowHeight = HorizontalSlider(new Rect(x + colW + ItemGap, y, colW, SliderHeight), policyRowHeight, 12f, 40f,
-                    label: "BetterInspectPane.PolicyRowHeight".Translate(Mathf.RoundToInt(policyRowHeight)), roundTo: 1f);
-                y += SliderGap;
+                {
+                    float colW = (width - ItemGap) / 2f;
+                    policyRowFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(x, y, colW, SliderHeight), policyRowFontSize, 8f, 24f,
+                        label: "BetterInspectPane.PolicyRowFontSize".Translate(policyRowFontSize), roundTo: 1f));
+                    policyRowHeight = HorizontalSlider(new Rect(x + colW + ItemGap, y, colW, SliderHeight), policyRowHeight, 12f, 40f,
+                        label: "BetterInspectPane.PolicyRowHeight".Translate(Mathf.RoundToInt(policyRowHeight)), roundTo: 1f);
+                    y += SliderGap;
+                }
             }
         }
         // Pawn 技能区（需 enablePawns 开启自定义 Pawn 面板内容；与 overrideInspectPane 无关）。
@@ -669,6 +685,13 @@ public partial class MyModTemplateSettings : ModSettings
                     TooltipHandler.TipRegion(passionIconAfterRect, "BetterInspectPane.PawnSkillPassionIconAfterNameTip".Translate());
                     y += RowGap;
                 }
+
+                // 技能条使用小号字体（游戏内置 Tiny 字体）：
+                // 开启后技能名 / 等级改用小号字体，字号仍由技能条字号滑杆控制（条高度不受影响）。
+                Rect skillTinyFontRect = new Rect(x, y, width, RowHeight);
+                Widgets.CheckboxLabeled(skillTinyFontRect, "BetterInspectPane.PawnSkillUseTinyFont".Translate(), ref pawnSkillUseTinyFont);
+                TooltipHandler.TipRegion(skillTinyFontRect, "BetterInspectPane.PawnSkillUseTinyFontTip".Translate());
+                y += RowGap;
 
                 // 字号 / 高度：并排显示在同一行的左右两列。
                 {
@@ -1728,6 +1751,22 @@ public partial class MyModTemplateSettings : ModSettings
         return height;
     }
 
+    /// <summary>条的文本行高：小号字体模式取 Tiny 样式在相同像素字号下的行高，否则按标准字体计算。
+    /// 小号字体不可用（游戏禁用微小文字 / Steam Deck 等）时按标准字体计算，与原版回退一致。</summary>
+    public static float BarTextLineHeight(int size, bool useTinyFont) =>
+        LineHeightForStyle(useTinyFont && Text.TinyFontSupported ? GameFont.Tiny : BaseFontSlot, size);
+
+    /// <summary>指定字体档位在指定像素字号下的单行行高（临时改共享样式字号，读取后还原）。</summary>
+    private static float LineHeightForStyle(GameFont slot, int size)
+    {
+        GUIStyle style = Text.fontStyles[(int)slot];
+        int prev = style.fontSize;
+        style.fontSize = Mathf.Max(1, size);
+        float height = style.lineHeight;
+        style.fontSize = prev;
+        return height;
+    }
+
     /// <summary>
     /// 规整一组显示顺序：去重、剔除未知成员，并把该组默认成员中缺失的按默认顺序补到队尾。
     /// 这样开发期新增的条（枚举里已存在、但旧档案顺序列表里没有）会自动获得一个有效位置，
@@ -1787,20 +1826,38 @@ public partial class MyModTemplateSettings : ModSettings
 /// 都基于 Text.CurFontStyle 绘制，而 CurFontStyle 取自共享样式 Text.fontStyles，只支持
 /// GameFont 三档固定字号。参考 RimHUD 以像素字号为基础的做法：进入作用域时临时把共享
 /// 样式字号改为指定像素值并选中基准档位，Dispose 时还原，从而支持任意具体数值。
+/// useGameFontTiny = true 时改用游戏内置的 Tiny 字体，但字号仍取传入的像素值（小号字体只换字体、不改字号），
+/// 退出时还原字号与进入前的字体档位（原版在 Tiny 不可用时会自动回退到标准字体）。
 /// </summary>
 public readonly struct FontSizeScope : IDisposable
 {
     private readonly int previousFontSize;
+    private readonly GameFont previousFont;
+    private readonly GameFont styledFont;
+    private readonly bool restoreFont;
 
-    public FontSizeScope(int size)
+    public FontSizeScope(int size, bool useGameFontTiny = false)
     {
-        GUIStyle style = Text.fontStyles[(int)MyModTemplateSettings.BaseFontSlot];
+        previousFont = Text.Font;
+        styledFont = useGameFontTiny && Text.TinyFontSupported
+            ? GameFont.Tiny
+            : MyModTemplateSettings.BaseFontSlot;
+        GUIStyle style = Text.fontStyles[(int)styledFont];
         previousFontSize = style.fontSize;
         style.fontSize = Mathf.Max(1, size);
-        Text.Font = MyModTemplateSettings.BaseFontSlot;
+        Text.Font = styledFont;
+        // 标准字体保持原有行为（绘制后保留基准档位）；小号字体退出时还原进入前的档位。
+        restoreFont = useGameFontTiny;
     }
 
-    public void Dispose() => Text.fontStyles[(int)MyModTemplateSettings.BaseFontSlot].fontSize = previousFontSize;
+    public void Dispose()
+    {
+        Text.fontStyles[(int)styledFont].fontSize = previousFontSize;
+        if (restoreFont)
+        {
+            Text.Font = previousFont;
+        }
+    }
 }
 
 /// <summary>Text.WordWrap 作用域：进入时设为指定值，Dispose 时还原；异常时也能恢复，防止文本状态泄漏。</summary>

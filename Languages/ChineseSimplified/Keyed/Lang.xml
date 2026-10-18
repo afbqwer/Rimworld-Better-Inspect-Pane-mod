@@ -67,6 +67,10 @@
 
   <BetterInspectPane.PawnSkillFontSize>技能条字号：{0}</BetterInspectPane.PawnSkillFontSize>
 
+  <BetterInspectPane.PawnSkillUseTinyFont>技能条使用小号字体</BetterInspectPane.PawnSkillUseTinyFont>
+
+  <BetterInspectPane.PawnSkillUseTinyFontTip>开启后技能条的技能名与等级改用游戏内置的小号字体；字号仍由「技能条字号」控制，条高度保持不变。推荐字号 12px（即游戏小号字体的默认行高）。若游戏设置中禁用了小号字体（或使用 Steam Deck），游戏会自动回退为标准字体。</BetterInspectPane.PawnSkillUseTinyFontTip>
+
   <BetterInspectPane.PawnSkillBarHeight>技能条高度：{0}</BetterInspectPane.PawnSkillBarHeight>
 
   <BetterInspectPane.PawnSkillColumnGap>技能条列间距：{0}</BetterInspectPane.PawnSkillColumnGap>
@@ -225,6 +229,10 @@
   <BetterInspectPane.EnablePawnPolicyRow>显示 Pawn 策略行（食物/管制/着装/区域）</BetterInspectPane.EnablePawnPolicyRow>
 
   <BetterInspectPane.PolicyRowFontSize>Pawn 策略行字号：{0}</BetterInspectPane.PolicyRowFontSize>
+
+  <BetterInspectPane.PawnPolicyRowUseTinyFont>策略行使用小号字体</BetterInspectPane.PawnPolicyRowUseTinyFont>
+
+  <BetterInspectPane.PawnPolicyRowUseTinyFontTip>开启后 Pawn 策略行（食物 / 管制 / 着装 / 区域）的文本改用游戏内置的小号字体；字号仍由「Pawn 策略行字号」控制，行高保持不变。推荐字号 12px（即游戏小号字体的默认行高）。若游戏设置中禁用了小号字体（或使用 Steam Deck），游戏会自动回退为标准字体。</BetterInspectPane.PawnPolicyRowUseTinyFontTip>
 
   <BetterInspectPane.PolicyRowHeight>Pawn 策略行高度：{0}</BetterInspectPane.PolicyRowHeight>
 
@@ -424,6 +432,10 @@
   <BetterInspectPane.LabelFontSize>条标签字号：{0}</BetterInspectPane.LabelFontSize>
 
   <BetterInspectPane.ValueFontSize>条数值字号：{0}</BetterInspectPane.ValueFontSize>
+
+  <BetterInspectPane.BarUseTinyFont>普通条使用小号字体</BetterInspectPane.BarUseTinyFont>
+
+  <BetterInspectPane.BarUseTinyFontTip>开启后普通进度条（含 Pawn 需求条、区域条、世界对象条等所有非技能条）的标签与数值改用游戏内置的小号字体；字号仍由「条标签字号 / 条数值字号」控制，额外文字字号不受影响。推荐字号 12px（即游戏小号字体的默认行高）。若游戏设置中禁用了小号字体（或使用 Steam Deck），游戏会自动回退为标准字体。</BetterInspectPane.BarUseTinyFontTip>
 
   <BetterInspectPane.InfoFontSize>额外文字字号：{0}</BetterInspectPane.InfoFontSize>
 

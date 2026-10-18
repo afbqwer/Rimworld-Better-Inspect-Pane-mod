@@ -67,6 +67,10 @@
 
   <BetterInspectPane.PawnSkillFontSize>Skill bar font size: {0}</BetterInspectPane.PawnSkillFontSize>
 
+  <BetterInspectPane.PawnSkillUseTinyFont>Skill bars use Tiny font</BetterInspectPane.PawnSkillUseTinyFont>
+
+  <BetterInspectPane.PawnSkillUseTinyFontTip>When enabled, skill bar names and levels use the game's built-in Tiny font; the skill bar font size setting still applies, as does bar height. Recommended font size: 12px (also the default line height of the game's Tiny font). If tiny text is disabled in game options (or on Steam Deck), the game automatically falls back to the standard font.</BetterInspectPane.PawnSkillUseTinyFontTip>
+
   <BetterInspectPane.PawnSkillBarHeight>Skill bar height: {0}</BetterInspectPane.PawnSkillBarHeight>
 
   <BetterInspectPane.PawnSkillColumnGap>Skill bar column gap: {0}</BetterInspectPane.PawnSkillColumnGap>
@@ -225,6 +229,10 @@
   <BetterInspectPane.EnablePawnPolicyRow>Show Pawn policy row (Food/Schedule/Outfit/Area)</BetterInspectPane.EnablePawnPolicyRow>
 
   <BetterInspectPane.PolicyRowFontSize>Pawn policy row font size: {0}</BetterInspectPane.PolicyRowFontSize>
+
+  <BetterInspectPane.PawnPolicyRowUseTinyFont>Policy row uses Tiny font</BetterInspectPane.PawnPolicyRowUseTinyFont>
+
+  <BetterInspectPane.PawnPolicyRowUseTinyFontTip>When enabled, the text of pawn policy row cells (food / schedule / outfit / allowed area) uses the game's built-in Tiny font; the pawn policy row font size setting still applies, as does row height. Recommended font size: 12px (also the default line height of the game's Tiny font). If tiny text is disabled in game options (or on Steam Deck), the game automatically falls back to the standard font.</BetterInspectPane.PawnPolicyRowUseTinyFontTip>
 
   <BetterInspectPane.PolicyRowHeight>Pawn policy row height: {0}</BetterInspectPane.PolicyRowHeight>
 
@@ -424,6 +432,10 @@
   <BetterInspectPane.LabelFontSize>Bar label font size: {0}</BetterInspectPane.LabelFontSize>
 
   <BetterInspectPane.ValueFontSize>Bar value font size: {0}</BetterInspectPane.ValueFontSize>
+
+  <BetterInspectPane.BarUseTinyFont>Normal bars use Tiny font</BetterInspectPane.BarUseTinyFont>
+
+  <BetterInspectPane.BarUseTinyFontTip>When enabled, labels and values of normal bars (all non-skill bars, including pawn need bars, zone bars and world object bars) use the game's built-in Tiny font; the bar label/value font size settings still apply, while the inspect string font size is unaffected. Recommended font size: 12px (also the default line height of the game's Tiny font). If tiny text is disabled in game options (or on Steam Deck), the game automatically falls back to the standard font.</BetterInspectPane.BarUseTinyFontTip>
 
   <BetterInspectPane.InfoFontSize>Inspect string font size: {0}</BetterInspectPane.InfoFontSize>
 
