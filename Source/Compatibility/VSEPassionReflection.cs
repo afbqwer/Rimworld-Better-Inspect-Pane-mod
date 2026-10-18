@@ -29,6 +29,16 @@ public static class VSEPassionReflection
     private static readonly PropertyInfo? IconProp;
     private static readonly PropertyInfo? IndicatorProp;
 
+    // Passion 的取值很少（原版 3 种 + VSE 扩展若干），按枚举字节值缓存解析结果；
+    // 否则技能区每帧会为每个技能重复执行 PassionToDef 与属性反射（默认文本激情样式下约 2 次/技能/帧）。
+    private const int PassionCacheSize = 256;
+    private static readonly object?[] CachedDefs = new object?[PassionCacheSize];
+    private static readonly bool[] DefResolved = new bool[PassionCacheSize];
+    private static readonly Texture2D?[] CachedIcons = new Texture2D?[PassionCacheSize];
+    private static readonly bool[] IconResolved = new bool[PassionCacheSize];
+    private static readonly string?[] CachedIndicators = new string?[PassionCacheSize];
+    private static readonly bool[] IndicatorResolved = new bool[PassionCacheSize];
+
     static VSEPassionReflection()
     {
         if (!ModActive)
@@ -71,13 +81,24 @@ public static class VSEPassionReflection
     /// </summary>
     internal static bool TryGetIcon(Passion passion, out Texture2D? icon)
     {
-        icon = null;
-        object? def = ResolveDef(passion);
-        if (def == null || IconProp == null)
+        int key = (byte)passion;
+        if (!IconResolved[key])
         {
-            return false;
+            IconResolved[key] = true;
+            object? def = ResolveDef(passion);
+            if (def != null && IconProp != null)
+            {
+                try
+                {
+                    CachedIcons[key] = IconProp.GetValue(def) as Texture2D;
+                }
+                catch (Exception ex)
+                {
+                    Log.WarningOnce("ASQBetterInspectPane: 读取 Vanilla Skills Expanded 激情图标失败，本次回退原版图标。ex=" + ex.Message, 81752345);
+                }
+            }
         }
-        icon = IconProp.GetValue(def) as Texture2D;
+        icon = CachedIcons[key];
         return icon != null;
     }
 
@@ -87,31 +108,49 @@ public static class VSEPassionReflection
     /// </summary>
     internal static bool TryGetIndicator(Passion passion, out string? indicator)
     {
-        indicator = null;
-        object? def = ResolveDef(passion);
-        if (def == null || IndicatorProp == null)
+        int key = (byte)passion;
+        if (!IndicatorResolved[key])
         {
-            return false;
+            IndicatorResolved[key] = true;
+            object? def = ResolveDef(passion);
+            if (def != null && IndicatorProp != null)
+            {
+                try
+                {
+                    CachedIndicators[key] = IndicatorProp.GetValue(def) as string;
+                }
+                catch (Exception ex)
+                {
+                    Log.WarningOnce("ASQBetterInspectPane: 读取 Vanilla Skills Expanded 激情文本失败，本次回退原版文本。ex=" + ex.Message, 81752346);
+                }
+            }
         }
-        indicator = IndicatorProp.GetValue(def) as string;
+        indicator = CachedIndicators[key];
         return !string.IsNullOrEmpty(indicator);
     }
 
-    /// <summary>把原版 Passion 映射为 VSE 的 PassionDef（PassionToDef）；调用失败时返回 null 并记一次性警告。</summary>
+    /// <summary>把原版 Passion 映射为 VSE 的 PassionDef（PassionToDef）；调用失败时返回 null 并记一次性警告。
+    /// 结果按 Passion 缓存：PassionDef 在游戏会话内是静态的。</summary>
     private static object? ResolveDef(Passion passion)
     {
         if (PassionToDefMethod == null)
         {
             return null;
         }
+        int key = (byte)passion;
+        if (DefResolved[key])
+        {
+            return CachedDefs[key];
+        }
+        DefResolved[key] = true;
         try
         {
-            return PassionToDefMethod.Invoke(null, new object[] { passion });
+            CachedDefs[key] = PassionToDefMethod.Invoke(null, new object[] { passion });
         }
         catch (Exception ex)
         {
             Log.WarningOnce("ASQBetterInspectPane: 调用 Vanilla Skills Expanded 激情判定失败，本次回退原版图标/文本。ex=" + ex.Message, 81752344);
-            return null;
         }
+        return CachedDefs[key];
     }
 }

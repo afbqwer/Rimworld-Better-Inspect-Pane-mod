@@ -406,7 +406,9 @@ public static partial class InspectPanePatch
     /// </summary>
     private static List<BarRowInfo> CollectSpecs(List<BarType> order, Func<BarType, BarRowInfo?> resolve)
     {
-        List<BarRowInfo> bars = new List<BarRowInfo>(Math.Max(1, order.Count));
+        // 复用静态列表：每帧新建 List 会产生持续 GC 垃圾；调用方在本帧内绘制完毕后才会再次收集。
+        List<BarRowInfo> bars = collectSpecsScratch;
+        bars.Clear();
         for (int i = 0; i < order.Count; i++)
         {
             BarRowInfo? spec = resolve(order[i]);
@@ -417,6 +419,8 @@ public static partial class InspectPanePatch
         }
         return bars;
     }
+
+    private static readonly List<BarRowInfo> collectSpecsScratch = new List<BarRowInfo>(32);
 
     /// <summary>
     /// 收集当前可见的进度条：按 mainBarOrder 依次取各物品条，统一更新健康/护盾两路缓动后返回。

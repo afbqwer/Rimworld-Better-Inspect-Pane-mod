@@ -77,6 +77,11 @@ public static partial class InspectPanePatch
     // 每帧在绘制网格时按鼠标位置更新（见 UpdateHoveredGridCell）；网格不再显示时由场景判定清空。
     private static readonly List<object> hoveredGridMembers = new List<object>();
 
+    // 悬停成员列表缓存：同一格 + 同一 cells 列表 + 成员数未变时无需每帧重扫大组（成员列表随网格重建而更新）。
+    private static int hoveredGridCellIndex = -1;
+    private static List<GridCell>? hoveredGridCellSource;
+    private static int hoveredGridCellMemberCount = -1;
+
     // Shift 构建选区（多选 = 移除未被选择的项）的单元格高亮配色：淡黄色背景 + 黄色边框。
     private static readonly Color MultiSelectShiftFill = new Color(1f, 0.92f, 0.45f, 0.4f);
     private static readonly Color MultiSelectShiftBorder = new Color(1f, 0.85f, 0f, 1f);
@@ -96,6 +101,15 @@ public static partial class InspectPanePatch
     // 避免每帧重复 Text.CalcSize（k 缩写后实际字符数很小，数组长度足够；字号变化时见下方缓存失效逻辑）。
     private static readonly float[] multiSelectBadgeWidthCache = new float[12];
     private static readonly bool[] multiSelectBadgeWidthCached = new bool[12];
+
+    // 角标文本缓存：数量与显示设置不变时复用既有字符串，避免每帧每格重新 ToString/拼接。
+    private struct BadgeTextInfo
+    {
+        public string text;
+        public int digitCount;
+    }
+    private static readonly Dictionary<(int count, bool showX, bool abbreviate), BadgeTextInfo> badgeTextCache =
+        new Dictionary<(int, bool, bool), BadgeTextInfo>();
     // 角标宽度缓存对应的字号：字号设置变化时缓存失效（宽度随字号缩放，旧测量值不再适用）。
     private static int multiSelectBadgeWidthCacheFontSize = -1;
     // 「×」前缀字形宽度缓存：仅随字号变化失效，避免热路径（每帧每格）重复 Text.CalcSize。
@@ -106,11 +120,23 @@ public static partial class InspectPanePatch
     // 每帧先做 O(n) 整数比对，内容未变则复用 cells，避免每帧重建 List/Dictionary 造成 GC 垃圾。
     // 1.6 的 Selector 无 selectedVersion 字段（SelectedObjects 返回同一列表引用、原地增删），
     // 因此用快照比对判定选中内容是否变化：任一销毁/增减/换序都会反映到 thingIDNumber 或 stackCount 上。
-    // 仅 Things 选择可能较大，Region/World 选择量小，每帧直接重建不做缓存。
     private static int[] cachedGridSnapshotThingIds = new int[0];
     private static int[] cachedGridSnapshotStacks = new int[0];
     private static int cachedGridSnapshotCount = -1;
     private static List<GridCell>? cachedGridCells;
+
+    // Zone/World 网格缓存：规则同 Things（选序 ID 序列 + 单组展开设置；World 额外比对阵营），
+    // 避免选中大量区域/世界对象时每帧重建 cells 与各组 members 列表。
+    private static int[] cachedZoneSnapshotIds = new int[0];
+    private static int cachedZoneSnapshotCount = -1;
+    private static bool cachedZoneSnapshotExpand;
+    private static List<GridCell>? cachedZoneCells;
+
+    private static int[] cachedWorldSnapshotIds = new int[0];
+    private static int[] cachedWorldSnapshotFactionIds = new int[0];
+    private static int cachedWorldSnapshotCount = -1;
+    private static bool cachedWorldSnapshotExpand;
+    private static List<GridCell>? cachedWorldCells;
 
     // 多选健康条每格缓动状态：按代表物 thingIDNumber 索引（跨网格重建/重排持续过渡，仅 Things）。
     // EaseState / easeSpeed / easingStyle 复用单选框的缓动实现。
@@ -217,7 +243,7 @@ public static partial class InspectPanePatch
     {
         ctrlMarkedForRemoval.Clear();
         shiftSelectedThings.Clear();
-        hoveredGridMembers.Clear();
+        ClearHoveredGridCellCache();
         multiSelectDrag.Reset();
     }
 
@@ -263,7 +289,7 @@ public static partial class InspectPanePatch
             {
                 if (TryGetMultiSelectZones(out List<Zone> zones))
                 {
-                    DrawSceneGrid(rect, MultiSelectScene.Zones, BuildZoneCells(zones));
+                    DrawSceneGrid(rect, MultiSelectScene.Zones, GetOrBuildZoneCells(zones));
                     return false;
                 }
                 return true;
@@ -419,7 +445,7 @@ public static partial class InspectPanePatch
                 return true; // 单选 / 选中单个格 / 未启用：走原版。
             }
             List<WorldObject> wos = Find.WorldSelector.SelectedObjects;
-            DrawSceneGrid(rect, MultiSelectScene.World, BuildWorldCells(wos));
+            DrawSceneGrid(rect, MultiSelectScene.World, GetOrBuildWorldCells(wos));
             return false;
         }
     }
@@ -523,7 +549,9 @@ public static partial class InspectPanePatch
             return false;
         }
         List<object> selected = Find.Selector.SelectedObjects;
-        List<Thing> list = new List<Thing>(selected.Count);
+        // 复用静态列表：多选数量可能很大，每帧新建 List 会持续产生 GC 垃圾；调用方在本帧内消费完毕。
+        List<Thing> list = multiSelectThingsScratch;
+        list.Clear();
         for (int i = 0; i < selected.Count; i++)
         {
             if (selected[i] is not Thing t)
@@ -545,7 +573,8 @@ public static partial class InspectPanePatch
             return false;
         }
         List<object> selected = Find.Selector.SelectedObjects;
-        List<Zone> list = new List<Zone>(selected.Count);
+        List<Zone> list = multiSelectZonesScratch;
+        list.Clear();
         for (int i = 0; i < selected.Count; i++)
         {
             if (selected[i] is not Zone z)
@@ -557,6 +586,9 @@ public static partial class InspectPanePatch
         zones = list;
         return true;
     }
+
+    private static readonly List<Thing> multiSelectThingsScratch = new List<Thing>();
+    private static readonly List<Zone> multiSelectZonesScratch = new List<Zone>();
 
     /// <summary>复刻 MainTabWindow_Inspect.TryGetSelectedStorageGroup：全部为同组且组非空的 IStorageGroupMember。</summary>
     private static bool IsStorageGroupMultiSelect(List<object> selected)
@@ -726,6 +758,81 @@ public static partial class InspectPanePatch
         for (int i = 1; i < wos.Count; i++)
         {
             if ((wos[i].def, (Faction?)wos[i].Faction) != first)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>取 Zones 网格单元格：选中序列（ID + 顺序）与单组展开设置未变时复用缓存，否则重建。</summary>
+    private static List<GridCell> GetOrBuildZoneCells(List<Zone> zones)
+    {
+        if (cachedZoneCells != null
+            && cachedZoneSnapshotCount == zones.Count
+            && cachedZoneSnapshotExpand == expandSingleGroupNonThing
+            && ZoneSnapshotMatches(zones))
+        {
+            return cachedZoneCells;
+        }
+        cachedZoneCells = BuildZoneCells(zones);
+        if (cachedZoneSnapshotIds.Length < zones.Count)
+        {
+            cachedZoneSnapshotIds = new int[Math.Max(8, zones.Count)];
+        }
+        for (int i = 0; i < zones.Count; i++)
+        {
+            cachedZoneSnapshotIds[i] = zones[i].ID;
+        }
+        cachedZoneSnapshotCount = zones.Count;
+        cachedZoneSnapshotExpand = expandSingleGroupNonThing;
+        return cachedZoneCells;
+    }
+
+    private static bool ZoneSnapshotMatches(List<Zone> zones)
+    {
+        for (int i = 0; i < zones.Count; i++)
+        {
+            if (cachedZoneSnapshotIds[i] != zones[i].ID)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>取 World 网格单元格：选中序列（ID + 阵营 + 顺序）与单组展开设置未变时复用缓存，否则重建。</summary>
+    private static List<GridCell> GetOrBuildWorldCells(List<WorldObject> wos)
+    {
+        if (cachedWorldCells != null
+            && cachedWorldSnapshotCount == wos.Count
+            && cachedWorldSnapshotExpand == expandSingleGroupNonThing
+            && WorldSnapshotMatches(wos))
+        {
+            return cachedWorldCells;
+        }
+        cachedWorldCells = BuildWorldCells(wos);
+        if (cachedWorldSnapshotIds.Length < wos.Count)
+        {
+            cachedWorldSnapshotIds = new int[Math.Max(8, wos.Count)];
+            cachedWorldSnapshotFactionIds = new int[Math.Max(8, wos.Count)];
+        }
+        for (int i = 0; i < wos.Count; i++)
+        {
+            cachedWorldSnapshotIds[i] = wos[i].ID;
+            cachedWorldSnapshotFactionIds[i] = wos[i].Faction?.loadID ?? -1;
+        }
+        cachedWorldSnapshotCount = wos.Count;
+        cachedWorldSnapshotExpand = expandSingleGroupNonThing;
+        return cachedWorldCells;
+    }
+
+    private static bool WorldSnapshotMatches(List<WorldObject> wos)
+    {
+        for (int i = 0; i < wos.Count; i++)
+        {
+            if (cachedWorldSnapshotIds[i] != wos[i].ID
+                || cachedWorldSnapshotFactionIds[i] != (wos[i].Faction?.loadID ?? -1))
             {
                 return false;
             }
@@ -1104,18 +1211,27 @@ public static partial class InspectPanePatch
     private static void UpdateHoveredGridCell(List<GridCell> cells, int shown,
         int columns, float cellSize, float gap, float gridY)
     {
-        hoveredGridMembers.Clear();
         if (!enableMultiSelectMapIndicator)
         {
+            ClearHoveredGridCellCache();
             return;
         }
         Vector2 mouse = Event.current.mousePosition;
         int idx = GridHitTest(mouse, shown, columns, cellSize, gap, gridY);
         if (idx < 0)
         {
-            return; // 悬停在空白/非单元格区域（空隙/边距）：保持清空。
+            ClearHoveredGridCellCache(); // 悬停在空白/非单元格区域（空隙/边距）：保持清空。
+            return;
         }
         GridCell gc = cells[idx];
+        // 同一格、同一网格、成员数未变：成员列表与上一帧相同，无需重扫（大组可省下每帧 O(n)）。
+        if (idx == hoveredGridCellIndex
+            && ReferenceEquals(cells, hoveredGridCellSource)
+            && gc.members.Count == hoveredGridCellMemberCount)
+        {
+            return;
+        }
+        hoveredGridMembers.Clear();
         for (int j = 0; j < gc.members.Count; j++)
         {
             object o = gc.members[j];
@@ -1124,6 +1240,18 @@ public static partial class InspectPanePatch
                 hoveredGridMembers.Add(t);
             }
         }
+        hoveredGridCellIndex = idx;
+        hoveredGridCellSource = cells;
+        hoveredGridCellMemberCount = gc.members.Count;
+    }
+
+    /// <summary>清空悬停成员列表与缓存键（切出网格、关闭指示或悬停空白时调用）。</summary>
+    private static void ClearHoveredGridCellCache()
+    {
+        hoveredGridMembers.Clear();
+        hoveredGridCellIndex = -1;
+        hoveredGridCellSource = null;
+        hoveredGridCellMemberCount = -1;
     }
 
     /// <summary>准备单个单元格的绘制状态（高亮、健康缓动、角标文本/位置）；不产生绘制调用。</summary>
@@ -1166,14 +1294,14 @@ public static partial class InspectPanePatch
         // 文本/位置在此预计算，绘制层只负责画，避免背景与文字分属两层时重复计算。
         if (!gc.isColonist && gc.count > 1)
         {
-            string digits = FormatCountText(gc.count);
+            BadgeTextInfo badgeText = GetBadgeTextInfo(gc.count);
             visual.hasBadge = true;
-            visual.badgeText = multiSelectBadgeShowX ? "×" + digits : digits;
+            visual.badgeText = badgeText.text;
             // 首次测量须使用角标字号；缓存命中后不再调用 Text.CalcSize。
             using (new FontSizeScope(multiSelectBadgeFontSize))
             {
                 float scale = multiSelectBadgeScale;
-                float badgeWidth = MultiSelectBadgeWidthFor(digits.Length) * scale;
+                float badgeWidth = MultiSelectBadgeWidthFor(badgeText.digitCount) * scale;
                 if (multiSelectBadgeShowX)
                 {
                     badgeWidth += MultiSelectBadgeXWidth() * scale;
@@ -1582,6 +1710,29 @@ public static partial class InspectPanePatch
             return count.ToString();
         }
         return (count / 1000f).ToString("0.#", CultureInfo.InvariantCulture) + "k";
+    }
+
+    /// <summary>取角标文本与纯数字字符数（供宽度查表）：按数量与显示设置缓存，避免每帧每格重建字符串。</summary>
+    private static BadgeTextInfo GetBadgeTextInfo(int count)
+    {
+        (int count, bool showX, bool abbreviate) key = (count, multiSelectBadgeShowX, multiSelectCountAbbreviation);
+        if (badgeTextCache.TryGetValue(key, out BadgeTextInfo cached))
+        {
+            return cached;
+        }
+        string digits = FormatCountText(count);
+        BadgeTextInfo info = new BadgeTextInfo
+        {
+            text = multiSelectBadgeShowX ? "×" + digits : digits,
+            digitCount = digits.Length
+        };
+        // 设置切换会产生新键；简单上限防止缓存无限增长（正常只有个位数条目）。
+        if (badgeTextCache.Count >= 512)
+        {
+            badgeTextCache.Clear();
+        }
+        badgeTextCache[key] = info;
+        return info;
     }
 
     /// <summary>绘制「+N」溢出提示格：灰化、不响应点击。</summary>

@@ -628,6 +628,10 @@ public static partial class InspectPanePatch
         public Need? tooltipNeed; // 需求条悬浮提示的数据源（非 null 时悬停条区显示原版需求提示）
     }
 
+    // 多列布局的当前行缓冲：每帧复用，避免反复分配 List。
+    private static readonly List<(BarRowInfo bar, int col, int width)> barGridRowScratch =
+        new List<(BarRowInfo, int, int)>();
+
     /// <summary>
     /// 进度条区：收集当前可见条并按显示顺序排布后绘制，返回新的 y。
     /// 布局按设置（单列 / 两列 / 三列 / 四列）：单列全宽逐条排布；多列按网格排布
@@ -708,8 +712,7 @@ public static partial class InspectPanePatch
         return y;
     }
 
-    /// <summary>
-    /// 多列网格布局：按列数排布进度条，条按占位（整行/单列/两列/适应）占据相应宽度。
+    /// <summary>多列网格布局：按列数排布进度条，条按占位（整行/单列/两列/适应）占据相应宽度。
     /// 所有条从左到右、从上到下排列；「适应」条默认占单列，若其右侧没有条
     /// （下一个条放不进本行剩余格，或已是最后一个条）则增宽填满本行剩余列数。
     /// 三列/四列布局开启「双条行均分」时：同一行仅 1~2 个单列宽条（占不满整行）→ 该行两列平分显示；
@@ -720,8 +723,9 @@ public static partial class InspectPanePatch
     private static float DrawBarsGrid(Rect rect, List<BarRowInfo> bars, float y, int columns,
         float gap, bool evenSplit)
     {
-        // 当前行缓冲：已放置的条、起始列与占宽（列数）。
-        List<(BarRowInfo bar, int col, int width)> rowBars = new List<(BarRowInfo, int, int)>();
+        // 当前行缓冲：已放置的条、起始列与占宽（列数）。复用静态列表避免每帧分配。
+        List<(BarRowInfo bar, int col, int width)> rowBars = barGridRowScratch;
+        rowBars.Clear();
         float rowHeight = 0f;
         int col = 0;
 
@@ -1119,7 +1123,9 @@ public static partial class InspectPanePatch
     /// <summary>收集 Pawn 的原版 12 技能记录（SkillDefOf 中为 null 的条目跳过）。</summary>
     private static List<SkillRecord> CollectVanillaSkills(Pawn pawn)
     {
-        List<SkillRecord> result = new List<SkillRecord>(VanillaSkillDefs.Count);
+        // 复用静态列表：每帧新建 List（12 项）会持续产生 GC 垃圾；调用方在本帧内消费完毕。
+        List<SkillRecord> result = vanillaSkillsScratch;
+        result.Clear();
         List<SkillRecord> records = pawn.skills.skills;
         for (int i = 0; i < VanillaSkillDefs.Count; i++)
         {
@@ -1161,6 +1167,7 @@ public static partial class InspectPanePatch
     }
 
     private static readonly List<SkillBarVisual> skillBarVisuals = new List<SkillBarVisual>();
+    private static readonly List<SkillRecord> vanillaSkillsScratch = new List<SkillRecord>(12);
     private static readonly Action<SkillBarVisual>[] skillBarDrawLayers =
     {
         DrawSkillBarBackground,
@@ -1340,17 +1347,44 @@ public static partial class InspectPanePatch
     }
 
     /// <summary>技能条标签（本地化）：中文为技能名称原文，英文为 3-4 字母缩写；未配置翻译时回退到 Def 的 skillLabel。
-    /// 文本样式在名称后附加激情后缀 + / ++（图标样式返回纯名称，激情由图标表示）。</summary>
+    /// 文本样式在名称后附加激情后缀 + / ++（图标样式返回纯名称，激情由图标表示）。
+    /// 结果按（技能 Def、激情、激情样式）缓存，语言或样式变化时整体失效：避免每帧为全部技能重复翻译/拼接字符串。</summary>
     private static string PawnSkillLabel(SkillRecord skill)
     {
-        string key = "BetterInspectPane.Skill_" + skill.def.defName;
-        if (key.TryTranslate(out TaggedString translated))
+        if (!ReferenceEquals(skillLabelCacheLanguage, LanguageDatabase.activeLanguage)
+            || skillLabelCacheStyle != pawnSkillPassionStyle)
         {
-            return translated.RawText + PassionTextSuffix(skill);
+            skillLabelCache.Clear();
+            skillLabelCacheLanguage = LanguageDatabase.activeLanguage;
+            skillLabelCacheStyle = pawnSkillPassionStyle;
         }
-        string label = skill.def.skillLabel;
-        return string.IsNullOrEmpty(label) ? skill.def.LabelCap : label;
+        (SkillDef def, Passion passion, SkillPassionStyle style) key = (skill.def, skill.passion, pawnSkillPassionStyle);
+        if (skillLabelCache.TryGetValue(key, out string? cached))
+        {
+            return cached;
+        }
+        string keyText = "BetterInspectPane.Skill_" + skill.def.defName;
+        string label;
+        if (keyText.TryTranslate(out TaggedString translated))
+        {
+            label = translated.RawText + PassionTextSuffix(skill);
+        }
+        else
+        {
+            label = skill.def.skillLabel;
+            if (string.IsNullOrEmpty(label))
+            {
+                label = skill.def.LabelCap;
+            }
+        }
+        skillLabelCache[key] = label;
+        return label;
     }
+
+    private static readonly Dictionary<(SkillDef def, Passion passion, SkillPassionStyle style), string> skillLabelCache =
+        new Dictionary<(SkillDef, Passion, SkillPassionStyle), string>();
+    private static LoadedLanguage? skillLabelCacheLanguage;
+    private static SkillPassionStyle skillLabelCacheStyle;
 
     /// <summary>文本样式的激情后缀：优先取 Vanilla Skills Expanded 的 PassionDef.Indicator（含其额外激情种类），
 /// 未装 VSE 时回退原版 轻微 = "+"、重度 = "++"；无激情 = 空，图标样式一律为空字符串。
