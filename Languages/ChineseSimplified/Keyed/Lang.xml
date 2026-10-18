@@ -429,13 +429,19 @@
 
   <BetterInspectPane.RowSpacing>行间距：{0}</BetterInspectPane.RowSpacing>
 
+  <BetterInspectPane.BarAppearanceSection>进度条外观</BetterInspectPane.BarAppearanceSection>
+
+  <BetterInspectPane.BarLayoutSection>进度条布局</BetterInspectPane.BarLayoutSection>
+
   <BetterInspectPane.LabelWidth>标签宽度：{0}</BetterInspectPane.LabelWidth>
 
   <BetterInspectPane.ValueWidth>数值宽度：{0}</BetterInspectPane.ValueWidth>
 
-  <BetterInspectPane.LabelFontSize>条标签字号：{0}</BetterInspectPane.LabelFontSize>
+  <BetterInspectPane.LabelFontSize>普通条标签字号：{0}</BetterInspectPane.LabelFontSize>
 
-  <BetterInspectPane.ValueFontSize>条数值字号：{0}</BetterInspectPane.ValueFontSize>
+  <BetterInspectPane.ValueFontSize>普通条数值字号：{0}</BetterInspectPane.ValueFontSize>
+
+  <BetterInspectPane.BarFontSizeTip>普通进度条标签与数值的字号（像素）。默认 14；开启小号字体时仍由此处控制字号，推荐 12。</BetterInspectPane.BarFontSizeTip>
 
   <BetterInspectPane.BarUseTinyFont>普通条使用小号字体</BetterInspectPane.BarUseTinyFont>
 

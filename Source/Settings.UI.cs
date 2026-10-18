@@ -127,6 +127,53 @@ public partial class MyModTemplateSettings : ModSettings
 
         }
 
+        infoFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(x, y, width, SliderHeight), infoFontSize, 8f, 24f,
+            label: "BetterInspectPane.InfoFontSize".Translate(infoFontSize), roundTo: 1f));
+        y += SliderGap;
+
+        // 检查面板窗口尺寸：最小宽度、最小高度（实际尺寸取原版值与设置值中的较大者）。
+        paneWidth = HorizontalSlider(new Rect(x, y, width, SliderHeight), paneWidth, 432f, 800f,
+            label: "BetterInspectPane.PaneWidth".Translate(Mathf.RoundToInt(paneWidth)), roundTo: 1f);
+        y += SliderGap;
+
+        paneHeight = HorizontalSlider(new Rect(x, y, width, SliderHeight), paneHeight, 165f, 600f,
+            label: "BetterInspectPane.PaneHeight".Translate(Mathf.RoundToInt(paneHeight)), roundTo: 1f);
+        y += SliderGap;
+
+        // 自适应面板宽度：标题（名称）与右侧按钮条放不下时自动加宽面板（需覆盖面板绘制开启，
+        // 与覆盖路径的标题测量同源，见 InspectPaneOnGUIPatch.UpdateRequiredPaneWidth）。
+        if (overrideInspectPane)
+        {
+            Rect adaptiveWidthRect = new Rect(x, y, width, RowHeight);
+            Widgets.CheckboxLabeled(adaptiveWidthRect, "BetterInspectPane.AdaptivePaneWidth".Translate(), ref adaptivePaneWidth);
+            TooltipHandler.TipRegion(adaptiveWidthRect, "BetterInspectPane.AdaptivePaneWidth_Tip".Translate());
+            y += RowGap;
+        }
+
+        // 覆盖 InspectString 绘制：自定义面板路径改用本模组实现（20 帧缓存）。
+        // 自适应面板高度：信息文字放不下时自动增高面板（需覆盖 InspectString 绘制开启）。
+        Widgets.CheckboxLabeled(new Rect(x, y, width, RowHeight), "BetterInspectPane.OverrideInspectString".Translate(), ref overrideInspectString);
+        y += RowGap;
+
+        if (overrideInspectString)
+        {
+            Widgets.CheckboxLabeled(new Rect(x, y, width, RowHeight), "BetterInspectPane.AdaptivePaneHeight".Translate(), ref adaptivePaneHeight);
+            y += RowGap;
+        }
+
+        EndPageScroll(SettingsPage.General, y);
+    }
+
+    // ----- 第 2 页：进度条（布局 + 主进度条 + 世界地图对象 + 区域）-----
+    private void DoBarsPage(Rect inRect)
+    {
+        BeginPageScroll(inRect, SettingsPage.Bars, out float x, out float y, out float width);
+
+        // ---- 进度条外观：分隔线 / 默认高度 / 标签与数值的宽度、样式、字体 ----
+        // 这些设置原先分散在「常规」页，现统一收拢到进度条页，便于集中调整普通条外观。
+        Widgets.Label(new Rect(x, y, width, RowHeight), "BetterInspectPane.BarAppearanceSection".Translate());
+        y += RowGap;
+
         Widgets.CheckboxLabeled(new Rect(x, y, width, RowHeight), "BetterInspectPane.ShowSeparators".Translate(), ref showSeparators);
         y += RowGap;
 
@@ -140,7 +187,7 @@ public partial class MyModTemplateSettings : ModSettings
             y += SliderGap;
         }
 
-        // 条默认高度：所有条的基本高度，各条在「进度条」页通过高度偏移在此基础上增减。
+        // 条默认高度：所有条的基本高度，各条通过高度偏移在此基础上增减。
         defaultBarHeight = HorizontalSlider(new Rect(x, y, width, SliderHeight), defaultBarHeight, 4f, 32f,
             label: "BetterInspectPane.DefaultBarHeight".Translate(Mathf.RoundToInt(defaultBarHeight)), roundTo: 1f);
         y += SliderGap;
@@ -197,71 +244,41 @@ public partial class MyModTemplateSettings : ModSettings
         }
 
         // 普通条使用小号字体（游戏内置 Tiny 字体）：
-        // 开启后条标签 / 数值改用小号字体，字号仍由下面的标签 / 数值字号滑杆控制（额外文字字号不受影响）。
+        // 开启后条标签 / 数值改用小号字体，字号仍由下面的标签 / 数值字号滑杆控制。
         Rect tinyFontRect = new Rect(x, y, width, RowHeight);
         Widgets.CheckboxLabeled(tinyFontRect, "BetterInspectPane.BarUseTinyFont".Translate(), ref barUseTinyFont);
         TooltipHandler.TipRegion(tinyFontRect, "BetterInspectPane.BarUseTinyFontTip".Translate());
         y += RowGap;
 
-        // 字号（像素，可调具体数值）：条标签 / 条数值 / 额外文字。
-        // 条标签 / 条数值字号并排显示在同一行的左右两列。
+        // 普通条标签 / 数值字号（像素）：并排显示在同一行的左右两列。
+        // 默认 14；开启小号字体时仍由这里控制字号（推荐 12）。
         if (!embedLabelShown || !embedValueShown)
         {
             float colW = (width - ItemGap) / 2f;
             if (!embedLabelShown)
             {
-                labelFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(x, y, !embedValueShown ? colW : width, SliderHeight), labelFontSize, 8f, 24f,
+                Rect labelSliderRect = new Rect(x, y, !embedValueShown ? colW : width, SliderHeight);
+                labelFontSize = Mathf.RoundToInt(HorizontalSlider(labelSliderRect, labelFontSize, 8f, 24f,
                     label: "BetterInspectPane.LabelFontSize".Translate(labelFontSize), roundTo: 1f));
+                TooltipHandler.TipRegion(labelSliderRect, "BetterInspectPane.BarFontSizeTip".Translate());
             }
             if (!embedValueShown)
             {
-                valueFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(!embedLabelShown ? x + colW + ItemGap : x, y, !embedLabelShown ? colW : width, SliderHeight), valueFontSize, 8f, 24f,
+                Rect valueSliderRect = new Rect(!embedLabelShown ? x + colW + ItemGap : x, y, !embedLabelShown ? colW : width, SliderHeight);
+                valueFontSize = Mathf.RoundToInt(HorizontalSlider(valueSliderRect, valueFontSize, 8f, 24f,
                     label: "BetterInspectPane.ValueFontSize".Translate(valueFontSize), roundTo: 1f));
+                TooltipHandler.TipRegion(valueSliderRect, "BetterInspectPane.BarFontSizeTip".Translate());
             }
             y += SliderGap;
         }
 
-        infoFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(x, y, width, SliderHeight), infoFontSize, 8f, 24f,
-            label: "BetterInspectPane.InfoFontSize".Translate(infoFontSize), roundTo: 1f));
-        y += SliderGap;
+        // 外观与布局之间加分隔线。
+        y += 8f;
+        Widgets.DrawLineHorizontal(x, y, width, new Color(0.4f, 0.4f, 0.4f));
+        y += 8f;
 
-        // 检查面板窗口尺寸：最小宽度、最小高度（实际尺寸取原版值与设置值中的较大者）。
-        paneWidth = HorizontalSlider(new Rect(x, y, width, SliderHeight), paneWidth, 432f, 800f,
-            label: "BetterInspectPane.PaneWidth".Translate(Mathf.RoundToInt(paneWidth)), roundTo: 1f);
-        y += SliderGap;
-
-        paneHeight = HorizontalSlider(new Rect(x, y, width, SliderHeight), paneHeight, 165f, 600f,
-            label: "BetterInspectPane.PaneHeight".Translate(Mathf.RoundToInt(paneHeight)), roundTo: 1f);
-        y += SliderGap;
-
-        // 自适应面板宽度：标题（名称）与右侧按钮条放不下时自动加宽面板（需覆盖面板绘制开启，
-        // 与覆盖路径的标题测量同源，见 InspectPaneOnGUIPatch.UpdateRequiredPaneWidth）。
-        if (overrideInspectPane)
-        {
-            Rect adaptiveWidthRect = new Rect(x, y, width, RowHeight);
-            Widgets.CheckboxLabeled(adaptiveWidthRect, "BetterInspectPane.AdaptivePaneWidth".Translate(), ref adaptivePaneWidth);
-            TooltipHandler.TipRegion(adaptiveWidthRect, "BetterInspectPane.AdaptivePaneWidth_Tip".Translate());
-            y += RowGap;
-        }
-
-        // 覆盖 InspectString 绘制：自定义面板路径改用本模组实现（20 帧缓存）。
-        // 自适应面板高度：信息文字放不下时自动增高面板（需覆盖 InspectString 绘制开启）。
-        Widgets.CheckboxLabeled(new Rect(x, y, width, RowHeight), "BetterInspectPane.OverrideInspectString".Translate(), ref overrideInspectString);
+        Widgets.Label(new Rect(x, y, width, RowHeight), "BetterInspectPane.BarLayoutSection".Translate());
         y += RowGap;
-
-        if (overrideInspectString)
-        {
-            Widgets.CheckboxLabeled(new Rect(x, y, width, RowHeight), "BetterInspectPane.AdaptivePaneHeight".Translate(), ref adaptivePaneHeight);
-            y += RowGap;
-        }
-
-        EndPageScroll(SettingsPage.General, y);
-    }
-
-    // ----- 第 2 页：进度条（布局 + 主进度条 + 世界地图对象 + 区域）-----
-    private void DoBarsPage(Rect inRect)
-    {
-        BeginPageScroll(inRect, SettingsPage.Bars, out float x, out float y, out float width);
 
         // 进度条区布局（同一行）：布局下拉 + 列间距滑杆（非单列时）+ 双条行均分开关（三列/四列时）。
         // 行高取滑杆块高度（SliderHeight，滑杆标签画在轨道上方），下拉/复选框在该行内垂直居中。

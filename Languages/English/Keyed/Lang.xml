@@ -429,13 +429,19 @@
 
   <BetterInspectPane.RowSpacing>Row spacing: {0}</BetterInspectPane.RowSpacing>
 
+  <BetterInspectPane.BarAppearanceSection>Bar appearance</BetterInspectPane.BarAppearanceSection>
+
+  <BetterInspectPane.BarLayoutSection>Bar layout</BetterInspectPane.BarLayoutSection>
+
   <BetterInspectPane.LabelWidth>Label width: {0}</BetterInspectPane.LabelWidth>
 
   <BetterInspectPane.ValueWidth>Value width: {0}</BetterInspectPane.ValueWidth>
 
-  <BetterInspectPane.LabelFontSize>Bar label font size: {0}</BetterInspectPane.LabelFontSize>
+  <BetterInspectPane.LabelFontSize>Normal bar label font size: {0}</BetterInspectPane.LabelFontSize>
 
-  <BetterInspectPane.ValueFontSize>Bar value font size: {0}</BetterInspectPane.ValueFontSize>
+  <BetterInspectPane.ValueFontSize>Normal bar value font size: {0}</BetterInspectPane.ValueFontSize>
+
+  <BetterInspectPane.BarFontSizeTip>Font size (px) for normal bar labels and values. Default 14; also applies when the Tiny font is enabled, 12 recommended.</BetterInspectPane.BarFontSizeTip>
 
   <BetterInspectPane.BarUseTinyFont>Normal bars use Tiny font</BetterInspectPane.BarUseTinyFont>
 
