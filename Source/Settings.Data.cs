@@ -441,6 +441,10 @@ public partial class MyModTemplateSettings : ModSettings
     public static bool rememberOpenTab = false;
     public const int RememberOpenTabCapacity = 2; // 记忆容量（目标种类数量），范围 2~10
 
+    // Esc 快速关闭：窗口的搜索输入框聚焦时，原版 Esc 只取消输入框聚焦而不关闭窗口；
+    // 开启后 Esc 无视输入框聚焦，直接按原版取消逻辑关闭当前窗口（默认关闭）。
+    public static bool enableEscQuickClose = false;
+
     // ==================== 进度条通用外观 ====================
 
     // 条默认高度：所有条的基本高度，各条再通过「高度偏移」在此基础上增减（健康条默认 +2，其余默认 0）。
@@ -1036,6 +1040,7 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref enableDragBoxPreview, "enableDragBoxPreview", false);
         Scribe_Values.Look(ref dragBoxPreviewShowCount, "dragBoxPreviewShowCount", true);
         Scribe_Values.Look(ref rememberOpenTab, "rememberOpenTab", false);
+        Scribe_Values.Look(ref enableEscQuickClose, "enableEscQuickClose", false);
 
         // 检查面板整体边距与标题字号。
         Scribe_Values.Look(ref paneMargin, "paneMargin", 8f);

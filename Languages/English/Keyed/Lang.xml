@@ -647,6 +647,12 @@ Holding Ctrl never clears the current selection.</BetterInspectPane.EnableCtrlSe
 • Manually closing a tab won't re-open it immediately; it only auto-opens when you switch to another type and then back.</BetterInspectPane.EnableRememberOpenTab_Tip>
   <BetterInspectPane.RememberOpenTabCapacity>Remembered target types: {0}</BetterInspectPane.RememberOpenTabCapacity>
 
+  <BetterInspectPane.EnableEscQuickClose>Esc quick close window</BetterInspectPane.EnableEscQuickClose>
+  <BetterInspectPane.EnableEscQuickClose_Tip>When enabled, Esc ignores a focused input field (such as a window's search box) and directly closes the currently focused window.
+• Vanilla: when a window's search box is focused, pressing Esc only unfocuses the search box instead of closing the window.
+• With this enabled: Esc goes through the vanilla cancel logic and closes the current window (a cancellable window); the search box no longer intercepts Esc.
+• In all other cases (no focused input field, etc.) behavior is identical to vanilla.</BetterInspectPane.EnableEscQuickClose_Tip>
+
   <BetterInspectPane.MarketValueLabel>Market value: {0}</BetterInspectPane.MarketValueLabel>
 
   <BetterInspectPane.MarketValueStackLabel>Market value: {0} ({1} each)</BetterInspectPane.MarketValueStackLabel>

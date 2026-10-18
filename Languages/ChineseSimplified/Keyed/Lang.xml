@@ -647,6 +647,12 @@
 • 手动关闭标签页后不会立刻自动重开；切换到其它种类再切回时才按记忆自动打开。</BetterInspectPane.EnableRememberOpenTab_Tip>
   <BetterInspectPane.RememberOpenTabCapacity>记忆目标种类数量：{0}</BetterInspectPane.RememberOpenTabCapacity>
 
+  <BetterInspectPane.EnableEscQuickClose>Esc 快速关闭窗口</BetterInspectPane.EnableEscQuickClose>
+  <BetterInspectPane.EnableEscQuickClose_Tip>开启后，Esc 键会无视输入框（如窗口内的搜索框）的聚焦，直接关闭当前聚焦的窗口。
+• 原版：当窗口的搜索框处于聚焦状态时，按 Esc 只会取消搜索框的聚焦，而不会关闭窗口。
+• 本功能开启后：按 Esc 将按原版取消逻辑关闭当前窗口（可取消的窗口），搜索框不再拦截 Esc。
+• 其余情况（未聚焦输入框等）的行为与原版完全一致。</BetterInspectPane.EnableEscQuickClose_Tip>
+
   <BetterInspectPane.MarketValueLabel>市场价值：{0}</BetterInspectPane.MarketValueLabel>
 
   <BetterInspectPane.MarketValueStackLabel>市场价值：{0}（{1}）</BetterInspectPane.MarketValueStackLabel>

@@ -1244,6 +1244,12 @@ public partial class MyModTemplateSettings : ModSettings
         TooltipHandler.TipRegion(rememberRow, "BetterInspectPane.EnableRememberOpenTab_Tip".Translate());
         y += RowGap;
 
+        // Esc 快速关闭：Esc 无视输入框聚焦，直接关闭当前窗口（悬停查看详细说明）。
+        Rect escQuickCloseRow = new Rect(x, y, width, RowHeight);
+        Widgets.CheckboxLabeled(escQuickCloseRow, "BetterInspectPane.EnableEscQuickClose".Translate(), ref enableEscQuickClose);
+        TooltipHandler.TipRegion(escQuickCloseRow, "BetterInspectPane.EnableEscQuickClose_Tip".Translate());
+        y += RowGap;
+
         EndPageScroll(SettingsPage.Effects, y);
     }
 
