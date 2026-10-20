@@ -660,6 +660,7 @@
 • 青色 = 将要增加：当前未选中，松手后会被选中。
 • 橙色 = 将被排除：当前已选中，松手后会失去选择（只在会先清空选择的普通框选里出现；Shift / Ctrl 框选不会清空选择，因此不会出现橙色）。
 • 白色（原版括号）= 不变：已选中且仍在框内，或已选中且本次框选不影响它。
+• 顶部殖民者条上的头像同样会标出（地图视图）：拖拽框覆盖到头像时，将被选中的头像显示青色括号，将被取消选择的显示橙色括号。
 • 预览与实际选中规则完全一致：原版优先级链（殖民者 → 人类 → 资源 → Pawn → 可选物）、区域与计划，以及上方「改进的原版 Shift 选择」「Ctrl 选择功能」的规则都会被考虑。
 • 受「修改选择数量限制」影响：超出上限、松手后会被跳过的对象不会标为青色。</BetterInspectPane.EnableDragBoxPreview_Tip>
   <BetterInspectPane.DragBoxPreviewShowCount>显示选中数量</BetterInspectPane.DragBoxPreviewShowCount>

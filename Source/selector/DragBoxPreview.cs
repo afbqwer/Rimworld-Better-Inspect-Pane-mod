@@ -10,7 +10,8 @@ using Verse;
 namespace ASQBetterInspectPane;
 
 /// <summary>
-/// 框选预览（多选预览）：拖拽原版选择框（地图 / 世界地图）时，在松开鼠标之前就把每一项的最终归属标出来。
+/// 框选预览（多选预览）：拖拽原版选择框（地图 / 世界地图）时，在松开鼠标之前就把每一项的最终归属标出来；
+/// 顶部殖民者条上被框到的头像同样会标出。
 /// <para>
 /// 三色语义：
 /// <list type="bullet">
@@ -28,6 +29,8 @@ namespace ASQBetterInspectPane;
 /// 以及本模组 <see cref="SelectorSelectionPatch"/> 的「改进 Shift」「Ctrl 选择」两条补丁路径。</item>
 /// <item>橙色需要盖住原版白色括号：预览材质 / 区域边框的渲染队列都取原版对应材质的队列 +1/+30，
 /// 保证稳定画在白括号之上；青色只画在未选中对象上，不与白色重叠。</item>
+/// <item>殖民者条头像在原版 <c>ColonistBarColonistDrawer.DrawColonist</c> 之后叠加同款括号，命中直接复用本帧预测集合，
+/// 因此头像上的颜色与地图上该殖民者的颜色始终一致（含选择数量上限、Shift / Ctrl 等全部规则）。</item>
 /// </list>
 /// </para>
 /// </summary>
@@ -820,6 +823,98 @@ public static class DragBoxPreview
 
     #endregion
 
+    #region 殖民者条预览
+
+    // 每帧缓存殖民者条预览用的命中集合：直接复用地图预测结果，保证头像上的标记与地图上的标记完全一致
+    // （选中的殖民者在地图上画括号，在殖民者条上就画头像括号）。
+    private static int barFrame = -1;
+    private static bool barDragging;
+    private static readonly HashSet<object> barPredictedSet = new HashSet<object>();
+    private static readonly HashSet<object> barExcludedSet = new HashSet<object>();
+
+    /// <summary>
+    /// 确保本帧殖民者条预览状态已计算（仅地图视图；世界地图里殖民者条框选的语义不同，不预览）。
+    /// 预测本身已经包含「框住殖民者条头像」这一分支（原版优先级 1），因此这里只需复用同一帧的预测结果。
+    /// </summary>
+    private static void EnsureColonistBarState()
+    {
+        int frame = Time.frameCount;
+        if (barFrame == frame)
+        {
+            return;
+        }
+        barFrame = frame;
+        barDragging = false;
+        barPredictedSet.Clear();
+        barExcludedSet.Clear();
+        if (!Active || Find.CurrentMap == null || !WorldRendererUtility.DrawingMap)
+        {
+            return;
+        }
+        Selector sel = Find.Selector;
+        if (sel == null || !sel.dragBox.IsValidAndActive)
+        {
+            return;
+        }
+        EnsureMapPrediction(sel);
+        barDragging = true;
+        for (int i = 0; i < mapPredicted.Count; i++)
+        {
+            barPredictedSet.Add(mapPredicted[i]);
+        }
+        for (int i = 0; i < mapExcluded.Count; i++)
+        {
+            barExcludedSet.Add(mapExcluded[i]);
+        }
+    }
+
+    /// <summary>
+    /// 殖民者条条目的预览（由 <c>ColonistBarColonistDrawer.DrawColonist</c> 后置逐条目调用）：
+    /// 与地图同一套三色语义 —— 青色 = 将要增加、橙色 = 将被排除、白色 = 不变（直接沿用原版括号）。
+    /// </summary>
+    private static void DrawColonistBarEntryPreview(Rect entryRect, Pawn colonist)
+    {
+        if (!Active || Find.ScreenshotModeHandler.Active)
+        {
+            return;
+        }
+        EnsureColonistBarState();
+        if (!barDragging)
+        {
+            return;
+        }
+        // 与原版一致：死亡且尸体已生成时，实际被选中的是尸体。
+        Thing? target = colonist.Dead ? colonist.Corpse : colonist;
+        if (target == null)
+        {
+            return;
+        }
+        bool willSelect = barPredictedSet.Contains(target);
+        bool willExclude = barExcludedSet.Contains(target);
+        if (!willSelect && !willExclude)
+        {
+            return; // 不变。
+        }
+        if (willSelect && Find.Selector.IsSelected(target))
+        {
+            return; // 已选中且仍会被选中 → 原版白色括号即为「不变」。
+        }
+        // 与原版 ColonistBarColonistDrawer.DrawSelectionOverlayOnGUI 完全相同的矩形与缩放，保证覆盖白色括号；
+        // 其它地图的条目按原版规则降低不透明度。
+        Color color = willSelect ? AddColor : ExcludeColor;
+        color.a *= Find.ColonistBar.GetEntryRectAlpha(entryRect);
+        Color oldColor = GUI.color;
+        GUI.color = color;
+        SelectionDrawerUtility.DrawSelectionOverlayOnGUI(
+            target,
+            entryRect.ContractedBy(-2f * Find.ColonistBar.Scale),
+            0.4f * Find.ColonistBar.Scale,
+            20f * Find.ColonistBar.Scale);
+        GUI.color = oldColor;
+    }
+
+    #endregion
+
     #region 补丁
 
     /// <summary>地图预览绘制（Update 阶段，紧随原版选择括号）。</summary>
@@ -869,6 +964,16 @@ public static class DragBoxPreview
             }
             EnsureWorldPrediction(Find.WorldSelector);
             DrawCountLabel(__instance.ScreenRect, worldTotalCount, worldNewCount);
+        }
+    }
+
+    /// <summary>殖民者条条目预览（OnGUI Repaint 阶段，原版条目绘制之后）。</summary>
+    [HarmonyPatch(typeof(ColonistBarColonistDrawer), nameof(ColonistBarColonistDrawer.DrawColonist))]
+    public static class ColonistBarPreviewPatch
+    {
+        static void Postfix(Rect rect, Pawn colonist)
+        {
+            DrawColonistBarEntryPreview(rect, colonist);
         }
     }
 

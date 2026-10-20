@@ -42,7 +42,7 @@ My Mod Template 2/
 | `PaneLayoutPatch.cs` | `PaneWidthFor` / `PaneTopY` 等 | 面板变大后让 gizmo 区与标签页让位 |
 | `InspectTabMemoryPatch.cs` | `InspectPaneUtility.UpdateTabs` | 记忆各类目标最近打开的标签页（LRU） |
 | `SelectorSelectionPatch.cs` | `Selector.SelectInternal` | 选择数量上限可调、改进 Shift 框选 |
-| `DragBoxPreview.cs` | `SelectionDrawer.DrawSelectionOverlays` / `DragBox.DragBoxOnGUI` / `WorldSelectionDrawer.SelectionOverlaysOnGUI` / `WorldDragBox.DragBoxOnGUI` | 框选预览：拖拽原版选择框时实时标出「松手后将被选中」的对象（地图 / 世界地图），可显示选中数量；青色 = 将要增加，橙色 = 将被排除，白色 = 不变（默认关闭） |
+| `DragBoxPreview.cs` | `SelectionDrawer.DrawSelectionOverlays` / `DragBox.DragBoxOnGUI` / `WorldSelectionDrawer.SelectionOverlaysOnGUI` / `WorldDragBox.DragBoxOnGUI` | 框选预览：拖拽原版选择框时实时标出「松手后将被选中」的对象（地图 / 世界地图 / 顶部殖民者条），可显示选中数量；青色 = 将要增加，橙色 = 将被排除，白色 = 不变（默认关闭） |
 
 ### 设置
 

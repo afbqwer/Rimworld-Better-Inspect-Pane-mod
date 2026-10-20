@@ -660,6 +660,7 @@ Holding Ctrl never clears the current selection.</BetterInspectPane.EnableCtrlSe
 • Cyan = will be added: not selected now, will be selected on release.
 • Orange = will be excluded: selected now, but will lose the selection on release (only in ordinary box selections that clear the selection first; Shift / Ctrl selections never clear, so orange won't appear).
 • White (vanilla brackets) = unchanged: selected and kept, or selected and unaffected by this box.
+• Colonist bar portraits are marked too (map view): when the drag box covers a portrait, it turns cyan if that colonist will be selected and orange if it will be deselected.
 • The preview follows the real selection rules: the vanilla priority chain (colonists → humanlikes → resources → pawns → selectables), zones and plans, plus the "Improved Shift selection" and "Ctrl selection" options above.
 • Respects "Modify selection limit": objects beyond the limit (which would be skipped on release) are not marked cyan.</BetterInspectPane.EnableDragBoxPreview_Tip>
   <BetterInspectPane.DragBoxPreviewShowCount>Show selection count</BetterInspectPane.DragBoxPreviewShowCount>
