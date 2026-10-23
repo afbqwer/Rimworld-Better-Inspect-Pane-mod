@@ -1105,7 +1105,8 @@ public partial class MyModTemplateSettings : ModSettings
         // Pawn 当前行动 / 下一个行动区域。
         Scribe_Values.Look(ref enablePawnJobArea, "enablePawnJobArea", true);
         Scribe_Values.Look(ref pawnJobShowNext, "pawnJobShowNext", true);
-        Scribe_Values.Look(ref pawnJobAreaBelowInspectText, "pawnJobAreaBelowInspectText", true);
+        // 使用新键（旧键曾以 false 为默认值），确保升级后默认位于观察文本下方。
+        Scribe_Values.Look(ref pawnJobAreaBelowInspectText, "pawnJobBelowInspectText", true);
         Scribe_Values.Look(ref pawnJobFontSize, "pawnJobFontSize", 14);
         Scribe_Values.Look(ref pawnJobLineGap, "pawnJobLineGap", 0f);
         Scribe_Values.Look(ref pawnJobShowForAllies, "pawnJobShowForAllies", true);
@@ -1113,7 +1114,8 @@ public partial class MyModTemplateSettings : ModSettings
 
         // Pawn 技能区。
         Scribe_Values.Look(ref pawnShowSkills, "pawnShowSkills", true);
-        Scribe_Values.Look(ref pawnSkillSplitColumns, "pawnSkillSplitColumns", false);
+        // 使用新键（旧键曾以 true 为默认值），确保升级后默认关闭左右分栏。
+        Scribe_Values.Look(ref pawnSkillSplitColumns, "pawnSkillSplitLayout", false);
         Scribe_Values.Look(ref pawnSkillSplitRatio, "pawnSkillSplitRatio", 0.5f);
         Scribe_Values.Look(ref pawnSkillColumns, "pawnSkillColumns", PawnSkillColumns.Six);
         Scribe_Values.Look(ref pawnSkillFontSize, "pawnSkillFontSize", 12);
