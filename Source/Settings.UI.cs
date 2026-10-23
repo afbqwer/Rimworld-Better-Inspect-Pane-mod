@@ -115,9 +115,13 @@ public partial class MyModTemplateSettings : ModSettings
                 label: "BetterInspectPane.PawnTitleFontSize".Translate(pawnTitleFontSize), roundTo: 1f));
             y += SliderGap;
 
-            // 显示 Pawn 全名 / 显示 Pawn 额外按钮（异种类型、阵营、文化）/ Pawn 标题字号。
+            // 显示 Pawn 全名 / 标题按关系上色 / 显示 Pawn 额外按钮（异种类型、阵营、文化）/ Pawn 标题字号。
             Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
                 "BetterInspectPane.PawnShowFullName".Translate(), ref pawnShowFullName);
+            y += RowGap;
+
+            Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
+                "BetterInspectPane.PawnTitleRelationColor".Translate(), ref pawnTitleRelationColor);
             y += RowGap;
 
             Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),

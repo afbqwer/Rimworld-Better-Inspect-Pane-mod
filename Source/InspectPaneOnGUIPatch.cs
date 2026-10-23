@@ -160,13 +160,22 @@ public static class InspectPaneOnGUIPatch
                 titleRect.width += 300f;
                 GameFont prevFont = Text.Font;
                 TextAnchor prevAnchor = Text.Anchor;
+                Color prevColor = GUI.color;
                 Text.Anchor = TextAnchor.UpperLeft;
+                // 单选 Pawn 的标题按与玩家的关系上色：直接沿用原版 PawnNameColorOf，
+                // 与殖民者条 / 地图上的 Pawn 名称配色保持一致（殖民者近白、敌对红、中立青、
+                // 囚犯黄、奴隶金、野生人粉紫等）。Widgets.Label 走 GUI.Label，GUI.color 即文字颜色。
+                if (singlePawn != null && MyModTemplateSettings.pawnTitleRelationColor)
+                {
+                    GUI.color = PawnNameColorUtility.PawnNameColorOf(singlePawn);
+                }
                 using (new FontSizeScope(effectiveTitleFontSize))
                 {
                     // 截断改在真实标题字号下现算：原版 AdjustedLabelFor 固定按 Medium 度量且结果按文本
                     // 冻结缓存，标题字号调大后测得偏窄、名称会画进右侧按钮区（本功能要解决的原始问题）。
                     Widgets.Label(titleRect, TruncateToWidth(label, effectiveTitleFontSize, titleAvailableWidth));
                 }
+                GUI.color = prevColor;
                 Text.Font = prevFont;
                 Text.Anchor = prevAnchor;
 

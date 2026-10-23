@@ -19,6 +19,8 @@
 
   <BetterInspectPane.PawnShowFullName>Show Pawn's full name (override title with full name)</BetterInspectPane.PawnShowFullName>
 
+  <BetterInspectPane.PawnTitleRelationColor>Color Pawn title by relation to the player (vanilla name colors)</BetterInspectPane.PawnTitleRelationColor>
+
   <BetterInspectPane.PawnShowExtraButtons>Show extra Pawn buttons (xenotype, faction, ideology)</BetterInspectPane.PawnShowExtraButtons>
 
   <BetterInspectPane.PawnTitleFontSize>Pawn panel title font size: {0}</BetterInspectPane.PawnTitleFontSize>

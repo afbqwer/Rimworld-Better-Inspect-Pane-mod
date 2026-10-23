@@ -19,6 +19,8 @@
 
   <BetterInspectPane.PawnShowFullName>显示 Pawn 全名（覆盖默认标题，改用全名）</BetterInspectPane.PawnShowFullName>
 
+  <BetterInspectPane.PawnTitleRelationColor>Pawn 标题按与玩家的关系上色（原版名称配色）</BetterInspectPane.PawnTitleRelationColor>
+
   <BetterInspectPane.PawnShowExtraButtons>显示 Pawn 额外按钮（异种类型、阵营、文化）</BetterInspectPane.PawnShowExtraButtons>
 
   <BetterInspectPane.PawnTitleFontSize>Pawn 面板标题字号：{0}</BetterInspectPane.PawnTitleFontSize>

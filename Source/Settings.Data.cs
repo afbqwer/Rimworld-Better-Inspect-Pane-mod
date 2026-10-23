@@ -260,6 +260,9 @@ public partial class MyModTemplateSettings : ModSettings
     // Pawn 单选检查面板专用（需 overrideInspectPane 开启才显示对应设置；运行时仅对单选 Pawn 生效）：
     // 显示 Pawn 全名：覆盖默认标题，改用 Pawn.Name.ToStringFull。
     public static bool pawnShowFullName = false;
+    // Pawn 标题按与玩家的关系上色：沿用原版 PawnNameColorUtility.PawnNameColorOf 配色
+    // （殖民者近白、敌对红、中立青、囚犯黄、奴隶金、野生人粉紫等，与殖民者条 / 地图名称一致）。
+    public static bool pawnTitleRelationColor = true;
     // 显示 Pawn 额外按钮：在标题右侧原版按钮左侧依次绘制 异种类型 / 阵营 / 文化 三个图标按钮（顺序从右到左）。
     public static bool pawnShowExtraButtons = true;
     // Pawn 面板标题字号：单选 Pawn 时标题改用该字号（普通对象仍用 titleFontSize）。
@@ -1070,6 +1073,7 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref paneMargin, "paneMargin", 8f);
         Scribe_Values.Look(ref titleFontSize, "titleFontSize", 23);
         Scribe_Values.Look(ref pawnShowFullName, "pawnShowFullName", false);
+        Scribe_Values.Look(ref pawnTitleRelationColor, "pawnTitleRelationColor", true);
         Scribe_Values.Look(ref pawnShowExtraButtons, "pawnShowExtraButtons", true);
         Scribe_Values.Look(ref pawnTitleFontSize, "pawnTitleFontSize", 23);
 
