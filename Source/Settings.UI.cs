@@ -97,6 +97,11 @@ public partial class MyModTemplateSettings : ModSettings
                 label: "BetterInspectPane.PaneMargin".Translate(Mathf.RoundToInt(paneMargin)), roundTo: 1f);
             y += SliderGap;
 
+            // 下边距：独立于四周边距，仅控制内容区底部与窗口底边的距离。
+            paneBottomMargin = HorizontalSlider(new Rect(x, y, width, SliderHeight), paneBottomMargin, 0f, 30f,
+                label: "BetterInspectPane.PaneBottomMargin".Translate(Mathf.RoundToInt(paneBottomMargin)), roundTo: 1f);
+            y += SliderGap;
+
             titleFontSize = Mathf.RoundToInt(HorizontalSlider(new Rect(x, y, width, SliderHeight), titleFontSize, 8f, 32f,
                 label: "BetterInspectPane.TitleFontSize".Translate(titleFontSize), roundTo: 1f));
             y += SliderGap;

@@ -54,7 +54,12 @@ public static class InspectPaneOnGUIPatch
 
         try
         {
-            Rect rect = inRect.ContractedBy(MyModTemplateSettings.paneMargin);
+            // 左右/上边距沿用 paneMargin；底部使用独立的下边距 paneBottomMargin。
+            Rect rect = Rect.MinMaxRect(
+                inRect.xMin + MyModTemplateSettings.paneMargin,
+                inRect.yMin + MyModTemplateSettings.paneMargin,
+                inRect.xMax - MyModTemplateSettings.paneMargin,
+                inRect.yMax - MyModTemplateSettings.paneBottomMargin);
             Widgets.BeginGroup(rect);
             try
             {

@@ -255,6 +255,8 @@ public partial class MyModTemplateSettings : ModSettings
     // 检查面板整体边距与标题字号（仅在 overrideInspectPane 开启时生效）：
     // 四周边距替换原版 InpectPaneOnGUI 里的 ContractedBy(12f)；标题字号替换原版固定 GameFont.Medium。
     public static float paneMargin = 8f;
+    // 检查面板下边距：独立于 paneMargin，仅控制内容区底部与窗口底边的距离（默认 8，与原四周边距一致）。
+    public static float paneBottomMargin = 0f;
     public static int titleFontSize = 23;
 
     // Pawn 单选检查面板专用（需 overrideInspectPane 开启才显示对应设置；运行时仅对单选 Pawn 生效）：
@@ -1095,6 +1097,7 @@ public partial class MyModTemplateSettings : ModSettings
 
         // 检查面板整体边距与标题字号。
         Scribe_Values.Look(ref paneMargin, "paneMargin", 8f);
+        Scribe_Values.Look(ref paneBottomMargin, "paneBottomMargin", 0f);
         Scribe_Values.Look(ref titleFontSize, "titleFontSize", 23);
         Scribe_Values.Look(ref pawnShowFullName, "pawnShowFullName", false);
         Scribe_Values.Look(ref pawnTitleRelationColor, "pawnTitleRelationColor", true);
