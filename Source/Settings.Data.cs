@@ -271,7 +271,12 @@ public partial class MyModTemplateSettings : ModSettings
     // Pawn 技能区（需 enablePawns 开启自定义 Pawn 面板内容；与 overrideInspectPane 无关）：
     // 在 Pawn 面板普通条区域下方以多列平铺的嵌入样式条显示技能（标签 = 技能名、数值 = 技能等级、填充 = 升级进度）。
     public static bool pawnShowSkills = true;
-    // 每行列数（3 / 4 / 6，默认 6）。
+    // 技能区左右分栏：开启后普通条在左栏、技能条在右栏（右栏固定每行 2 列）；
+    // 关闭则技能条仍显示在普通条下方（沿用 pawnSkillColumns）。整体面板宽度在「常规」页调整。
+    public static bool pawnSkillSplitColumns = false;
+    // 左右分栏时左栏（普通条）占两栏总宽度的比例（0.2~0.8，默认 0.5）。
+    public static float pawnSkillSplitRatio = 0.5f;
+    // 每行列数（3 / 4 / 6，默认 6；仅在未开启左右分栏时生效）。
     public static PawnSkillColumns pawnSkillColumns = PawnSkillColumns.Six;
     // 技能条文本字号（像素）。
     public static int pawnSkillFontSize = 12;
@@ -279,9 +284,11 @@ public partial class MyModTemplateSettings : ModSettings
     public static bool pawnSkillUseTinyFont = false;
     // 技能条高度。
     public static float pawnSkillBarHeight = 13f;
-    // 技能条列间距：相邻两列之间的空隙。
+    // 技能条列间距：相邻两列之间的空隙（横向间距）。
     public static float pawnSkillColumnGap = 1f;
-    // 技能区纵向间隔：技能行之间、以及技能区与上下分隔线之间的间隔。
+    // 技能条行间距：相邻两行之间的空隙（纵向间距）。
+    public static float pawnSkillRowGap = 1f;
+    // 技能区纵向间隔：技能区与上下分隔线之间的间隔。
     public static float pawnSkillSpacing = 2f;
     // 技能条填充颜色（默认黄色）。
     public static Color pawnSkillColor = DefaultSkillColor;
@@ -303,6 +310,20 @@ public partial class MyModTemplateSettings : ModSettings
     // 显示原版对应提示——技能条复用原版 SkillUI.DrawSkill 的技能提示（私有 GetSkillDescription，反射调用），
     // 需求条复用原版 Need.GetTipString 需求提示。
     public static bool pawnBarTooltips = true;
+
+    // Pawn 当前行动 / 下一个行动区域（默认开启）：显示在面板底部（信息文字上方或下方，可配置），
+    // 并从原版信息文字中移除「当前行动」与「排队」两行（由本区域统一展示）。
+    public static bool enablePawnJobArea = true;
+    // 是否显示「下一个行动」（关闭则只显示当前行动）。
+    public static bool pawnJobShowNext = true;
+    // 行动区域位置：false = 观察文本上方，true = 观察文本下方（面板最底部，默认）。
+    public static bool pawnJobAreaBelowInspectText = true;
+    // 行动区域字号（像素）与行间距（像素）：默认值与原版检查文本一致（14px、行间无额外间距）。
+    public static int pawnJobFontSize = 14;
+    public static float pawnJobLineGap = 0f;
+    // 是否为盟友 / 敌人显示行动区域（玩家自己的 Pawn、无阵营与中立阵营始终显示）。
+    public static bool pawnJobShowForAllies = true;
+    public static bool pawnJobShowForEnemies = true;
 
     // 检查面板窗口尺寸：宽度 = max(原版按 Tab 数量计算值, 最小宽度)、
     // 高度 = max(原版固定 165f, 最小高度)。
@@ -897,8 +918,9 @@ public partial class MyModTemplateSettings : ModSettings
     public static bool enableExtraBeautyText = true;         // 普通对象：美观
     public static bool enableExtraComfortText = true;        // 普通对象：舒适度（床等，StatDef.Comfort）
     public static bool enableExtraCeHeightText = true;       // 普通对象：CE 高度（Combat Extended 激活时显示）
-    public static bool enableExtraPawnText = true;           // Pawn：额外信息文字总开关（下辖 特性 / CE 高度 / 收藏统计）
+    public static bool enableExtraPawnText = true;           // Pawn：额外信息文字总开关（下辖 特性 / 屠宰产出 / CE 高度 / 收藏统计）
     public static bool enableExtraPawnTraitText = true;      // Pawn：特性
+    public static bool enableExtraButcherText = true;        // Pawn（动物）：屠宰可获得的肉 / 皮
     public static bool enableExtraCeHeightPawnText = true;   // Pawn：CE 高度（随 Pawn 额外信息总开关嵌套显示）
     public static bool enableExtraMapTileText = true;        // 世界地图空地砖：靠近污染 / 靠近其它势力
 
@@ -1080,13 +1102,25 @@ public partial class MyModTemplateSettings : ModSettings
         // Pawn 条悬浮提示（技能条与需求条统一开关）。
         Scribe_Values.Look(ref pawnBarTooltips, "pawnBarTooltips", true);
 
+        // Pawn 当前行动 / 下一个行动区域。
+        Scribe_Values.Look(ref enablePawnJobArea, "enablePawnJobArea", true);
+        Scribe_Values.Look(ref pawnJobShowNext, "pawnJobShowNext", true);
+        Scribe_Values.Look(ref pawnJobAreaBelowInspectText, "pawnJobAreaBelowInspectText", true);
+        Scribe_Values.Look(ref pawnJobFontSize, "pawnJobFontSize", 14);
+        Scribe_Values.Look(ref pawnJobLineGap, "pawnJobLineGap", 0f);
+        Scribe_Values.Look(ref pawnJobShowForAllies, "pawnJobShowForAllies", true);
+        Scribe_Values.Look(ref pawnJobShowForEnemies, "pawnJobShowForEnemies", true);
+
         // Pawn 技能区。
         Scribe_Values.Look(ref pawnShowSkills, "pawnShowSkills", true);
+        Scribe_Values.Look(ref pawnSkillSplitColumns, "pawnSkillSplitColumns", false);
+        Scribe_Values.Look(ref pawnSkillSplitRatio, "pawnSkillSplitRatio", 0.5f);
         Scribe_Values.Look(ref pawnSkillColumns, "pawnSkillColumns", PawnSkillColumns.Six);
         Scribe_Values.Look(ref pawnSkillFontSize, "pawnSkillFontSize", 12);
         Scribe_Values.Look(ref pawnSkillUseTinyFont, "pawnSkillUseTinyFont", false);
         Scribe_Values.Look(ref pawnSkillBarHeight, "pawnSkillBarHeight", 13f);
         Scribe_Values.Look(ref pawnSkillColumnGap, "pawnSkillColumnGap", 1f);
+        Scribe_Values.Look(ref pawnSkillRowGap, "pawnSkillRowGap", 1f);
         Scribe_Values.Look(ref pawnSkillSpacing, "pawnSkillSpacing", 2f);
         LookColor(ref pawnSkillColor, "pawnSkillColor", DefaultSkillColor);
         Scribe_Values.Look(ref pawnSkillWhiteFont, "pawnSkillWhiteFont", true);
@@ -1493,6 +1527,7 @@ public partial class MyModTemplateSettings : ModSettings
         Scribe_Values.Look(ref enableExtraCeHeightText, "enableExtraCeHeightText", true);
         Scribe_Values.Look(ref enableExtraPawnText, "enableExtraPawnText", true);
         Scribe_Values.Look(ref enableExtraPawnTraitText, "enableExtraPawnTraitText", true);
+        Scribe_Values.Look(ref enableExtraButcherText, "enableExtraButcherText", true);
         Scribe_Values.Look(ref enableExtraCeHeightPawnText, "enableExtraCeHeightPawnText", true);
         Scribe_Values.Look(ref enableExtraMapTileText, "enableExtraMapTileText", true);
 

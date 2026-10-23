@@ -27,6 +27,32 @@
 
   <BetterInspectPane.PawnShowSkills>Show Pawn skills (skill level bars below the regular bar area)</BetterInspectPane.PawnShowSkills>
 
+  <BetterInspectPane.PawnSkillSplitColumns>Split into two columns (left: bars / right: skills)</BetterInspectPane.PawnSkillSplitColumns>
+
+  <BetterInspectPane.PawnSkillSplitColumnsTip>When enabled, regular bars and skill bars are shown side by side: bars in the left column, skill bars in the right column with two per row. When disabled, skill bars remain below the regular bars (arranged by "Columns per row"). Adjust the overall panel width via "Inspect pane minimum width" on the General page.</BetterInspectPane.PawnSkillSplitColumnsTip>
+
+  <BetterInspectPane.PawnSkillSplitRatio>Left column width ratio: {0}%</BetterInspectPane.PawnSkillSplitRatio>
+
+  <BetterInspectPane.PawnSkillSplitRatioTip>The share of the total two-column width given to the left column (regular bars); the remaining width goes to the right column (skill bars). Adjust the overall panel width via "Inspect pane minimum width" on the General page.</BetterInspectPane.PawnSkillSplitRatioTip>
+
+  <BetterInspectPane.PawnSkillSplitWidthHint>Overall panel width is set on the General page.</BetterInspectPane.PawnSkillSplitWidthHint>
+
+  <BetterInspectPane.EnablePawnJobArea>Show current / next action area</BetterInspectPane.EnablePawnJobArea>
+
+  <BetterInspectPane.EnablePawnJobAreaTip>When enabled, the current action and next action are shown in a separate area at the bottom of the Pawn panel, and the current action and queued lines are removed from the vanilla inspect text below; when disabled, the vanilla inspect text is left unchanged.</BetterInspectPane.EnablePawnJobAreaTip>
+
+  <BetterInspectPane.PawnJobShowNext>Show next action</BetterInspectPane.PawnJobShowNext>
+
+  <BetterInspectPane.PawnJobAreaBelow>Place below the inspect text</BetterInspectPane.PawnJobAreaBelow>
+
+  <BetterInspectPane.PawnJobFontSize>Action area font size: {0}</BetterInspectPane.PawnJobFontSize>
+
+  <BetterInspectPane.PawnJobLineGap>Action area line spacing: {0}</BetterInspectPane.PawnJobLineGap>
+
+  <BetterInspectPane.PawnJobShowForAllies>Show action area for allies</BetterInspectPane.PawnJobShowForAllies>
+
+  <BetterInspectPane.PawnJobShowForEnemies>Show action area for enemies</BetterInspectPane.PawnJobShowForEnemies>
+
   <BetterInspectPane.PawnBarTooltips>Pawn bar tooltips</BetterInspectPane.PawnBarTooltips>
 
   <BetterInspectPane.PawnBarTooltipsTip>Unified toggle: hovering a skill bar or need bar (mood / food / rest / joy / mech energy / mod needs, etc.) in the Pawn panel shows the corresponding vanilla tooltip — skill bars show the vanilla character tab skill tooltip, need bars show the vanilla needs tab need tooltip (current level, description, enabling trait / gene, etc.).</BetterInspectPane.PawnBarTooltipsTip>
@@ -75,9 +101,9 @@
 
   <BetterInspectPane.PawnSkillBarHeight>Skill bar height: {0}</BetterInspectPane.PawnSkillBarHeight>
 
-  <BetterInspectPane.PawnSkillColumnGap>Skill bar column gap: {0}</BetterInspectPane.PawnSkillColumnGap>
+  <BetterInspectPane.PawnSkillColumnGap>Skill bar horizontal spacing: {0}</BetterInspectPane.PawnSkillColumnGap>
 
-  <BetterInspectPane.PawnSkillSpacing>Skill area spacing: {0}</BetterInspectPane.PawnSkillSpacing>
+  <BetterInspectPane.PawnSkillRowGap>Skill bar vertical spacing: {0}</BetterInspectPane.PawnSkillRowGap>
 
   <BetterInspectPane.ColorSkill>Skill bar color:</BetterInspectPane.ColorSkill>
 
@@ -640,6 +666,8 @@
 
   <BetterInspectPane.EnableExtraPawnTraitText>Show traits</BetterInspectPane.EnableExtraPawnTraitText>
 
+  <BetterInspectPane.EnableExtraButcherText>Show butcher yields for animals (meat / leather)</BetterInspectPane.EnableExtraButcherText>
+
   <BetterInspectPane.EnableExtraMapTileText>Show nearby pollution / nearby factions on empty world map tiles</BetterInspectPane.EnableExtraMapTileText>
 
   <BetterInspectPane.EnableSelectionLimitModify>Modify selection count limit</BetterInspectPane.EnableSelectionLimitModify>
@@ -733,6 +761,14 @@ Holding Ctrl never clears the current selection.</BetterInspectPane.EnableCtrlSe
   <BetterInspectPane.CeHeightLabel>Height: {0} m</BetterInspectPane.CeHeightLabel>
 
   <BetterInspectPane.TraitLabel>Traits: {0}</BetterInspectPane.TraitLabel>
+
+  <BetterInspectPane.ButcherProductsLabel>Butcher yields: {0}</BetterInspectPane.ButcherProductsLabel>
+
+  <BetterInspectPane.ButcherProductsSeparator>, </BetterInspectPane.ButcherProductsSeparator>
+
+  <BetterInspectPane.CurrentJobLabel>Current action: {0}</BetterInspectPane.CurrentJobLabel>
+
+  <BetterInspectPane.NextJobLabel>Next action: {0}</BetterInspectPane.NextJobLabel>
 
   <BetterInspectPane.NearPollutionLabel>Nearby pollution: {0}</BetterInspectPane.NearPollutionLabel>
 

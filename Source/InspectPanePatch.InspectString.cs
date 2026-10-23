@@ -14,10 +14,11 @@ namespace ASQBetterInspectPane;
 /// InspectPanePatch 的 InspectString 绘制部分：本模组自己的 DrawInspectStringFor 实现。
 /// 接管「拼接文本」这一步：按 30 帧缓存文本与其 CalcHeight，并据此实现自适应面板高度。
 /// 文本 = 原版 GetInspectString（+ 低优先级段）+ 本模组额外信息文字（普通对象：所属势力 /
-/// 市场价值 / 武器 / 衣物护甲 / 营养 / 美观 / 舒适度 / CE 高度；Pawn：CE 高度；世界地图空地砖：
-/// 靠近污染与势力；世界地图对象：自然阵营关系；派系定居点：派系类别（置于原版文字之前），
+/// 市场价值 / 武器 / 衣物护甲 / 营养 / 美观 / 舒适度 / CE 高度；Pawn：特性 / 屠宰产出 / CE 高度；
+/// 世界地图空地砖：靠近污染与势力；世界地图对象：自然阵营关系；派系定居点：派系类别（置于原版文字之前），
 /// 额外文字由 GetExtraText 统一计算、拼装时并入，测量与绘制共用同一份文本
 /// （绘制走 DrawInspectStringText），保证高度与实际显示一致。
+/// Pawn 的「当前行动 / 排队」行在开启面板底部行动区域时由 AssembleInspectString 移除。
 /// 不使用 Harmony Prefix，直接由 InspectPanePatch.Prefix 调用。
 /// </summary>
 public static partial class InspectPanePatch
@@ -534,9 +535,10 @@ public static partial class InspectPanePatch
     }
 
     /// <summary>
-    /// Pawn 额外信息文字：特性 与 CE 高度（Combat Extended 的竖直碰撞高度，米）。
+    /// Pawn 额外信息文字：特性、动物屠宰产出（肉 / 皮）与 CE 高度（Combat Extended 的竖直碰撞高度，米）。
     /// 特性：列出该 Pawn 的全部特性（Trait.LabelCap，与原版角色卡口径一致，含等级/基因特性）；
     /// Bounded Rationality 同步：逐条按 BR「特性是否已知」判定过滤，全部未知时整行不显示。
+    /// 屠宰产出：动物（非人形）按原版 MeatAmount / LeatherAmount 统计显示屠宰可获得的肉与皮数量。
     /// CE 高度按 CE 自身实现（GetCollisionBodyFactors）计算并叠加蹲伏/飞行修正，
     /// 与其信息卡「掩护高度」口径一致。
     /// 受 Pawn 总开关 enableExtraPawnText 与其下子开关控制；CE 高度仅在 Combat Extended 激活、
@@ -589,6 +591,45 @@ public static partial class InspectPanePatch
                 {
                     AppendLineTo(sb, "BetterInspectPane.TraitLabel".Translate(names.ToString()).RawText);
                 }
+            }
+        }
+
+        // 屠宰产出：动物（非人形）屠宰后可获得的肉与皮，合并为一行（如「屠宰产出：牛肉 × 180、皮革 × 45」）。
+        // 数量取原版 MeatAmount / LeatherAmount 统计（已含体型、缺失部位、屠宰难度与难度系数），
+        // 与 Pawn.ButcherProducts 的实际口径一致。
+        if (enableExtraButcherText && pawn.RaceProps != null && !pawn.RaceProps.Humanlike)
+        {
+            try
+            {
+                string products = "";
+                if (pawn.RaceProps.meatDef != null)
+                {
+                    int meat = Mathf.RoundToInt(pawn.GetStatValue(StatDefOf.MeatAmount));
+                    if (meat > 0)
+                    {
+                        products = pawn.RaceProps.meatDef.LabelCap + " × " + meat;
+                    }
+                }
+                if (pawn.RaceProps.leatherDef != null)
+                {
+                    int leather = Mathf.RoundToInt(pawn.GetStatValue(StatDefOf.LeatherAmount));
+                    if (leather > 0)
+                    {
+                        if (products.Length > 0)
+                        {
+                            products += "BetterInspectPane.ButcherProductsSeparator".Translate();
+                        }
+                        products += pawn.RaceProps.leatherDef.LabelCap + " × " + leather;
+                    }
+                }
+                if (products.Length > 0)
+                {
+                    AppendLineTo(sb, "BetterInspectPane.ButcherProductsLabel".Translate(products));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.WarningOnce("ASQBetterInspectPane: 读取屠宰产出失败，已忽略。ex=" + ex.Message, 51578423);
             }
         }
 
@@ -653,8 +694,13 @@ public static partial class InspectPanePatch
     internal static string AssembleInspectString(ISelectable? sel, string vanilla, string extra, string pinned, string pre = "")
     {
         // Pawn：额外信息文字（含收藏统计）全部置于原版文字上方，无视置底设置。
-        if (sel is Pawn)
+        // 当前行动 / 下一个行动改由面板底部区域展示时，从原版文字中移除对应行，避免重复。
+        if (sel is Pawn pawn)
         {
+            if (enablePawns && enablePawnJobArea && ShouldShowPawnJobArea(pawn))
+            {
+                vanilla = StripPawnCurrentActionText(pawn, vanilla);
+            }
             StringBuilder pawnSb = new StringBuilder();
             AppendMergedPart(pawnSb, extra);
             AppendMergedPart(pawnSb, pinned);
@@ -676,6 +722,66 @@ public static partial class InspectPanePatch
             AppendMergedPart(sb, pinned);
         }
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// 从 Pawn 的原版信息文字中移除「当前行动」与「排队」两行（这些内容改由面板底部的
+    /// 当前行动 / 下一个行动区域展示）。按行精确匹配原版生成的内容：
+    ///   - 当前行动行 = GetJobReport().EndWithPeriod()，或「领主报告: 当前行动」组合行的后缀；
+    ///   - 排队行以原版 Queued 标签（当前语言）+ ": " 开头（仅在显示下一个行动时移除）。
+    /// 未匹配到任何行时返回原串（不产生多余分配）。
+    /// </summary>
+    private static string StripPawnCurrentActionText(Pawn pawn, string vanilla)
+    {
+        if (vanilla.NullOrEmpty())
+        {
+            return vanilla;
+        }
+
+        string? jobReport = null;
+        try
+        {
+            jobReport = pawn.GetJobReport();
+        }
+        catch (Exception)
+        {
+            // GetJobReport 内部已捕获常规异常；此处兜底，保持信息文字原样。
+        }
+        string jobLine = jobReport.NullOrEmpty() ? "" : jobReport!.EndWithPeriod();
+        string queuedPrefix = "Queued".Translate() + ": ";
+
+        string[] lines = vanilla.Split('\n');
+        StringBuilder sb = new StringBuilder(vanilla.Length);
+        bool removed = false;
+        for (int i = 0; i < lines.Length; i++)
+        {
+            string line = lines[i].TrimEnd('\r');
+            bool remove = false;
+            if (!jobLine.NullOrEmpty())
+            {
+                // 单独一行，或领主报告与当前行动拼成的「领主报告: 当前行动」行。
+                if (line == jobLine
+                    || line.EndsWith(": " + jobLine, StringComparison.Ordinal))
+                {
+                    remove = true;
+                }
+            }
+            if (!remove && pawnJobShowNext && line.StartsWith(queuedPrefix, StringComparison.Ordinal))
+            {
+                remove = true;
+            }
+            if (remove)
+            {
+                removed = true;
+                continue;
+            }
+            if (sb.Length > 0)
+            {
+                sb.Append('\n');
+            }
+            sb.Append(line);
+        }
+        return removed ? sb.ToString() : vanilla;
     }
 
     /// <summary>按「非空才参与、段间单个换行」并入一段文字（先去除段尾换行）。</summary>

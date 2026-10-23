@@ -27,6 +27,32 @@
 
   <BetterInspectPane.PawnShowSkills>显示 Pawn 技能（在普通条区域下方显示技能等级条）</BetterInspectPane.PawnShowSkills>
 
+  <BetterInspectPane.PawnSkillSplitColumns>左右分栏（左：普通条 / 右：技能条）</BetterInspectPane.PawnSkillSplitColumns>
+
+  <BetterInspectPane.PawnSkillSplitColumnsTip>开启后 Pawn 面板的普通条与技能条并排显示：左栏为普通条，右栏为技能条且每行两列。关闭则技能条仍显示在普通条下方（按「每行列数」排布）。面板整体宽度在「常规」页的「检查面板最小宽度」调整。</BetterInspectPane.PawnSkillSplitColumnsTip>
+
+  <BetterInspectPane.PawnSkillSplitRatio>左栏宽度比例：{0}%</BetterInspectPane.PawnSkillSplitRatio>
+
+  <BetterInspectPane.PawnSkillSplitRatioTip>左栏（普通条）占两栏总宽度的比例，剩余宽度归右栏（技能条）。面板整体宽度在「常规」页的「检查面板最小宽度」调整。</BetterInspectPane.PawnSkillSplitRatioTip>
+
+  <BetterInspectPane.PawnSkillSplitWidthHint>面板整体宽度在「常规」页设置。</BetterInspectPane.PawnSkillSplitWidthHint>
+
+  <BetterInspectPane.EnablePawnJobArea>显示当前行动 / 下一个行动区域</BetterInspectPane.EnablePawnJobArea>
+
+  <BetterInspectPane.EnablePawnJobAreaTip>开启后在 Pawn 面板底部单独显示当前行动与下一个行动，并从下方原版信息文字中移除当前行动与排队行；关闭则保持原版信息文字不变。</BetterInspectPane.EnablePawnJobAreaTip>
+
+  <BetterInspectPane.PawnJobShowNext>显示下一个行动</BetterInspectPane.PawnJobShowNext>
+
+  <BetterInspectPane.PawnJobAreaBelow>置于观察文本下方</BetterInspectPane.PawnJobAreaBelow>
+
+  <BetterInspectPane.PawnJobFontSize>行动区域字号：{0}</BetterInspectPane.PawnJobFontSize>
+
+  <BetterInspectPane.PawnJobLineGap>行动区域行间距：{0}</BetterInspectPane.PawnJobLineGap>
+
+  <BetterInspectPane.PawnJobShowForAllies>为盟友显示行动区域</BetterInspectPane.PawnJobShowForAllies>
+
+  <BetterInspectPane.PawnJobShowForEnemies>为敌人显示行动区域</BetterInspectPane.PawnJobShowForEnemies>
+
   <BetterInspectPane.PawnBarTooltips>Pawn 条悬浮提示</BetterInspectPane.PawnBarTooltips>
 
   <BetterInspectPane.PawnBarTooltipsTip>统一开关：悬停 Pawn 面板的技能条或需求条（心情 / 食物 / 休息 / 娱乐 / 机械能量 / 模组需求等）时显示原版对应提示——技能条显示原版角色页的技能提示，需求条显示原版需求页的需求提示（当前比例、说明、来源特性 / 基因等）。</BetterInspectPane.PawnBarTooltipsTip>
@@ -75,9 +101,9 @@
 
   <BetterInspectPane.PawnSkillBarHeight>技能条高度：{0}</BetterInspectPane.PawnSkillBarHeight>
 
-  <BetterInspectPane.PawnSkillColumnGap>技能条列间距：{0}</BetterInspectPane.PawnSkillColumnGap>
+  <BetterInspectPane.PawnSkillColumnGap>技能条横向间距：{0}</BetterInspectPane.PawnSkillColumnGap>
 
-  <BetterInspectPane.PawnSkillSpacing>技能区间隔：{0}</BetterInspectPane.PawnSkillSpacing>
+  <BetterInspectPane.PawnSkillRowGap>技能条纵向间距：{0}</BetterInspectPane.PawnSkillRowGap>
 
   <BetterInspectPane.ColorSkill>技能条颜色：</BetterInspectPane.ColorSkill>
 
@@ -640,6 +666,8 @@
 
   <BetterInspectPane.EnableExtraPawnTraitText>显示特性</BetterInspectPane.EnableExtraPawnTraitText>
 
+  <BetterInspectPane.EnableExtraButcherText>对动物显示屠宰产出（肉 / 皮）</BetterInspectPane.EnableExtraButcherText>
+
   <BetterInspectPane.EnableExtraMapTileText>在世界地图空地砖信息末尾显示靠近污染 / 靠近其它势力</BetterInspectPane.EnableExtraMapTileText>
 
   <BetterInspectPane.EnableSelectionLimitModify>修改选择数量限制</BetterInspectPane.EnableSelectionLimitModify>
@@ -733,6 +761,14 @@
   <BetterInspectPane.CeHeightLabel>高度：{0} 米</BetterInspectPane.CeHeightLabel>
 
   <BetterInspectPane.TraitLabel>特性：{0}</BetterInspectPane.TraitLabel>
+
+  <BetterInspectPane.ButcherProductsLabel>屠宰产出：{0}</BetterInspectPane.ButcherProductsLabel>
+
+  <BetterInspectPane.ButcherProductsSeparator>、</BetterInspectPane.ButcherProductsSeparator>
+
+  <BetterInspectPane.CurrentJobLabel>当前行动：{0}</BetterInspectPane.CurrentJobLabel>
+
+  <BetterInspectPane.NextJobLabel>下一个行动：{0}</BetterInspectPane.NextJobLabel>
 
   <BetterInspectPane.NearPollutionLabel>靠近污染：{0}</BetterInspectPane.NearPollutionLabel>
 

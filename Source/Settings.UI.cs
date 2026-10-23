@@ -645,6 +645,49 @@ public partial class MyModTemplateSettings : ModSettings
                 }
             }
         }
+        // Pawn 当前行动 / 下一个行动区域（位置、字号、间距与关系开关）。
+        if (enablePawns)
+        {
+            Rect jobAreaRect = new Rect(x, y, width, RowHeight);
+            Widgets.CheckboxLabeled(jobAreaRect, "BetterInspectPane.EnablePawnJobArea".Translate(), ref enablePawnJobArea);
+            TooltipHandler.TipRegion(jobAreaRect, "BetterInspectPane.EnablePawnJobAreaTip".Translate());
+            y += RowGap;
+
+            if (enablePawnJobArea)
+            {
+                float indent = 20f;
+
+                // 是否显示下一个行动。
+                Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
+                    "BetterInspectPane.PawnJobShowNext".Translate(), ref pawnJobShowNext);
+                y += RowGap;
+
+                // 位置：观察文本上方（默认）或下方（面板最底部）。
+                Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
+                    "BetterInspectPane.PawnJobAreaBelow".Translate(), ref pawnJobAreaBelowInspectText);
+                y += RowGap;
+
+                // 字号 / 行间距：并排显示在同一行的左右两列，默认值与原版检查文本一致。
+                {
+                    float colW = (width - indent - ItemGap) / 2f;
+                    pawnJobFontSize = Mathf.RoundToInt(HorizontalSlider(
+                        new Rect(x + indent, y, colW, SliderHeight), pawnJobFontSize, 8f, 24f,
+                        label: "BetterInspectPane.PawnJobFontSize".Translate(pawnJobFontSize), roundTo: 1f));
+                    pawnJobLineGap = HorizontalSlider(
+                        new Rect(x + indent + colW + ItemGap, y, colW, SliderHeight), pawnJobLineGap, 0f, 12f,
+                        label: "BetterInspectPane.PawnJobLineGap".Translate(Mathf.RoundToInt(pawnJobLineGap)), roundTo: 1f);
+                    y += SliderGap;
+                }
+
+                // 关系开关：玩家自己的 Pawn、无阵营与中立阵营始终显示。
+                Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
+                    "BetterInspectPane.PawnJobShowForAllies".Translate(), ref pawnJobShowForAllies);
+                y += RowGap;
+                Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
+                    "BetterInspectPane.PawnJobShowForEnemies".Translate(), ref pawnJobShowForEnemies);
+                y += RowGap;
+            }
+        }
         // Pawn 技能区（需 enablePawns 开启自定义 Pawn 面板内容；与 overrideInspectPane 无关）。
         if (enablePawns)
         {
@@ -678,13 +721,38 @@ public partial class MyModTemplateSettings : ModSettings
                 TooltipHandler.TipRegion(skillWhiteFontRect, "BetterInspectPane.PawnSkillWhiteFontTip".Translate());
                 y += RowGap;
 
-                // 每行列数（3 / 4 / 6）：标签 + 下拉并排。
-                float skillColLabelW = Text.CalcSize("BetterInspectPane.PawnSkillColumns".Translate()).x;
-                Widgets.Label(new Rect(x, y, skillColLabelW, RowHeight), "BetterInspectPane.PawnSkillColumns".Translate());
-                DoEnumDropdown(x + skillColLabelW + 4f, y - dropdownNudgeY, width - skillColLabelW - 4f, RowHeight,
-                    "BetterInspectPane.PawnSkillColumns".Translate(), true, pawnSkillColumns, v => pawnSkillColumns = v,
-                    v => ("BetterInspectPane.PawnSkillColumns_" + v).Translate());
+                // 左右分栏（左：普通条 / 右：技能条，右栏固定每行 2 列）。
+                Rect skillSplitRect = new Rect(x, y, width, RowHeight);
+                Widgets.CheckboxLabeled(skillSplitRect, "BetterInspectPane.PawnSkillSplitColumns".Translate(), ref pawnSkillSplitColumns);
+                TooltipHandler.TipRegion(skillSplitRect, "BetterInspectPane.PawnSkillSplitColumnsTip".Translate());
                 y += RowGap;
+
+                if (pawnSkillSplitColumns)
+                {
+                    // 左栏宽度比例：左栏普通条占两栏总宽度的比例，右栏技能条占剩余宽度。
+                    // 面板整体宽度在「常规」页的「检查面板最小宽度」调整。
+                    Rect splitRatioRect = new Rect(x, y, width, SliderHeight);
+                    pawnSkillSplitRatio = HorizontalSlider(splitRatioRect, pawnSkillSplitRatio, 0.2f, 0.8f,
+                        label: "BetterInspectPane.PawnSkillSplitRatio".Translate(
+                            Mathf.RoundToInt(pawnSkillSplitRatio * 100f)), roundTo: 0.05f);
+                    TooltipHandler.TipRegion(splitRatioRect, "BetterInspectPane.PawnSkillSplitRatioTip".Translate());
+                    y += SliderGap;
+
+                    // 宽度提示：整体宽度不在此处设置，避免重复控件。
+                    Widgets.Label(new Rect(x, y, width, RowHeight),
+                        "BetterInspectPane.PawnSkillSplitWidthHint".Translate());
+                    y += RowGap;
+                }
+                else
+                {
+                    // 每行列数（3 / 4 / 6）：标签 + 下拉并排（左右分栏关闭时生效）。
+                    float skillColLabelW = Text.CalcSize("BetterInspectPane.PawnSkillColumns".Translate()).x;
+                    Widgets.Label(new Rect(x, y, skillColLabelW, RowHeight), "BetterInspectPane.PawnSkillColumns".Translate());
+                    DoEnumDropdown(x + skillColLabelW + 4f, y - dropdownNudgeY, width - skillColLabelW - 4f, RowHeight,
+                        "BetterInspectPane.PawnSkillColumns".Translate(), true, pawnSkillColumns, v => pawnSkillColumns = v,
+                        v => ("BetterInspectPane.PawnSkillColumns_" + v).Translate());
+                    y += RowGap;
+                }
 
                 // 激情表示方式（文本 + / ++ / 原版图标）：标签 + 下拉并排。
                 float passionLabelW = Text.CalcSize("BetterInspectPane.PawnSkillPassionStyle".Translate()).x;
@@ -720,14 +788,14 @@ public partial class MyModTemplateSettings : ModSettings
                     y += SliderGap;
                 }
 
-                // 列间距 / 间隔：并排显示在同一行的左右两列。
-                // 列间距 = 相邻两列之间的空隙；间隔 = 技能行之间、以及与上下分隔线的间隔。
+                // 横向间距 / 纵向间距：并排显示在同一行的左右两列。
+                // 横向 = 相邻两列之间的空隙；纵向 = 相邻两行之间的空隙。
                 {
                     float colW = (width - ItemGap) / 2f;
                     pawnSkillColumnGap = HorizontalSlider(new Rect(x, y, colW, SliderHeight), pawnSkillColumnGap, 0f, 12f,
                         label: "BetterInspectPane.PawnSkillColumnGap".Translate(Mathf.RoundToInt(pawnSkillColumnGap)), roundTo: 1f);
-                    pawnSkillSpacing = HorizontalSlider(new Rect(x + colW + ItemGap, y, colW, SliderHeight), pawnSkillSpacing, 0f, 12f,
-                        label: "BetterInspectPane.PawnSkillSpacing".Translate(Mathf.RoundToInt(pawnSkillSpacing)), roundTo: 1f);
+                    pawnSkillRowGap = HorizontalSlider(new Rect(x + colW + ItemGap, y, colW, SliderHeight), pawnSkillRowGap, 0f, 12f,
+                        label: "BetterInspectPane.PawnSkillRowGap".Translate(Mathf.RoundToInt(pawnSkillRowGap)), roundTo: 1f);
                     y += SliderGap;
                 }
             }
@@ -1165,6 +1233,10 @@ public partial class MyModTemplateSettings : ModSettings
 
             // 特性：列出该 Pawn 的全部特性。
             Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight), "BetterInspectPane.EnableExtraPawnTraitText".Translate(), ref enableExtraPawnTraitText);
+            y += RowGap;
+
+            // 动物屠宰产出：显示屠宰后可获得的肉与皮。
+            Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight), "BetterInspectPane.EnableExtraButcherText".Translate(), ref enableExtraButcherText);
             y += RowGap;
 
             // Pawn 的 CE 高度（Combat Extended 的竖直碰撞高度）。

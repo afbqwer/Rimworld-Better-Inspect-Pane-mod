@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using RimWorld;
 using RimWorld.Planet;
 using HarmonyLib;
@@ -27,6 +28,8 @@ public static partial class InspectPanePatch
     // 右下角设置按钮（图标按钮，样式同 RimHUD）：边距与按钮边长。
     private const float SettingsButtonMargin = 2f;
     private const float SettingsButtonHeight = 16f;
+    // 行动区域位于观察文本下方时，底部额外留白，避免最后一行文字贴住面板边缘被裁切。
+    private const float JobAreaBottomPadding = 2f;
 
     // 设置按钮图标材质
     private static Texture2D? SettingsIconTex = ContentFinder<Texture2D>.Get("UI/Icons/Options/OptionsGeneral", true);
@@ -304,31 +307,57 @@ public static partial class InspectPanePatch
                 }
             }
 
-            // (2)-(6) 进度条区：收集可见条并按显示顺序排布（可选两列布局）。
-            // Thing 走原有条，世界地图对象走剩余时间 / 阵营关系条，区域走已种植 / 容量 / 鱼条。
-            y = thing != null
-                ? DrawBarBlock(rect, thing, y, out bool anyBars)
-                : (worldObject != null
-                    ? DrawWorldObjectBarBlock(rect, worldObject, y, out anyBars)
-                    : DrawZoneBarBlock(rect, zone!, y, out anyBars));
+            // Pawn 当前行动 / 下一个行动文本：每帧只计算一次，位置（观察文本上方 / 下方）只影响布局。
+            Pawn? jobPawn = thing as Pawn;
+            string currentJobLine = "";
+            string nextJobLine = "";
+            bool jobHasContent = jobPawn != null
+                && TryGetPawnJobLines(jobPawn, out currentJobLine, out nextJobLine);
+            bool jobBelowInfo = jobHasContent && pawnJobAreaBelowInspectText;
+            float jobReservedHeight = jobBelowInfo
+                ? CalcPawnJobBlockHeight(rect, currentJobLine, nextJobLine, reserveSettingsButtonSpace: true)
+                : 0f;
 
-            // (6.5) Pawn 技能区：在普通条区域下方（以分隔线相隔）绘制多列技能等级条。
+            // (2)-(6) 进度条区：收集可见条并按显示顺序排布（可选两列布局）。
+            // Pawn 走「普通条 + 技能区」合并布局（技能区开启左右分栏时并排绘制）；
+            // 其余 Thing 走原有条，世界地图对象走剩余时间 / 阵营关系条，区域走已种植 / 容量 / 鱼条。
+            bool anyBars;
             bool skillDrawn = false;
-            if (thing is Pawn skillPawn)
+            if (thing is Pawn pawnContent)
             {
-                y = DrawPawnSkillBlock(rect, skillPawn, y, out skillDrawn);
+                y = DrawPawnContentBlock(rect, pawnContent, y, out anyBars, out skillDrawn);
+            }
+            else if (thing != null)
+            {
+                y = DrawBarBlock(rect, thing, y, out anyBars);
+            }
+            else if (worldObject != null)
+            {
+                y = DrawWorldObjectBarBlock(rect, worldObject, y, out anyBars);
+            }
+            else
+            {
+                y = DrawZoneBarBlock(rect, zone!, y, out anyBars);
             }
 
-            // (7) bottom separator: bars/skills -> info. 若无任何条可显示，则不绘制该分隔线。
-            if (anyBars || skillDrawn)
+            // (6.5) 当前行动 / 下一个行动区域（位于观察文本上方时）：绘制在普通条 / 技能区之后。
+            bool jobAbove = jobHasContent && !jobBelowInfo;
+            if (jobAbove)
+            {
+                y = DrawPawnJobBlock(rect, y, anyBars || skillDrawn, currentJobLine, nextJobLine);
+            }
+
+            // (7) bottom separator: bars/skills/jobs -> info. 若无任何内容可显示，则不绘制该分隔线。
+            if (anyBars || skillDrawn || jobAbove)
             {
                 y = DrawSeparator(rect.width, y);
             }
 
             // (8) vanilla inspect string below. 直接铺满剩余高度，设置按钮绘制在其上（通常不会重叠）。
+            // 行动区域位于观察文本下方时，底部预留其高度；自适应面板高度会把该预留一并计入所需高度。
             Rect info = rect.AtZero();
             info.yMin = y;
-            info.yMax = rect.height;
+            info.yMax = Mathf.Max(y, rect.height - jobReservedHeight);
             // 开启「覆盖 InspectString 绘制」时用本模组自己的实现（帧缓存 + 自适应高度）。
             if (overrideInspectString)
             {
@@ -337,6 +366,12 @@ public static partial class InspectPanePatch
             else
             {
                 InspectPaneFiller.DrawInspectStringFor(sel, info);
+            }
+
+            // (8.5) 当前行动 / 下一个行动区域（位于观察文本下方时）：绘制在面板最底部。
+            if (jobBelowInfo)
+            {
+                DrawPawnJobBlockBelow(rect, info.yMax, currentJobLine, nextJobLine);
             }
 
             // (9) 右下角设置按钮：游戏进行中打开独立设置窗口（图标按钮）。
@@ -891,6 +926,284 @@ public static partial class InspectPanePatch
     }
 
     /// <summary>
+    /// Pawn 面板的「普通条 + 技能区」内容块：
+    ///   - 关闭技能区或没有技能时：仅按 Pawn 布局绘制普通条；
+    ///   - 开启技能区但未开启左右分栏时：普通条在上、技能条在下（沿用 pawnSkillColumns）；
+    ///   - 开启左右分栏时：左栏普通条（沿用 Pawn 布局），右栏技能条固定每行 2 列，两栏高度取较大者。
+    /// 普通条与技能条各自收集（是否可见由各自 Spec / 过滤器判断），
+    /// anyBars / skillDrawn 供调用方决定是否绘制底部分隔线。
+    /// </summary>
+    private static float DrawPawnContentBlock(Rect rect, Pawn pawn, float y, out bool anyBars, out bool skillDrawn)
+    {
+        List<BarRowInfo> bars = CollectPawnBars(pawn);
+        anyBars = bars.Count > 0;
+        List<SkillRecord>? skills = CollectVisiblePawnSkills(pawn);
+        skillDrawn = skills != null;
+        int columns = PawnLayoutColumns;
+
+        // 未开启左右分栏（或没有技能）：普通条与技能条上下排列。
+        if (skills == null || !pawnSkillSplitColumns)
+        {
+            if (anyBars)
+            {
+                y = columns == 1
+                    ? DrawBarsSingleColumn(rect, bars, y)
+                    : DrawBarsGrid(rect, bars, y, columns, pawnColumnGap, pawnEvenSplitTwoBarRows);
+            }
+            if (skills != null)
+            {
+                y = DrawPawnSkillBlock(rect, skills, y);
+            }
+            return y;
+        }
+
+        // 左右分栏：左栏普通条、右栏技能条（每行固定 2 列）。
+        // 面板整体宽度由「常规」页的检查面板最小宽度控制，此处只按比例分配左右两栏。
+        float ratio = Mathf.Clamp(pawnSkillSplitRatio, 0.2f, 0.8f);
+        float gap = Mathf.Max(0f, pawnColumnGap);
+        float leftWidth = (rect.width - gap) * ratio;
+        float rightWidth = rect.width - gap - leftWidth;
+        Rect leftRect = new Rect(rect.x, y, leftWidth, rect.height);
+        Rect rightRect = new Rect(rect.x + leftWidth + gap, y, rightWidth, rect.height);
+
+        float leftBottom = anyBars
+            ? (columns == 1
+                ? DrawBarsSingleColumn(leftRect, bars, y)
+                : DrawBarsGrid(leftRect, bars, y, columns, pawnColumnGap, pawnEvenSplitTwoBarRows))
+            : y;
+        float rightBottom = DrawPawnSkillGrid(rightRect, skills, y, 2);
+        return Mathf.Max(leftBottom, rightBottom) + pawnSkillSpacing;
+    }
+
+    /// <summary>
+    /// 收集该 Pawn 要显示的行动区域文本（已带标签）：当前行动 + 可选的下一行动。
+    /// 功能关闭、按关系开关不显示、或两者都为空时返回 false。
+    /// </summary>
+    private static bool TryGetPawnJobLines(Pawn pawn, out string currentLine, out string nextLine)
+    {
+        currentLine = "";
+        nextLine = "";
+        if (!enablePawnJobArea || !ShouldShowPawnJobArea(pawn))
+        {
+            return false;
+        }
+
+        string? current = CurrentActionReport(pawn);
+        if (!current.NullOrEmpty())
+        {
+            currentLine = "BetterInspectPane.CurrentJobLabel".Translate(current!);
+        }
+        if (pawnJobShowNext)
+        {
+            string? next = NextActionReport(pawn);
+            if (!next.NullOrEmpty())
+            {
+                nextLine = "BetterInspectPane.NextJobLabel".Translate(next!);
+            }
+        }
+        return !currentLine.NullOrEmpty() || !nextLine.NullOrEmpty();
+    }
+
+    /// <summary>
+    /// 按与玩家的关系判定是否显示行动区域：玩家自己的 Pawn、无阵营与中立阵营始终显示；
+    /// 盟友 / 敌人分别由 pawnJobShowForAllies / pawnJobShowForEnemies 控制。
+    /// </summary>
+    private static bool ShouldShowPawnJobArea(Pawn pawn)
+    {
+        Faction? faction = pawn.Faction;
+        if (faction == null)
+        {
+            return true;
+        }
+        Faction? player = Faction.OfPlayerSilentFail;
+        if (player == null || faction == player)
+        {
+            return true;
+        }
+        switch (faction.RelationKindWith(player))
+        {
+            case FactionRelationKind.Ally:
+                return pawnJobShowForAllies;
+            case FactionRelationKind.Hostile:
+                return pawnJobShowForEnemies;
+            default:
+                return true;
+        }
+    }
+
+    /// <summary>
+    /// 行动区域（观察文本上方）：separatorAbove 为 true（上方已有普通条 / 技能区）时先补一条分隔线与行距，
+    /// 调用方随后再绘制底部分隔线；最后补一个行距，避免与分隔线贴在一起。
+    /// </summary>
+    private static float DrawPawnJobBlock(Rect rect, float y, bool separatorAbove,
+        string currentLine, string nextLine)
+    {
+        if (separatorAbove)
+        {
+            if (showSeparators)
+            {
+                y = DrawSeparator(rect.width, y);
+            }
+            y += rowSpacing;
+        }
+        y = DrawPawnJobLines(rect, y, currentLine, nextLine);
+        return y + rowSpacing;
+    }
+
+    /// <summary>
+    /// 行动区域（观察文本下方）：从预留区顶部绘制分隔线，再绘制行动文本。
+    /// 文本宽度为面板宽度减去右下角设置按钮宽度，避免按钮覆盖文字。
+    /// </summary>
+    private static void DrawPawnJobBlockBelow(Rect rect, float y, string currentLine, string nextLine)
+    {
+        Rect area = new Rect(rect.x, y, JobAreaWidth(rect, reserveSettingsButtonSpace: true), rect.height - y);
+        if (showSeparators)
+        {
+            y = DrawSeparator(rect.width, y);
+        }
+        y += rowSpacing;
+        DrawPawnJobLines(area, y, currentLine, nextLine);
+    }
+
+    /// <summary>预留行动区域所需高度（含观察文本下方的分隔线与行距），供画观察文本前收缩其矩形。</summary>
+    private static float CalcPawnJobBlockHeight(Rect rect, string currentLine, string nextLine,
+        bool reserveSettingsButtonSpace)
+    {
+        float width = JobAreaWidth(rect, reserveSettingsButtonSpace);
+        float height = 0f;
+        if (showSeparators)
+        {
+            height += separatorHeight;
+        }
+        height += rowSpacing;
+
+        bool first = true;
+        if (!currentLine.NullOrEmpty())
+        {
+            height += CalcPawnJobLineHeight(width, currentLine);
+            first = false;
+        }
+        if (!nextLine.NullOrEmpty())
+        {
+            if (!first)
+            {
+                height += pawnJobLineGap;
+            }
+            height += CalcPawnJobLineHeight(width, nextLine);
+        }
+        return height + JobAreaBottomPadding;
+    }
+
+    /// <summary>行动区域可用文本宽度（位于观察文本下方时为设置按钮预留右侧空间）。</summary>
+    private static float JobAreaWidth(Rect rect, bool reserveSettingsButtonSpace)
+    {
+        float reserved = reserveSettingsButtonSpace ? SettingsButtonHeight + SettingsButtonMargin : 0f;
+        return Mathf.Max(1f, rect.width - reserved);
+    }
+
+    /// <summary>按行动区域字号计算一行文本的换行高度。</summary>
+    private static float CalcPawnJobLineHeight(float width, string text)
+    {
+        bool prevWordWrap = Text.WordWrap;
+        Text.WordWrap = true;
+        try
+        {
+            using (new FontSizeScope(pawnJobFontSize))
+            {
+                return Text.CalcHeight(text, Mathf.Max(1f, width));
+            }
+        }
+        finally
+        {
+            Text.WordWrap = prevWordWrap;
+        }
+    }
+
+    /// <summary>绘制行动区域的所有行（当前行动与可选的下一个行动），行间使用 pawnJobLineGap。</summary>
+    private static float DrawPawnJobLines(Rect area, float y, string currentLine, string nextLine)
+    {
+        bool first = true;
+        if (!currentLine.NullOrEmpty())
+        {
+            y = DrawPawnJobLine(area, y, currentLine);
+            first = false;
+        }
+        if (!nextLine.NullOrEmpty())
+        {
+            if (!first)
+            {
+                y += pawnJobLineGap;
+            }
+            y = DrawPawnJobLine(area, y, nextLine);
+        }
+        return y;
+    }
+
+    /// <summary>绘制一行行动文本（按动作区域字号、自动换行），返回行底 y。</summary>
+    private static float DrawPawnJobLine(Rect rect, float y, string text)
+    {
+        float height = CalcPawnJobLineHeight(rect.width, text);
+        bool prevWordWrap = Text.WordWrap;
+        Text.WordWrap = true;
+        try
+        {
+            using (new FontSizeScope(pawnJobFontSize))
+            {
+                Widgets.Label(new Rect(rect.x, y, rect.width, height), text);
+            }
+        }
+        finally
+        {
+            Text.WordWrap = prevWordWrap;
+        }
+        return y + height;
+    }
+
+    /// <summary>当前行动报告（与原版信息文字同口径：优先领主任务报告，其次当前 JobDriver 报告）。</summary>
+    private static string? CurrentActionReport(Pawn pawn)
+    {
+        try
+        {
+            return pawn.GetJobReport();
+        }
+        catch (Exception ex)
+        {
+            Log.WarningOnce("ASQBetterInspectPane: 读取当前行动失败，已忽略。ex=" + ex.Message, 61728391);
+            return null;
+        }
+    }
+
+    /// <summary>下一个行动报告：取作业队列首项的报告（队列多于 1 项时附加剩余数量）。</summary>
+    private static string? NextActionReport(Pawn pawn)
+    {
+        Pawn_JobTracker? tracker = pawn.jobs;
+        if (tracker == null || tracker.jobQueue.Count == 0)
+        {
+            return null;
+        }
+        try
+        {
+            Verse.AI.Job? job = tracker.jobQueue[0].job;
+            if (job == null)
+            {
+                return null;
+            }
+            string report = job.GetReport(pawn).CapitalizeFirst();
+            if (report.NullOrEmpty())
+            {
+                return null;
+            }
+            int remaining = tracker.jobQueue.Count - 1;
+            return remaining > 0 ? report + " (+" + remaining + ")" : report;
+        }
+        catch (Exception ex)
+        {
+            Log.WarningOnce("ASQBetterInspectPane: 读取下一个行动失败，已忽略。ex=" + ex.Message, 61728392);
+            return null;
+        }
+    }
+
+    /// <summary>
     /// 世界地图对象进度条区：收集剩余时间 / 阵营关系条并按显示顺序排布后绘制，返回新的 y。
     /// 布局（单列/两列/三列/四列）与 Thing 条共用。
     /// </summary>
@@ -1276,34 +1589,37 @@ public static partial class InspectPanePatch
     };
 
     /// <summary>
-    /// Pawn 技能区：在普通条区域下方（以分隔线相隔）绘制技能等级条网格（多列平铺的嵌入样式条）。
-    /// 每个条：标签 = 技能名（左）、数值 = 技能等级（右）、填充 = 升级进度（XpProgressPercent）。
-    /// 只取原版 12 技能，按原版技能页顺序（listOrder 降序）排列。
-    /// 技能行之间、以及与上下分隔线之间使用 pawnSkillSpacing 间隔；列宽取整到整数像素、
-    /// 余数像素分给前几列，保证每条宽度与列间距均为整数、右缘严丝合缝（无浮点残差）。
-    /// 未开启或无技能时直接返回原 y 且 skillDrawn 为 false。
+    /// 收集当前可显示的技能记录（已按原版技能页顺序 listOrder 降序排列）：
+    /// 技能区关闭、无技能组件、Bounded Rationality 判定技能未知、或过滤后无技能时返回 null。
+    /// 返回的是复用的静态列表，调用方须在本帧内消费完毕。
     /// </summary>
-    private static float DrawPawnSkillBlock(Rect rect, Pawn pawn, float y, out bool skillDrawn)
+    private static List<SkillRecord>? CollectVisiblePawnSkills(Pawn pawn)
     {
-        skillDrawn = false;
         // Bounded Rationality 同步：技能信息未知时隐藏技能区（BR 隐藏技能页口径）。
         if (!pawnShowSkills || pawn.skills == null || !BoundedRationalityReflection.IsSkillsKnown(pawn))
         {
-            return y;
+            return null;
         }
 
         // 只取原版 12 技能（缺失的记录跳过；通常全部存在）。
         List<SkillRecord> skills = CollectVanillaSkills(pawn);
-        // Bounded Rationality 同步：技能与特性一样逐个解锁（按等级从高到低、随在殖民地时间逐步解锁），
-        // 逐条按 BR「技能是否已知」过滤（Skills 类别未知时全部未知）；全部未知时整个技能区不显示。
+        // Bounded Rationality 同步：技能与特性一样逐个解锁，逐条按 BR「技能是否已知」过滤。
         skills.RemoveAll(skill => !BoundedRationalityReflection.IsSkillKnown(skill));
         if (skills.Count == 0)
         {
-            return y;
+            return null;
         }
         // 按原版技能页顺序（listOrder 降序）排列，保证与角色页一致。
         skills.SortByDescending(s => s.def.listOrder);
+        return skills;
+    }
 
+    /// <summary>
+    /// 上下排列的技能区：在普通条区域下方以分隔线相隔绘制技能网格（每行 pawnSkillColumns 列），
+    /// 网格上下各留 pawnSkillSpacing 间隔。仅在未开启左右分栏时使用。
+    /// </summary>
+    private static float DrawPawnSkillBlock(Rect rect, List<SkillRecord> skills, float y)
+    {
         float spacing = pawnSkillSpacing;
 
         // 分隔线（普通条区域与技能区之间），随后留间隔进入技能网格。
@@ -1313,16 +1629,27 @@ public static partial class InspectPanePatch
         }
         y += spacing;
 
-        // 网格：每行 columns 列、行间留 spacing。列宽先向下取整到整数像素，
-        // 除不尽的余数像素分给前几列各 +1px，使每条宽度与列间距都是整数、右缘严丝合缝
-        //（列间距滑杆按整数步进、面板宽度亦为整数，故 总宽 = 各列宽之和 + 列间距之和，无浮点残差）。
-        int columns = (int)pawnSkillColumns;
+        y = DrawPawnSkillGrid(rect, skills, y, (int)pawnSkillColumns);
+
+        // 与下方分隔线的间隔（网格底部）。
+        return y + spacing;
+    }
+
+    /// <summary>
+    /// 绘制技能条网格：每行 columns 列，横向间距 pawnSkillColumnGap、纵向间距 pawnSkillRowGap。
+    /// 列宽先向下取整到整数像素，除不尽的余数像素分给前几列各 +1px，
+    /// 使每条宽度与列间距都是整数、右缘严丝合缝（列间距滑杆按整数步进、面板宽度亦为整数）。
+    /// area.x 可非零（左右分栏时右栏起点），绘制状态与分层绘制逻辑与原先一致。返回网格底部 y。
+    /// </summary>
+    private static float DrawPawnSkillGrid(Rect area, List<SkillRecord> skills, float y, int columns)
+    {
         float colGap = pawnSkillColumnGap;
+        float rowGap = pawnSkillRowGap;
         float barHeight = pawnSkillBarHeight;
-        float barSpace = rect.width - colGap * (columns - 1); // 条可用的总宽度
+        float barSpace = area.width - colGap * (columns - 1); // 条可用的总宽度
         int baseColWidth = Mathf.Max(1, Mathf.FloorToInt(barSpace / columns));
         int extraPx = Mathf.Max(0, Mathf.FloorToInt(barSpace) - baseColWidth * columns); // 余数：前 extraPx 列各 +1px
-        float rowHeight = barHeight + colGap;
+        float rowHeight = barHeight + rowGap;
         int rows = (skills.Count + columns - 1) / columns;
 
         // 先收集所有技能条的绘制状态，再分层绘制：底色/填充连续绘制可合并为少量批次；
@@ -1332,20 +1659,16 @@ public static partial class InspectPanePatch
         {
             int row = i / columns;
             int col = i % columns;
-            // 列宽 = 基础宽 + 前 extraPx 列各多 1px；左缘 = 前面各列宽之和 + 前面各列间距之和。
+            // 列宽 = 基础宽 + 前 extraPx 列各多 1px；左缘 = 区域起点 + 前面各列宽之和 + 前面各列间距之和。
             float width = baseColWidth + (col < extraPx ? 1 : 0);
-            float x = col * colGap + col * baseColWidth + Mathf.Min(col, extraPx);
+            float x = area.x + col * colGap + col * baseColWidth + Mathf.Min(col, extraPx);
             float rowY = y + row * rowHeight;
             PrepareSkillBarVisual(new Rect(x, rowY, width, barHeight), skills[i], out SkillBarVisual visual);
             skillBarVisuals.Add(visual);
         }
         DrawSkillBarLayers();
 
-        // 与下方分隔线的间隔（网格底部）。
-        y += rows * barHeight + (rows-1) * colGap + spacing;
-
-        skillDrawn = true;
-        return y;
+        return y + rows * barHeight + (rows - 1) * rowGap;
     }
 
     /// <summary>收集 Pawn 的原版 12 技能记录（SkillDefOf 中为 null 的条目跳过）。</summary>
