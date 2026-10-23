@@ -43,6 +43,10 @@
 
   <BetterInspectPane.PawnJobShowNext>显示下一个行动</BetterInspectPane.PawnJobShowNext>
 
+  <BetterInspectPane.PawnJobReserveNextHeight>总是为下一个行动预留高度</BetterInspectPane.PawnJobReserveNextHeight>
+
+  <BetterInspectPane.PawnJobReserveNextHeightTip>即使当前没有下一个行动，也为它保留一行高度，避免下一个行动出现或消失时面板高度跳动。</BetterInspectPane.PawnJobReserveNextHeightTip>
+
   <BetterInspectPane.PawnJobAreaBelow>置于观察文本下方</BetterInspectPane.PawnJobAreaBelow>
 
   <BetterInspectPane.PawnJobFontSize>行动区域字号：{0}</BetterInspectPane.PawnJobFontSize>

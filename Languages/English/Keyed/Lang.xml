@@ -43,6 +43,10 @@
 
   <BetterInspectPane.PawnJobShowNext>Show next action</BetterInspectPane.PawnJobShowNext>
 
+  <BetterInspectPane.PawnJobReserveNextHeight>Always reserve height for the next action</BetterInspectPane.PawnJobReserveNextHeight>
+
+  <BetterInspectPane.PawnJobReserveNextHeightTip>Even when there is no next action, keep one line of height reserved for it so the panel does not jump when a next action appears or disappears.</BetterInspectPane.PawnJobReserveNextHeightTip>
+
   <BetterInspectPane.PawnJobAreaBelow>Place below the inspect text</BetterInspectPane.PawnJobAreaBelow>
 
   <BetterInspectPane.PawnJobFontSize>Action area font size: {0}</BetterInspectPane.PawnJobFontSize>

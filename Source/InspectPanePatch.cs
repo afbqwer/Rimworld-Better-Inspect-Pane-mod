@@ -992,6 +992,7 @@ public static partial class InspectPanePatch
     private static int cachedJobLayoutFrame = -1000;
     private static float cachedJobLayoutWidth = -1f;
     private static int cachedJobLayoutFontSize;
+    private static bool cachedJobLayoutReserveNext;
     private static PawnJobLayout cachedJobLayout;
 
     /// <summary>行动区域的排版结果：已带标签的文本与实测行高/行距，绘制与预留高度共用，避免重复测量。</summary>
@@ -1003,6 +1004,7 @@ public static partial class InspectPanePatch
         public float currentHeight;
         public float nextHeight;
         public float lineStep; // 两行时第二行相对第一行顶部的真实行距（不含额外配置的行间距）
+        public bool reserveNext; // 没有实际下一行动，但仍为它预留高度
     }
 
     /// <summary>
@@ -1062,32 +1064,39 @@ public static partial class InspectPanePatch
         if (ReferenceEquals(cachedJobLayoutPawn, cachedJobPawn)
             && cachedJobLayoutFrame == cachedJobFrame
             && Mathf.Abs(cachedJobLayoutWidth - width) < 0.5f
-            && cachedJobLayoutFontSize == pawnJobFontSize)
+            && cachedJobLayoutFontSize == pawnJobFontSize
+            && cachedJobLayoutReserveNext == pawnJobReserveNextHeight)
         {
             return cachedJobLayout;
         }
 
         PawnJobLayout layout = default;
-        layout.currentLine = currentLine;
-        layout.nextLine = nextLine;
-        if (!currentLine.NullOrEmpty())
+        layout.currentLine = TruncatePawnJobLine(width, currentLine);
+        layout.nextLine = TruncatePawnJobLine(width, nextLine);
+        bool hasCurrent = !currentLine.NullOrEmpty();
+        bool hasNext = !nextLine.NullOrEmpty();
+        // 行动文本按单行绘制（过长截断，不换行），因此所有行的高度相同，直接复用实际行测得的单行行高。
+        string probeLine = hasCurrent ? currentLine : nextLine;
+        float lineHeight = CalcPawnJobLineHeight(width, probeLine);
+        layout.currentHeight = lineHeight;
+        layout.nextHeight = lineHeight;
+        if (!hasNext && hasCurrent && pawnJobShowNext && pawnJobReserveNextHeight)
         {
-            layout.currentHeight = CalcPawnJobLineHeight(width, currentLine);
+            // 没有实际下一个行动：仍按单行高度预留，避免它出现时面板高度跳动。
+            layout.reserveNext = true;
         }
-        if (!nextLine.NullOrEmpty())
+        if (hasCurrent && (hasNext || layout.reserveNext))
         {
-            layout.nextHeight = CalcPawnJobLineHeight(width, nextLine);
+            // 两行行距取 Unity 多行排版下的真实步进（单行不换行时与文本内容无关，同字号下恒定）。
+            layout.lineStep = CalcPawnJobLineStep(width, probeLine, probeLine, lineHeight);
         }
-        if (!currentLine.NullOrEmpty() && !nextLine.NullOrEmpty())
-        {
-            layout.lineStep = CalcPawnJobLineStep(width, currentLine, nextLine, layout.nextHeight);
-        }
-        layout.hasContent = !currentLine.NullOrEmpty() || !nextLine.NullOrEmpty();
+        layout.hasContent = hasCurrent || hasNext;
 
         cachedJobLayoutPawn = cachedJobPawn;
         cachedJobLayoutFrame = cachedJobFrame;
         cachedJobLayoutWidth = width;
         cachedJobLayoutFontSize = pawnJobFontSize;
+        cachedJobLayoutReserveNext = pawnJobReserveNextHeight;
         cachedJobLayout = layout;
         return layout;
     }
@@ -1167,7 +1176,7 @@ public static partial class InspectPanePatch
             height += separatorHeight;
         }
         height += rowSpacing;
-        if (hasCurrent && hasNext)
+        if (hasCurrent && (hasNext || layout.reserveNext))
         {
             // 两行总高按 Unity 多行文本的真实行距计算，而不是把两次单行 CalcHeight 直接相加
             //（单行高度含样式自身的上下留白，直接叠加会让 0 行间距看起来也偏大）。
@@ -1191,16 +1200,38 @@ public static partial class InspectPanePatch
         return Mathf.Max(1f, rect.width - reserved);
     }
 
-    /// <summary>按行动区域字号计算一行文本的换行高度。</summary>
+    /// <summary>按行动区域字号计算单行高度（强制不换行：行动文本按单行显示，过长截断）。</summary>
     private static float CalcPawnJobLineHeight(float width, string text)
     {
         bool prevWordWrap = Text.WordWrap;
-        Text.WordWrap = true;
+        Text.WordWrap = false;
         try
         {
             using (new FontSizeScope(pawnJobFontSize))
             {
                 return Text.CalcHeight(text, Mathf.Max(1f, width));
+            }
+        }
+        finally
+        {
+            Text.WordWrap = prevWordWrap;
+        }
+    }
+
+    /// <summary>截断过长的行动文本（单行显示，超出宽度时以 "..." 结尾），仅在排版缓存刷新时调用。</summary>
+    private static string TruncatePawnJobLine(float width, string text)
+    {
+        if (text.NullOrEmpty())
+        {
+            return "";
+        }
+        bool prevWordWrap = Text.WordWrap;
+        Text.WordWrap = false;
+        try
+        {
+            using (new FontSizeScope(pawnJobFontSize))
+            {
+                return text.Truncate(Mathf.Max(1f, width));
             }
         }
         finally
@@ -1217,7 +1248,7 @@ public static partial class InspectPanePatch
     private static float CalcPawnJobLineStep(float width, string first, string second, float secondHeight)
     {
         bool prevWordWrap = Text.WordWrap;
-        Text.WordWrap = true;
+        Text.WordWrap = false;
         try
         {
             using (new FontSizeScope(pawnJobFontSize))
@@ -1240,13 +1271,17 @@ public static partial class InspectPanePatch
         if (hasCurrent)
         {
             DrawPawnJobLine(area, y, layout.currentLine, layout.currentHeight);
-            if (!hasNext)
+            if (!hasNext && !layout.reserveNext)
             {
                 return y + layout.currentHeight;
             }
-            // 第二行按真实行距（而非单行高度）下移，再叠加用户配置的额外行间距。
+            // 第二行按真实行距（而非单行高度）下移，再叠加用户配置的额外行间距；
+            // 没有实际下一行动时为它预留的高度也保留出来，保证出现/消失时面板不跳动。
             float secondTop = y + layout.lineStep + pawnJobLineGap;
-            DrawPawnJobLine(area, secondTop, layout.nextLine, layout.nextHeight);
+            if (hasNext)
+            {
+                DrawPawnJobLine(area, secondTop, layout.nextLine, layout.nextHeight);
+            }
             return secondTop + layout.nextHeight;
         }
         if (hasNext)
@@ -1257,19 +1292,29 @@ public static partial class InspectPanePatch
         return y;
     }
 
-    /// <summary>绘制一行行动文本（按动作区域字号、自动换行），高度已由排版缓存提供。</summary>
+    /// <summary>绘制一行行动文本（单行、不换行；文本已按宽度截断），高度由排版缓存提供。</summary>
     private static void DrawPawnJobLine(Rect rect, float y, string text, float height)
     {
         bool prevWordWrap = Text.WordWrap;
         TextAnchor prevAnchor = Text.Anchor;
-        Text.WordWrap = true;
+        Text.WordWrap = false;
         Text.Anchor = TextAnchor.UpperLeft;
         GUI.color = Color.white;
         try
         {
             using (new FontSizeScope(pawnJobFontSize))
             {
-                Widgets.Label(new Rect(rect.x, y, rect.width, height), text);
+                // WordWrap=false 时 GUIStyle 的裁剪模式为 Overflow，用 BeginGroup 建立裁剪区，
+                // 保证截断后的文本不会溢出面板（测量与截断之间的微小差异也被裁掉）。
+                Widgets.BeginGroup(new Rect(rect.x, y, rect.width, height));
+                try
+                {
+                    Widgets.Label(new Rect(0f, 0f, rect.width, height), text);
+                }
+                finally
+                {
+                    Widgets.EndGroup();
+                }
             }
         }
         finally

@@ -662,6 +662,16 @@ public partial class MyModTemplateSettings : ModSettings
                     "BetterInspectPane.PawnJobShowNext".Translate(), ref pawnJobShowNext);
                 y += RowGap;
 
+                if (pawnJobShowNext)
+                {
+                    // 总是为下一个行动预留高度：没有下一行动时也留空一行，避免出现/消失时面板跳动。
+                    Rect reserveNextRect = new Rect(x + indent, y, width - indent, RowHeight);
+                    Widgets.CheckboxLabeled(reserveNextRect, "BetterInspectPane.PawnJobReserveNextHeight".Translate(),
+                        ref pawnJobReserveNextHeight);
+                    TooltipHandler.TipRegion(reserveNextRect, "BetterInspectPane.PawnJobReserveNextHeightTip".Translate());
+                    y += RowGap;
+                }
+
                 // 位置：观察文本上方（默认）或下方（面板最底部）。
                 Widgets.CheckboxLabeled(new Rect(x + indent, y, width - indent, RowHeight),
                     "BetterInspectPane.PawnJobAreaBelow".Translate(), ref pawnJobAreaBelowInspectText);

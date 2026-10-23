@@ -316,6 +316,8 @@ public partial class MyModTemplateSettings : ModSettings
     public static bool enablePawnJobArea = true;
     // 是否显示「下一个行动」（关闭则只显示当前行动）。
     public static bool pawnJobShowNext = true;
+    // 总是为下一个行动预留高度：即使当前没有下一个行动，也保留一行高度，避免出现/消失时面板跳动。
+    public static bool pawnJobReserveNextHeight = true;
     // 行动区域位置：false = 观察文本上方，true = 观察文本下方（面板最底部，默认）。
     public static bool pawnJobAreaBelowInspectText = true;
     // 行动区域字号（像素）与行间距（像素）：默认值与原版检查文本一致（14px、行间无额外间距）。
@@ -1105,6 +1107,7 @@ public partial class MyModTemplateSettings : ModSettings
         // Pawn 当前行动 / 下一个行动区域。
         Scribe_Values.Look(ref enablePawnJobArea, "enablePawnJobArea", true);
         Scribe_Values.Look(ref pawnJobShowNext, "pawnJobShowNext", true);
+        Scribe_Values.Look(ref pawnJobReserveNextHeight, "pawnJobReserveNextHeight", true);
         // 使用新键（旧键曾以 false 为默认值），确保升级后默认位于观察文本下方。
         Scribe_Values.Look(ref pawnJobAreaBelowInspectText, "pawnJobBelowInspectText", true);
         Scribe_Values.Look(ref pawnJobFontSize, "pawnJobFontSize", 14);
